@@ -10,7 +10,8 @@
    ======================================================================= *)
 TYPE ST_fbMachineHomingCycle_BucketCommit :
 STRUCT
-    CommitOpen  : BOOL;   (* Publier "benne ouverte" (impulsion 1 scan) *)
-    CommitClose : BOOL;   (* Publier "benne fermee" (impulsion 1 scan) *)
+    CommitOpen       : BOOL;   (* Publier "benne ouverte" (impulsion 1 scan) *)
+    CommitClose      : BOOL;   (* Publier "benne fermee" (impulsion 1 scan) *)
+    CommitInvalidate : BOOL;   (* Revoquer reference benne (abandon avant calibration altimetrie) *)
 END_STRUCT
 END_TYPE

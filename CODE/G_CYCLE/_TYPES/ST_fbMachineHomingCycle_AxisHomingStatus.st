@@ -7,9 +7,10 @@
    ======================================================================= *)
 TYPE ST_fbMachineHomingCycle_AxisHomingStatus :
 STRUCT
-    HomedAndReliable : BOOL;   (* Codeur reference ET mesure jugee fiable (gate strict) *)
-    HomingBusy       : BOOL;   (* Sequence de homing en cours sur l'axe *)
-    HomingDone       : BOOL;   (* Homing termine avec succes (HomingLifecycle.Done cote FB_Encoder) *)
-    HomingError      : BOOL;   (* Homing en erreur sur l'axe (HomingFault.Error) *)
+    HomedAndReliable  : BOOL;   (* Codeur reference ET mesure jugee fiable (gate strict) *)
+    HomingBusy        : BOOL;   (* Sequence de homing en cours sur l'axe *)
+    HomingDone        : BOOL;   (* Homing termine avec succes (HomingLifecycle.Done cote FB_Encoder) *)
+    HomingError       : BOOL;   (* Homing en erreur sur l'axe (HomingFault.Error) *)
+    HomingProvisional : BOOL;   (* TRUE si le datum persistant RETAIN est provisoire (HX1 0m) *)
 END_STRUCT
 END_TYPE

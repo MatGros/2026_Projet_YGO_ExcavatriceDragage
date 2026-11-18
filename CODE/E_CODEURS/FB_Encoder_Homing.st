@@ -17,6 +17,8 @@ VAR_INPUT
     Home                   : BOOL;        // --> [CMD] Demande de referencement (front)
     HomingPermit           : BOOL;        // --> [CMD] Autorisation de homer (calculee par le caller)
     BtnConfirmCoherence    : BOOL;        // --> [CMD] Levee de doute d'incoherence au boot (front)
+    InvalidateDatum        : BOOL := FALSE; // --> [CMD] Invalidation explicite du datum (abandon avant calibration finale)
+    ProvisionalHoming      : BOOL := FALSE; // --> [CMD] TRUE = preset provisoire (ex. 0m HX1), FALSE = definitif
 
     // === CIBLES & CONFIGURATION HOMING ===
     CfgHomingTargetM       : REAL;        // --> [CFG] Cible libre homing unitaire (m)
@@ -57,6 +59,7 @@ VAR_OUTPUT
     // === RESULTATS & MEMOIRE CALIBRATION ===
     Homed                  : BOOL;        // <-- [STAT] Codeur pagine et referencie
     HomingSuspect          : BOOL;        // <-- [DIAG] Incoherence redemarrage a lever
+    HomingProvisional      : BOOL;        // <-- [STAT] TRUE si datum provisoire RETAIN actif (HX1 0m)
     HomingRefRaw           : UDINT;       // <-- [DIAG] Offset de reference brut calcule
     PresetConfirmationFailed : BOOL;      // <-- [DIAG] Latch derniere verification preset echouee
 END_VAR
@@ -80,6 +83,7 @@ VAR
     DynamicHomingTrigger   : BOOL;        // . [LOC] Condition de declenchement homing dynamique
     HomingTrigger          : BOOL;        // . [LOC] Synthese declenchement homing
     PresetVerificationActive : BOOL;      // . [LOC] Verification preset en attente
+    PendingProvisional     : BOOL;        // . [LOC] Capture mode provisoire pendant verification preset
     PresetConfirmed        : BOOL;        // . [LOC] Resultat du mode de confirmation selectionne
 
     // === DRAPEAUX DEFAUTS INTERNES ===
@@ -168,6 +172,7 @@ IF NOT Enable THEN
     PresetVerifyTimer(IN := FALSE, PT := CST_PresetVerifyTime);
     Homed := Calib.Homed;
     HomingSuspect := Calib.HomingSuspect;
+    HomingProvisional := Calib.HomingProvisional;
     HomingRefRaw := Calib.HomingRefRaw;
     // PresetConfirmationFailed est un diagnostic latch : il est gelé hors Enable
     RETURN;
@@ -175,6 +180,16 @@ END_IF;
 
 Ready := Enable AND NOT Fault.Latched;
 {endregion}
+
+IF InvalidateDatum THEN
+    Calib.Homed              := FALSE;
+    Calib.HomingSuspect      := FALSE;
+    Calib.HomingProvisional  := FALSE;
+    PendingProvisional       := FALSE;
+    Lifecycle.Done           := FALSE;
+    PresetVerificationActive := FALSE;
+    PresetVerifyTimer(IN := FALSE, PT := CST_PresetVerifyTime);
+END_IF;
 
 {region "§3 Cohérence au redémarrage"}
 // 🔍 3. COHÉRENCE AU REDÉMARRAGE — une fois par session Enable, dès que le codeur répond
@@ -231,6 +246,7 @@ IF HomingTrigger THEN
         PresetValue := RawPos;
         PresetRequest := TRUE;
         PresetVerificationActive := TRUE;
+        PendingProvisional := ProvisionalHoming;
         Lifecycle.Done := FALSE;
     END_IF;
 END_IF;
@@ -264,17 +280,20 @@ IF PresetVerificationActive AND PresetVerifyTimer.Q THEN
         Calib.HomingRefRaw := PendingHomingRefRaw;
         Calib.Homed := TRUE;
         Calib.HomingSuspect := FALSE;
+        Calib.HomingProvisional := PendingProvisional;
         Calib.LastKnownRawPos := RawPos;
         PresetConfirmationFailed := FALSE;
         PresetFailError := FALSE;
         Lifecycle.Done := TRUE;
     ELSE
         Calib.HomingSuspect := TRUE;
+        Calib.HomingProvisional := FALSE;
         PresetConfirmationFailed := TRUE;
         PresetFailError := TRUE;
         Lifecycle.Done := FALSE;
     END_IF;
 
+    PendingProvisional := FALSE;
     PresetVerificationActive := FALSE;
     PresetVerifyTimer(IN := FALSE, PT := CST_PresetVerifyTime);
 END_IF;
@@ -289,5 +308,6 @@ END_IF;
 Lifecycle.Busy := PresetVerificationActive;
 Homed := Calib.Homed AND NOT Calib.HomingSuspect;
 HomingSuspect := Calib.HomingSuspect;
+HomingProvisional := Calib.HomingProvisional;
 HomingRefRaw := Calib.HomingRefRaw;
 {endregion}

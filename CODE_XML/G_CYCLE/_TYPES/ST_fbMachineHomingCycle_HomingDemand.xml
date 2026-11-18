@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.306832" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.306832">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T03:00:51.526985" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T03:00:51.526985">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -48,6 +48,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Cible geometrique benne (m) : CfgTopHomingTargetM + offset</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Provisional">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE =&gt; marque Calib.HomingProvisional RETAIN (zero provisoire HX1)</xhtml>
               </documentation>
             </variable>
           </struct>

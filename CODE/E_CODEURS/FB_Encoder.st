@@ -31,6 +31,8 @@ VAR_INPUT
     CfgTopSensorPosM      : REAL;        // --> [CFG] Cible homing nominal capteur haut (m)
     UseDynamicTarget      : BOOL;        // --> [CMD] Active cible dynamique
     DynamicHomingTargetM  : REAL;       // --> [CFG] Cible dynamique de referencement (m)
+    InvalidateDatum       : BOOL := FALSE; // --> [CMD] Invalidation explicite du datum (abandon homing avant altimetrie)
+    ProvisionalHoming     : BOOL := FALSE; // --> [CMD] TRUE = zero provisoire HX1 (survive coupure secteur RETAIN)
 
     // === CAPTEURS PHYSIQUES ===
     TopPositionSensor     : BOOL;        // --> [HW]  Capteur physique position haute unique
@@ -62,6 +64,7 @@ VAR_OUTPUT
     // === ETATS CODEUR ===
     Homed                 : BOOL;        // <-- [STAT] Codeur reference (sortie homing)
     HomingSuspect         : BOOL;        // <-- [DIAG] Incoherence redemarrage a lever
+    HomingProvisional     : BOOL;        // <-- [STAT] TRUE si datum provisoire RETAIN actif (HX1 0m)
     EncoderFault          : BOOL;        // <-- [SAFE] Gate general fiabilite (sans Homed)
     HomedAndReliable      : BOOL;        // <-- [STAT] Gate strict M3 : dispo ET ref ET pas incoherent
     PresetConfirmationFailed : BOOL;     // <-- [DIAG] Latch derniere verification preset echouee
@@ -100,6 +103,7 @@ IF NOT Enable THEN
     // un FB desactive ne doit pas faire perdre la reference aux consommateurs aval (PRG_04, FB_Encoder_Scale).
     Homed := Calib.Homed;
     HomingSuspect := Calib.HomingSuspect;
+    HomingProvisional := Calib.HomingProvisional;
     Measurement.HomingRefRaw := Calib.HomingRefRaw;
     // PresetConfirmationFailed est un diagnostic latch : il reste gele hors Enable
     // et ne doit pas etre efface par ce gate (AC3).
@@ -134,6 +138,8 @@ instHoming(
     Home                 := HomingAtTargetM,
     HomingPermit         := HomingPermit,
     BtnConfirmCoherence  := ConfirmCoherence,
+    InvalidateDatum      := InvalidateDatum,
+    ProvisionalHoming    := ProvisionalHoming,
     UseDynamicTarget     := UseDynamicTarget,
     DynamicHomingTargetM := DynamicHomingTargetM,
     CfgHomingTargetM     := CfgHomingTargetM,
@@ -212,6 +218,7 @@ HwOut.PresetValueOut    := instAbs.PresetValueOut;
 // Etats codeur
 Homed            := instHoming.Homed;
 HomingSuspect    := instHoming.HomingSuspect;
+HomingProvisional := instHoming.HomingProvisional;
 EncoderFault     := instRel.EncoderFault;
 HomedAndReliable := instRel.HomedAndReliable;
 PresetConfirmationFailed := instHoming.PresetConfirmationFailed;

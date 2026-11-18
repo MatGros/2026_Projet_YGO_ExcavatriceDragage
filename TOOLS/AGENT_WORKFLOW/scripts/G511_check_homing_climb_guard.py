@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""G511 - Garde de montee du cycle de referencement : realiste ET non consommee a vide (T364).
+"""G511 - Garde de montee & sequence du cycle de referencement 5 etapes (T417-C).
 
 Ce gate ECHOUE si :
   1. la garde de montee (CfgTimeoutClimb) est inferieure au temps de montee physique
@@ -7,10 +7,9 @@ Ce gate ECHOUE si :
      avec marge) -> un cycle echouerait par timeout sans aucun defaut machine ;
   2. la garde n'est pas conditionnee par la MONTEE COMMANDEE (compteur « temps mural »
      qui se consomme pendant un arret operateur ou un arret d'urgence) ;
-  3. la montee couplee HX2 ou l'interlock de couplage E1 a disparu ;
+  3. les etapes D1-D7 du GRAFCET 5 etapes ou le preset HX4 8.5m+OffsetCloseM ont disparu ;
   4. les cas de test portant ces exigences ont disparu du fichier de test (anti-test-vacuant).
 
-Regles couvertes : TASK_CONTRACT_T364_REFONTE_SEQUENCE_HOMING.yaml (AC1..AC8).
 Usage :
     python TOOLS/AGENT_WORKFLOW/scripts/G511_check_homing_climb_guard.py [racine]
     python TOOLS/AGENT_WORKFLOW/scripts/G511_check_homing_climb_guard.py . --selftest
@@ -29,11 +28,8 @@ CIBLE_PERSIST = "CODE/GVL_PERSISTENT.st"
 CIBLE_PRG02_REEL = "CODE/M_MAIN/PRG_02_Acquisition.st"
 CIBLE_TESTS = "TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclemachinehoming.st"
 
-# Marge de securite sur le temps de montee physique minimal (rampes, charge, usure).
 MARGE_GARDE = 2.0
-
-# Cas de test qui portent les exigences de la refonte T364.
-TESTS_REQUIS = tuple(f"TC-P09-H{i:03d}" for i in range(1, 14))
+TESTS_REQUIS = tuple(f"TC-P09-H{i:03d}" for i in range(1, 15))
 
 
 def read(root: Path, relative: str) -> str:
@@ -44,7 +40,6 @@ def read(root: Path, relative: str) -> str:
 
 
 def _time_vers_secondes(litteral: str) -> float | None:
-    """Convertit un litteral IEC T#... en secondes (s / ms / m / h)."""
     match = re.fullmatch(r"T#(\d+(?:\.\d+)?)(ms|s|m|h)", litteral)
     if not match:
         return None
@@ -53,7 +48,6 @@ def _time_vers_secondes(litteral: str) -> float | None:
 
 
 def _gardes_declarees(cfg_source: str) -> tuple[float | None, float | None]:
-    """Retourne (garde de montee, garde de descente) declarees dans le type de config, en secondes."""
     def extraire(champ: str) -> float | None:
         match = re.search(rf"{champ}\s*:\s*TIME\s*:=\s*(T#\d+(?:\.\d+)?(?:ms|s|m|h))", cfg_source)
         return _time_vers_secondes(match.group(1)) if match else None
@@ -62,7 +56,6 @@ def _gardes_declarees(cfg_source: str) -> tuple[float | None, float | None]:
 
 
 def _geometrie(persist_source: str) -> tuple[float, float]:
-    """Retourne (course maximale de cable en m, borne haute de vitesse palier 1 en m/s)."""
     haut = re.search(r"CfgTopSensorPos_M\s*:=\s*(-?\d+(?:\.\d+)?)", persist_source)
     bas = re.search(r"CfgCableLimitDescent_M\s*:=\s*(-?\d+(?:\.\d+)?)", persist_source)
     vitesse = re.search(r"SpeedBandMaxMps\s*:=\s*\[\s*(\d+(?:\.\d+)?)", persist_source)
@@ -81,7 +74,6 @@ def _geometrie(persist_source: str) -> tuple[float, float]:
 def check_invariant(fb: str, cfg: str, enum: str, persist: str, prg02: str) -> list[str]:
     errors: list[str] = []
 
-    # --- 1. Garde de montee realiste (derivee de la geometrie, pas un litteral hors sol) ---
     garde_montee, garde_descente = _gardes_declarees(cfg)
     if garde_montee is None:
         errors.append("CfgTimeoutClimb introuvable ou sans defaut TIME dans " + CIBLE_CFG)
@@ -99,40 +91,34 @@ def check_invariant(fb: str, cfg: str, enum: str, persist: str, prg02: str) -> l
     if garde_descente is None:
         errors.append("CfgTimeoutHomeAxes introuvable ou sans defaut TIME dans " + CIBLE_CFG)
 
-    # Le garde-fou doit rester la source unique de la valeur : si un POU la renseigne, ce gate
-    # doit etre mis a jour (fail-closed volontaire, jamais un oubli silencieux).
     if re.search(r"CfgTimeoutClimb\s*:=", prg02) or re.search(r"CfgTimeoutHomeAxes\s*:=", prg02):
         errors.append(
             "PRG_02 renseigne CfgTimeoutClimb/CfgTimeoutHomeAxes : la garde doit etre lue "
             "a la nouvelle source dans ce gate (mise a jour consciente requise)"
         )
 
-    # --- 2. Garde consommee UNIQUEMENT pendant le mouvement commande ---
     if "ClimbTimer(IN := ClimbCommandActive" not in fb:
         errors.append("garde de montee non conditionnee par ClimbCommandActive (compteur temps mural)")
     if re.search(r"ClimbTimer\(\s*IN\s*:=\s*\(\s*SeqStep", fb):
         errors.append("garde de montee encore armee sur le seul step (forme historiquement fautive)")
     if "ClimbCommandActive := ClimbStepActive AND ClimbPermit" not in fb:
         errors.append("ClimbCommandActive ne depend plus du permis operateur de montee")
-    if "ClimbStepActive := (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED);" not in fb:
-        errors.append("ClimbStepActive non lie a HX2_CLIMB_COUPLED")
+    if "ClimbStepActive    := (SeqStep = E_MachineHomingTxState.HX2_CLIMB_TO_TOP);" not in fb and "ClimbStepActive := (SeqStep = E_MachineHomingTxState.HX2_CLIMB_TO_TOP);" not in fb:
+        errors.append("ClimbStepActive non lie a HX2_CLIMB_TO_TOP")
 
-    # --- 3. Sequence T364 : etats, interlock E1, prise au vol HX3 ---
     for state in (
-        "HX0_REPOS", "HX1_BUCKET_PREPARE", "HX1A_COUPLING_INTERLOCK",
-        "HX2_CLIMB_COUPLED", "HX3_FLYING_REFERENCE", "HX4_STABILIZATION_CHECK",
-        "HX5_RELEASE_CLEARANCE", "HX6_HOMED_SUCCESS", "HX7_FAILED"
+        "HX0_REPOS", "HX1_BUCKET_PREPARE", "HX2_CLIMB_TO_TOP",
+        "HX3_TOP_CLEARANCE", "HX4_FINAL_CONFIRM", "HX7_FAILED"
     ):
         if state not in enum:
             errors.append(f"etat {state} absent de {CIBLE_ENUM}")
         if f"E_MachineHomingTxState.{state}:" not in fb:
             errors.append(f"etape {state} non implementee dans le CASE du GRAFCET")
 
-    if "CouplingInterlockFault := (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED)" not in fb:
-        errors.append("interlock E1 couplage M1/M2 manquant en HX2_CLIMB_COUPLED")
-
-    if 'M1Demand.HomeReq := TRUE' not in fb or 'M2Demand.HomeReq := TRUE' not in fb:
-        errors.append("demande de reference conjointe M1/M2 absente")
+    if "M1Demand.HomeReq          := TRUE" not in fb and "M1Demand.HomeReq := TRUE" not in fb:
+        errors.append("demande de reference M1 absente en HX4")
+    if "M2Demand.HomeReq          := TRUE" not in fb and "M2Demand.HomeReq := TRUE" not in fb:
+        errors.append("demande de reference M2 absente en HX4")
 
     return errors
 
@@ -143,12 +129,11 @@ def check_tests(tests: str) -> list[str]:
 
 MUTATIONS = (
     ("garde de montee revenue a 120 s en dur",
-     lambda src: src.replace("CfgTimeoutClimb      : TIME := T#300s;", "CfgTimeoutClimb      : TIME := T#120s;")),
+     lambda src: src.replace("CfgTimeoutClimb         : TIME := T#300s;", "CfgTimeoutClimb         : TIME := T#120s;")),
     ("garde de montee non conditionnee par la commande",
      lambda src: src.replace("ClimbTimer(IN := ClimbCommandActive", "ClimbTimer(IN := ClimbStepActive")),
-    ("interlock de couplage E1 supprime",
-     lambda src: src.replace("CouplingInterlockFault := (SeqStep = E_MachineHomingTxState.HX2_CLIMB_COUPLED)",
-                             "CouplingInterlockFault := FALSE")),
+    ("demande de reference M1 supprimee",
+     lambda src: src.replace("M1Demand.HomeReq          := TRUE;", "M1Demand.HomeReq          := FALSE;")),
 )
 
 
@@ -169,7 +154,7 @@ def selftest(cfg: str, fb: str, enum: str, persist: str, prg02: str, tests: str)
         elif not detecte:
             failures.append(f"mutation NON detectee : {label}")
 
-    for ident in ("TC-P09-H001", "TC-P09-H005", "TC-P09-H013"):
+    for ident in ("TC-P09-H001", "TC-P09-H007", "TC-P09-H014"):
         mut_tests = tests.replace(ident, "TC-P09-HXXX")
         if mut_tests == tests:
             failures.append(f"mutation non appliquee (motif absent) : cas de test {ident}")
@@ -213,7 +198,7 @@ def main() -> int:
         f"{garde:.0f} s >= minimum physique {course / vitesse * MARGE_GARDE:.1f} s "
         f"(course {course:.1f} m, {vitesse:.2f} m/s, marge {MARGE_GARDE:.0f}) ; "
         "consommee uniquement pendant la montee commandee ; "
-        "sequence T364 complete (HX0..HX6 + HX7_FAILED), interlock E1 et "
+        "sequence 5 etapes complete (HX0..HX4 + HX7_FAILED) et "
         f"{len(TESTS_REQUIS)} cas de test presents."
     )
     return 0

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-10-31T16:29:48.678834" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-10-31T16:29:48.678834">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T03:24:27.970003" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T03:24:27.970003">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1499,6 +1499,83 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Consigne opérateur en clair produite par FB_CycleMachineHoming</xhtml>
               </documentation>
             </variable>
+            <variable name="MachineHomingFailed">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Echec ou abandon cycle homing machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="MachineHomingProvisional">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Zero provisoire 0m HX1 actif (machine non encore calibree)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM1Error">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Defaut commande/barriere treuil M1 (FB_Winch/Interlock)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="WinchM2Error">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Defaut commande/barriere treuil M2 (FB_Winch/Interlock)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM1Fault">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Defaut codeur M1</xhtml>
+              </documentation>
+            </variable>
+            <variable name="EncoderM2Fault">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Defaut codeur M2</xhtml>
+              </documentation>
+            </variable>
+            <variable name="JoystickLatchedFault">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Defaut joystick latche</xhtml>
+              </documentation>
+            </variable>
             <variable name="BypassGlobalActive">
               <type>
                 <BOOL />
@@ -2829,6 +2906,8 @@ IF ModeChangePendingBlocked AND ModeChangeBlockReason &lt;&gt; '' THEN
     SpecialConditionCandidate := ModeChangeBlockReason;
 ELSIF CycleChecksInhibited THEN
     SpecialConditionCandidate := 'ESSAI CYCLE : CONTROLES INHIBES';
+ELSIF MachineHomingProvisional THEN
+    SpecialConditionCandidate := 'ATTENTION: Ref 0m PROVISOIRE - Non calibre';
 ELSIF AnyBypassActive THEN
     SpecialConditionCandidate := 'ATTENTION: Bypass actif';
 ELSIF SyncDegradedActive THEN
@@ -3584,6 +3663,26 @@ IF ((CycleErrorId AND 16#0200) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxA
 END_IF;
 IF ((CycleErrorId AND 16#0800) &lt;&gt; 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[CYCLE] ErrorID:12 - consigne profondeur invalide'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// 5h-bis. Collecte — defauts homing / commande treuils / codeurs / joystick / AU global
+IF MachineHomingFailed AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HOMING] Echec ou abandon referencement machine - Reset'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Error AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M1] Defaut commande ou barriere finale treuil'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Error AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[M2] Defaut commande ou barriere finale treuil'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF EncoderM1Fault AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CODEUR] Defaut codeur treuil M1'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF EncoderM2Fault AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[CODEUR] Defaut codeur treuil M2'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF JoystickLatchedFault AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[JOYSTICK] Defaut joystick latche - Reset'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5i. Collecte [HISTO] — défauts latched passés (LatchedId AND NOT ErrorId)

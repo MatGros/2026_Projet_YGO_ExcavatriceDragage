@@ -487,6 +487,14 @@ TRUE des qu'un referencement a reussi</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si incoherence detectee au redemarrage</xhtml>
               </documentation>
             </variable>
+            <variable name="HomingProvisional">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si zero provisoire 0m HX1 (avant HX4 8.5m)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

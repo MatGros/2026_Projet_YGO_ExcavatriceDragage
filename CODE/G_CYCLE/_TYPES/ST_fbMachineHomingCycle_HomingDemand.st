@@ -12,5 +12,6 @@ STRUCT
     HomeReq          : BOOL;   (* Demande de prise d'origine pour cet axe (vocab reserve Homing) *)
     UseDynamicTarget : BOOL;   (* TRUE => cible = DynamicTarget_M (M2 uniquement) *)
     DynamicTarget_M  : REAL;   (* Cible geometrique benne (m) : CfgTopHomingTargetM + offset *)
+    Provisional      : BOOL;   (* TRUE => marque Calib.HomingProvisional RETAIN (zero provisoire HX1) *)
 END_STRUCT
 END_TYPE

@@ -666,6 +666,46 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Override selecteur treuil cycle homing (-1=neutre, 0=couple, 2=benne)</xhtml>
               </documentation>
             </variable>
+            <variable name="AllowAscent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation montee par etape GRAFCET homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AllowDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation descente par etape GRAFCET homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SoftLimitsOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition limites soft position (HX1..HX3 uniquement, hors capteur TOP)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketRefInvalidate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Revoque reference benne sur abandon cycle avant HX4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProvisionalActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE tant que le zero 0m HX1 est provisoire avant HX4 8.5m</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

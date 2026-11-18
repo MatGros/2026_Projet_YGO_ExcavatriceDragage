@@ -1,0 +1,145 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# CONTRAT DE TACHE C4 — Refonte GRAFCET Homing Machine & Socle Sécurité
+# ═══════════════════════════════════════════════════════════════════════════
+contract:
+  task_id: T417-C-HOMING
+  criticality: C4
+  strategy: patch
+
+  objective: >
+    Implémenter le nouveau GRAFCET de référencement machine en 5 étapes (D1–D7),
+    exécutable en MAINT_N1 (maintien 5 s JoyBtnRaw au neutre) et MAINT_N2 (BtnStart),
+    avec verrou M3, Meca D actif en N2, et validation complète via CI STruCpp et gates.
+
+  acceptance:
+    - id: AC1
+      statement: "Step 0 (HX0_REPOS) bloque les mouvements libres M1/M2 en MAINT_N1 et verrouille M3 en MAINT_N1/SEMI_AUTO (échappatoire N2 préservée), et refuse tout lancement si MachineHomed = TRUE ; démarrage par 5 s JoyBtnRaw au neutre strict + anti-collage en MAINT_N1 ou BtnStart en MAINT_N2."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_CycleMachineHoming"
+    - id: AC2
+      statement: "Step 1 (HX1_BUCKET_PREPARE) autorise l'ouverture et la fermeture M2 seul (palier 1) sans aucune butée logicielle (ManualBucketLimitsActive/CableLimitDescent neutralisés), coupe après 20 s de commande continue (décompte visible dans MachineHomingInstruction) jusqu'au retour neutre + relâchement homme-mort, et valide via BtnValidate au neutre."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_CycleMachineHoming && python TOOLS/AGENT_WORKFLOW/scripts/G503_check_manual_bucket_limits_scope.py"
+    - id: AC3
+      statement: "Step 2 (HX2_CLIMB_TO_TOP) autorise la montée lente couplée M1+M2 et la détente câble bornée à 2 s max par geste ; tout contact TopPositionSensor coupe immédiatement la montée sans écrire 8.5 m et bascule vers Step 3 (HX3_TOP_CLEARANCE)."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_CycleMachineHoming && python TOOLS/AGENT_WORKFLOW/scripts/G511_check_homing_climb_guard.py ."
+    - id: AC4
+      statement: "Step 3 (HX3_TOP_CLEARANCE) interdit toute montée, exige une descente continue temporisée (~4 s après relâchement TopPositionSensor, sans dépendance codeurs et sans déclenchement Meca D sur descente intentionnelle), puis retourne en Step 1."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_CycleMachineHoming && python TOOLS/AGENT_WORKFLOW/scripts/G497_check_mecad_bucket_guard.py"
+    - id: AC5
+      statement: "Step 4 (HX4_FINAL_CONFIRM) valide visuellement avant TOP (TopPositionSensor=FALSE) sur BtnValidate avec avertissement, écrit la cote 8.5 m et la référence benne -> MachineHomed := TRUE ; les défauts homing/safety alimentent AnyFaultActive et les labels bandeau."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_CycleMachineHoming && python TOOLS/AGENT_WORKFLOW/scripts/G506_check_anyfault_banner_labels.py ."
+    - id: AC6
+      statement: "Meca D (PowerCutOff) reste actif en MAINT_N2 sans faux déclenchement Meca B au desserrage frein par gravité ; M3 est autorisé en toute position au homing (y compris entre capteurs) et blocages T248/M3AtTremie/WinchDescentAuth_M3 sont levés pendant MachineHoming.Active."
+      verified_by: "python TOOLS/TEST_AUTO_CI/scripts/run_tests.py --all --fast && python TOOLS/AGENT_WORKFLOW/scripts/G480_check_harness_mirrors_prg04.py"
+    - id: AC7
+      statement: "Cohérence structurelle CODE/M_MAIN : pour chaque programme modifié dans CODE/M_MAIN/, le nom de fichier est identique au nom de POU et le suffixe de langage est égal au langage bundle (.st -> ST)."
+      verified_by: "python TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py --report"
+
+  scope:
+    allowed:
+      - CODE/G_CYCLE/**
+      - CODE/H_TREUILS_BENNE/**
+      - CODE/E_CODEURS/**
+      - CODE/F_MODES/**
+      - CODE/M_MAIN/**
+      - CODE/J_SUPERVISION/**
+      - CODE/L_SIMULATION/**
+      - TOOLS/TEST_AUTO_CI/RESULTS/**
+      - TOOLS/AGENT_WORKFLOW/scripts/G506_check_anyfault_banner_labels.py
+      - TOOLS/AGENT_WORKFLOW/scripts/G511_check_homing_climb_guard.py
+      - DOC/WFLOW/MISE_EN_SERVICE/**
+      - DOC/WFLOW/TASKS/T417-C_CHALLENGE_SIMU_M3/**
+    forbidden:
+      - PRJ_CODESYS/PROJ_Full_ImportExport/Device.export
+      - DOC/STDS/NAMING_CONVENTION.md
+      - CODE/GVL_PERSISTENT.st
+
+  conservation:
+    must_survive:
+      - "Interface externe ST_MachineHoming et compatibilité descendante PRG_02 -> PRG_03/04/05/06/07"
+      - "Homing unitaire M1/M2 et confirmation manuelle benne N2 en fonctionnement normal"
+      - "Anti-déclenchement Meca D pendant manoeuvre benne (G497) et invariants T330 (G504)"
+      - "Tous les tests CI existants (hors tests réécrits du GRAFCET homing) et liaison bundle G200"
+    dropped_on_purpose:
+      - "Ancienne séquence T364 à 2 passes avec prise de référence au vol (HX1A, HX3_FLYING_REFERENCE, HX4_STABILIZATION_CHECK, HX5_RELEASE_CLEARANCE, HX6_HOMED_SUCCESS)"
+      - "Masquage automatique de Meca D (PowerCutOff) en MAINT_N2"
+
+  evidence_required:
+    - check_linkage
+    - run_all_gates
+    - bundle
+    - diff_bundle
+
+  models_allowed:
+    - "deepseek-v4.1-flash:cloud"
+    - "glm-5.3-flash:cloud"
+    - "platform/antigravity"
+
+  alert_duty: >
+    Tout écart constaté (liaison G200, gate rouge, collision simulation, effet de bord SEMI_AUTO)
+    est remonté et corrigé avant passage au jalon suivant.
+
+  companion_doc: "DOC/WFLOW/MISE_EN_SERVICE/PLAN_REFONTE_GRAFCET_HOMING_20261118_v1.0.md"
+
+execution_plan:
+  milestones:
+    - id: M0
+      title: "Contrat C4 validé et revue critique architecture par Ollama (DeepSeek V4.1 + GLM 5.3)"
+      done_when: "check_task_contract.py PASS + synthèses reviews enregistrées sous PREUVES"
+    - id: M1
+      title: "Phase 1 : Socle Sécurité, Meca D N2, butées soft, M3, AnyFaultActive, FB_Bucket/Encoder"
+      done_when: "Éditions Phase 1 compilent dans STruCpp, G200/G503/G506 PASS"
+    - id: M2
+      title: "Phase 2 : Nouveau GRAFCET 5 étapes FB_CycleMachineHoming + routage PRG_02..07 + FB_SimBench"
+      done_when: "G200 --report 0 erreur + G511 mis à jour PASS + bundle & diff bundle générés"
+    - id: M3
+      title: "Phase 3 : Réécriture tests CI STruCpp + revue finale Ollama + validation utilisateur"
+      done_when: "run_tests.py --all PASS + gates ciblés PASS + revues finales DeepSeek/GLM PASS"
+
+test_feedback:
+  - "FB_CycleMachineHoming: 14/14 PASS (TC-P09-H001..H014), FB_Modes: 15/15 PASS, PRG_02: 1/1 PASS, PRG_03: 5/5 PASS, PRG_04: 2/2 PASS, PRG_06: 3/3 PASS, PRG_07: 14/14 PASS"
+  - "G200 --report: PASS (0 erreur, 2205 instances), G511 PASS, G506 PASS (28 sources), G497 PASS, G504 PASS, G461 PASS, G487 PASS, G406/G407/G408 PASS"
+  - "Bundles generes: CODE_XML/CODE_Bundle.xml (264/264 objets) + CODE_XML/CODE_DiffBundle.xml (13 objets)"
+  - "Revues Ollama (8/20 budget): M0 (DeepSeek V4.1 + GLM 5.3) + M4 (DeepSeek V4.1 GRAFCET + Wiring, GLM 5.3 GRAFCET + Wiring)"
+
+status: IN_PROGRESS
+
+tracking:
+  user_need: "Refonte complète GRAFCET Homing 5 étapes conforme client, compilable, testée CI/agents, prête pour simulation CODESYS."
+  useful_history:
+    - "Décisions D1-D7 verrouillées dans PLAN_REFONTE_GRAFCET_HOMING_20261118_v1.0.md (commit 74ac94b7)"
+    - "Implémentation Phase 1-3 terminée + correctifs revues DeepSeek V4.1 & GLM 5.3 intégrés"
+  current_question: "Validation exploitant requise en simulation CODESYS avant commit final."
+  established:
+    - "Baseline Palier C exécuté : G200/G460/G480/G481/G497/G504/G506/G511 PASS ; G503 FAIL préexistant confirmé"
+    - "Suite CI STruCpp ciblée 100% PASS (54/54 tests sur 7 cibles) + bundle 264/264 + diff bundle 13 objets"
+  unknowns: []
+  next_action: "Importer CODE_XML/CODE_DiffBundle.xml (ou CODE_Bundle.xml) dans CODESYS et exécuter la checklist de test simulation (Step 0 -> Step 4)."
+  budget:
+    total: 20
+    used: 8
+    parallel_max: 4
+    log:
+      - "M0_REVUE_DEEPSEEK_V41.md"
+      - "M0_REVUE_GLM_53.md"
+      - "M4_REVUE_GRAFCET_DEEPSEEK_V41.md (x2)"
+      - "M4_REVUE_GRAFCET_GLM_53.md"
+      - "M4_REVUE_WIRING_DEEPSEEK_V41.md"
+      - "M4_REVUE_WIRING_GLM_53.md (x2)"
+  owners:
+    accountable: "AGY02"
+    executor: "AGY02"
+    control_maintainer: "AGY02"
+  delegation:
+    required_workflows:
+      - "TOOLS/AGENT_WORKFLOW/scripts/generate_codesys_bundle.py"
+      - "TOOLS/AGENT_WORKFLOW/scripts/G200_check_linkage.py"
+      - "TOOLS/TEST_AUTO_CI/scripts/run_tests.py"
+    permissions:
+      - "Edit CODE/** per scope.allowed"
+      - "Run Ollama subagents (deepseek-v4.1-flash:cloud, glm-5.3-flash:cloud) up to 4 concurrent"
+    forbidden_actions:
+      - "Touch Device.export or GVL_PERSISTENT.st"
+      - "Auto-push to origin/main without user approval"
+    measurable_deliverables:
+      - "CODE_XML/CODE_Bundle.xml + CODE_XML/CODE_DiffBundle.xml"
+      - "TOOLS/TEST_AUTO_CI/RESULTS/G_CYCLE/tests/test_fb_cyclemachinehoming.st PASS"

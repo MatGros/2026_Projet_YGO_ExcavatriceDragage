@@ -270,6 +270,9 @@ VAR
     // Usage effectif d'un override/bypass de position -> arme le re-homing obligatoire (PRG_03).
     PositionLimitOverriddenM1 : BOOL;
     PositionLimitOverriddenM2 : BOOL;
+    BrakeForceAllowedM1       : BOOL;
+    BrakeForceAllowedM2       : BOOL;
+    HomingFreeMoveBlockedN1   : BOOL;
 
     // 🕵️ Trace de blocage terrain (§8bis) — publiée via Data.TraceM1/M2, consommée FB_TroubleshootingView
     TraceM1               : ST_TraceWinch;        // . [LOC] Trace blocage treuil M1
@@ -314,7 +317,8 @@ ManualBucketJogActive := (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitr
 ArbBucketIHM.BtnOpen  := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnOpen;
 ArbBucketIHM.BtnClose := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnClose;
 
-ArbBucketContext.TglEnableCoupledBucketSequencing := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing;
+ArbBucketContext.TglEnableCoupledBucketSequencing := GVL_IHM.Commun.Cfg.TglEnableCoupledBucketSequencing
+                                                    AND NOT PRG_02_Acquisition.Data.MachineHoming.Active;
 ArbBucketContext.MotionActive   := WinchBothMotionActive;
 ArbBucketContext.ReqAscent      := WinchBothReqAscent;
 ArbBucketContext.ReqDescend     := WinchBothReqDescend;
@@ -323,7 +327,7 @@ ArbBucketContext.BucketIsClosed := _BucketState.IsClosed;
 ArbBucketContext.CoupledPhaseLocked := PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked;
 
 instArbBucket(
-    Enable    := TRUE,
+    Enable    := NOT PRG_02_Acquisition.Data.MachineHoming.Active,
     Auth      := PRG_03_Modes_Cycle.Data.Auth,
     ReqBucket := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket,
     IHM       := ArbBucketIHM,
@@ -377,6 +381,7 @@ instBucket(
     ConfirmClosePosition := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos,
     MachineHomingCommitOpen  := PRG_02_Acquisition.Data.MachineHoming.SetPosBucketOpen,
     MachineHomingCommitClose := PRG_02_Acquisition.Data.MachineHoming.SetPosBucketClose,
+    InvalidateRef            := PRG_02_Acquisition.Data.MachineHoming.BucketRefInvalidate,
     MachineHomed := PRG_02_Acquisition.Data.MachineHoming.Homed,
     MachineHomingActive := PRG_02_Acquisition.Data.MachineHoming.Active,
     Config              := _BucketCfgPersist.Config,
@@ -395,7 +400,9 @@ instBucket(
 // protégeant ainsi la mécanique même en pilotage unitaire ou si l'auto-séquencement est désactivé.
 // 📌 Note d'architecture (lag 1 scan) : M1/M2LogicRequestDirection est consommé ici avant son calcul arbitré
 // en §3 (lag d'un cycle automate nominal, toléré et homogène avec les arbitrages Translation/Modes).
-WinchBothMotionBlockedByBucket := WinchBothDiveBucketOpenArmed AND NOT instBucket.Lifecycle.Busy;
+WinchBothMotionBlockedByBucket := WinchBothDiveBucketOpenArmed
+                                 AND NOT instBucket.Lifecycle.Busy
+                                 AND NOT PRG_02_Acquisition.Data.MachineHoming.Active;
 BucketNotClosedAscentCapStep1 := NOT ManualBucketJogActive
     AND (M1LogicReqAscent OR M2LogicReqAscent)
     AND NOT instBucket.Lifecycle.Busy
@@ -574,6 +581,32 @@ M2LogicRequestStepTgt := instArbM2.StepTgt;
 IF PRG_03_Modes_Cycle.Data.Auth.WinchSelTransitionHold THEN
     M1LogicRunRequest := FALSE; M1LogicReqAscent := FALSE; M1LogicReqDescend := FALSE; M1LogicRequestStepTgt := 0;
     M2LogicRunRequest := FALSE; M2LogicReqAscent := FALSE; M2LogicReqDescend := FALSE; M2LogicRequestStepTgt := 0;
+END_IF;
+
+// D1/D3/D4/D6 : blocage mouvements libres MAINT_N1 en Step 0 (tant que NOT Homed) + gating directionnel homing
+HomingFreeMoveBlockedN1 := MaintN1
+                           AND NOT PRG_02_Acquisition.Data.MachineHoming.Homed
+                           AND NOT PRG_02_Acquisition.Data.MachineHoming.Active;
+IF HomingFreeMoveBlockedN1 THEN
+    M1LogicRunRequest := FALSE; M1LogicReqAscent := FALSE; M1LogicReqDescend := FALSE; M1LogicRequestStepTgt := 0;
+    M2LogicRunRequest := FALSE; M2LogicReqAscent := FALSE; M2LogicReqDescend := FALSE; M2LogicRequestStepTgt := 0;
+ELSIF PRG_02_Acquisition.Data.MachineHoming.Active THEN
+    IF PRG_02_Acquisition.Data.MachineHoming.CmdWinchSelect = 2 THEN
+        M1LogicRunRequest := FALSE; M1LogicReqAscent := FALSE; M1LogicReqDescend := FALSE; M1LogicRequestStepTgt := 0;
+        M2LogicReqAscent  := M2LogicReqAscent  AND PRG_02_Acquisition.Data.MachineHoming.AllowAscent;
+        M2LogicReqDescend := M2LogicReqDescend AND PRG_02_Acquisition.Data.MachineHoming.AllowDescend;
+        M2LogicRunRequest := M2LogicRunRequest AND (M2LogicReqAscent OR M2LogicReqDescend);
+    ELSIF PRG_02_Acquisition.Data.MachineHoming.CmdWinchSelect = 0 THEN
+        M1LogicReqAscent  := M1LogicReqAscent  AND PRG_02_Acquisition.Data.MachineHoming.AllowAscent;
+        M1LogicReqDescend := M1LogicReqDescend AND PRG_02_Acquisition.Data.MachineHoming.AllowDescend;
+        M1LogicRunRequest := M1LogicRunRequest AND (M1LogicReqAscent OR M1LogicReqDescend);
+        M2LogicReqAscent  := M2LogicReqAscent  AND PRG_02_Acquisition.Data.MachineHoming.AllowAscent;
+        M2LogicReqDescend := M2LogicReqDescend AND PRG_02_Acquisition.Data.MachineHoming.AllowDescend;
+        M2LogicRunRequest := M2LogicRunRequest AND (M2LogicReqAscent OR M2LogicReqDescend);
+    ELSE
+        M1LogicRunRequest := FALSE; M1LogicReqAscent := FALSE; M1LogicReqDescend := FALSE; M1LogicRequestStepTgt := 0;
+        M2LogicRunRequest := FALSE; M2LogicReqAscent := FALSE; M2LogicReqDescend := FALSE; M2LogicRequestStepTgt := 0;
+    END_IF;
 END_IF;
 // Diagnostic % (palier→%) pour IHM / simu — borne haute du palier arbitré.
 IF (M2LogicRequestStepTgt >= 1) AND (M2LogicRequestStepTgt <= 5) THEN
@@ -768,7 +801,11 @@ DescendPermitDiveBucketOpen := PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.Desc
 // instWinchM2 §6 plus bas).
 ManualBucketLimitsActive := GVL_IHM.M2TreuilBenne.Bucket.Cmd.TglManualBucketLimits
     AND (PRG_03_Modes_Cycle.Data.Auth.JoystickWinchSelectArbitrated = 2)
-    AND NOT PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked;
+    AND NOT PRG_03_Modes_Cycle.Data.Auth.CoupledBucketPhaseLocked
+    AND PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable
+    AND PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable
+    AND NOT (PRG_02_Acquisition.Data.MachineHoming.SoftLimitsOff
+             AND PRG_02_Acquisition.Data.MachineHoming.Active);
 
 ProcessPermitM1_Descend := NOT (KoboldBottomTouchLatched OR BypassKoboldBottomTouched) AND DescendPermitDiveBucketOpen;
 // Phase JOG du séquencement benne-auto couplé (CoupledBucketPhaseLocked ET Arbitrated=2) :
@@ -898,7 +935,9 @@ TopLimitM2_M := SEL(OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff,
 // a M1 courant (OffsetCloseM + marge) : c'est deja le vrai limiteur mecanique de la benne
 // (ManualBucketLimitsActive/anticipation, PRG_04 ~710-735). Le FdC haut MATERIEL
 // (TopPositionSensor, FB_Safety_Winch) reste une barriere INDEPENDANTE et non affectee.
-IF ManualBucketJogActive THEN
+IF ManualBucketJogActive
+   AND PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable
+   AND PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable THEN
     TopLimitM2_M := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM
                      + _BucketCfgPersist.Config.OffsetCloseM + 2.0;
 ELSIF WinchBothMotionActive AND NOT (OverrideTopSoftwareN1M2 OR BypassM2TopLimitSoftwareEff) THEN
@@ -925,16 +964,21 @@ PositionLimitOverriddenM2 := OverrideTopSoftwareN1M2 OR BypassM2TopLimitSwitchEf
 // FB_Safety_Winch M1/M2.
 // Instancié avant instWinchM1/M2 : MovementCommanded lit RelayFwd/RelayRev du scan précédent
 // (même lag 1 scan accepté que M4/Translation, jamais sur Reset/SafeStop/PowerCutOff/sortie finale).
+BrakeForceAllowedM1 := MaintN2
+    AND PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI
+    AND PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
+    AND (GVL_IHM.MaintenanceN2.Cmd.BtnBothBrakeRelease OR GVL_IHM.MaintenanceN2.Cmd.BtnM1BrakeRelease);
+BrakeForceAllowedM2 := MaintN2
+    AND PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI
+    AND PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
+    AND (GVL_IHM.MaintenanceN2.Cmd.BtnBothBrakeRelease OR GVL_IHM.MaintenanceN2.Cmd.BtnM2BrakeRelease);
+
 instSafetyWinchM1(
     Enable                 := (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.DISABLE) AND NOT PRG_03_Modes_Cycle.Data.Auth.InhibitM1,
     Reset                  := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     Mode                   := PRG_03_Modes_Cycle.Data.Auth.Mode,
     SyncEnable             := PRG_03_Modes_Cycle.Data.Auth.SyncEnable,
-    // Ecart critique croise M1/M2 (Meca E, FB_Safety_Winch:354) : gate canonique
-    // SyncOperationPermit (homing/benne -> OFF). N'affecte PAS le routage mou-de-cable
-    // (:508/:520) qui reste sur SyncEnable brut. Le mouvement couple par boutons-both
-    // (WinchBothMotionActive sans WinchSel=0) est un cas residuel -> voir T-tache.
     CrossCheckEnable       := SyncOperationPermit,
     JoystickOnline         := PRG_02_Acquisition.Data.Network.Joystick.Online,
     JoystickOperational    := PRG_02_Acquisition.Data.Network.Joystick.Operational,
@@ -949,6 +993,9 @@ instSafetyWinchM1(
     // FALSE = FdC haut atteint ou rupture de chaîne ; le FB bloque alors la montée.
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.Data.EncoderM1.Measurement.HomingLifecycle.Busy,
+    SoftLimitsBypassed     := PRG_02_Acquisition.Data.MachineHoming.SoftLimitsOff
+                              AND PRG_02_Acquisition.Data.MachineHoming.Active,
+    BrakeForceAllowed      := BrakeForceAllowedM1,
     CablePosM              := PRG_02_Acquisition.Data.EncoderM1.Measurement.CablePosM,
     CfgCableLimitDescentM  := _WinchM1CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
@@ -1018,6 +1065,9 @@ instSafetyWinchM2(
     // Même contact NC que M1 : TRUE = FdC haut libre, FALSE = FdC atteint/chaîne ouverte.
     TopPositionSensor      := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
     InReferencingMode      := PRG_02_Acquisition.Data.EncoderM2.Measurement.HomingLifecycle.Busy,
+    SoftLimitsBypassed     := PRG_02_Acquisition.Data.MachineHoming.SoftLimitsOff
+                              AND PRG_02_Acquisition.Data.MachineHoming.Active,
+    BrakeForceAllowed      := BrakeForceAllowedM2,
     CablePosM              := PRG_02_Acquisition.Data.EncoderM2.Measurement.CablePosM,
     CfgCableLimitDescentM  := _WinchM2CfgPersist.CfgCableLimitDescent_M,
     LimitLegalReached      := GVL_IHM.Commun.LimitLegalReached,
@@ -1129,6 +1179,31 @@ IF MaintN2 THEN
                                  AND (PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI OR BypassM2TopLimitSwitchEff);
 END_IF;
 
+// Si un cycle homing machine est actif (en N1 ou N2), appliquer ses permis par etape
+IF HomingFreeMoveBlockedN1 THEN
+    EffectivePermitM1_Ascent  := FALSE;
+    EffectivePermitM1_Descend := FALSE;
+    EffectivePermitM2_Ascent  := FALSE;
+    EffectivePermitM2_Descend := FALSE;
+ELSIF PRG_02_Acquisition.Data.MachineHoming.Active THEN
+    IF PRG_02_Acquisition.Data.MachineHoming.CmdWinchSelect = 2 THEN
+        EffectivePermitM1_Ascent  := FALSE;
+        EffectivePermitM1_Descend := FALSE;
+        EffectivePermitM2_Ascent  := EffectivePermitM2_Ascent  AND PRG_02_Acquisition.Data.MachineHoming.AllowAscent;
+        EffectivePermitM2_Descend := EffectivePermitM2_Descend AND PRG_02_Acquisition.Data.MachineHoming.AllowDescend;
+    ELSIF PRG_02_Acquisition.Data.MachineHoming.CmdWinchSelect = 0 THEN
+        EffectivePermitM1_Ascent  := EffectivePermitM1_Ascent  AND PRG_02_Acquisition.Data.MachineHoming.AllowAscent;
+        EffectivePermitM1_Descend := EffectivePermitM1_Descend AND PRG_02_Acquisition.Data.MachineHoming.AllowDescend;
+        EffectivePermitM2_Ascent  := EffectivePermitM2_Ascent  AND PRG_02_Acquisition.Data.MachineHoming.AllowAscent;
+        EffectivePermitM2_Descend := EffectivePermitM2_Descend AND PRG_02_Acquisition.Data.MachineHoming.AllowDescend;
+    ELSE
+        EffectivePermitM1_Ascent  := FALSE;
+        EffectivePermitM1_Descend := FALSE;
+        EffectivePermitM2_Ascent  := FALSE;
+        EffectivePermitM2_Descend := FALSE;
+    END_IF;
+END_IF;
+
 // Permis canoniques benne : ouverture = M2 vers le bas, fermeture = M2 vers le haut.
 // Les fins de course benne restent des faits fonctionnels distincts des limites treuil.
 EffectivePermitBucket_Open := EffectivePermitM2_Descend
@@ -1197,6 +1272,7 @@ ArmAnyAxisAvail := ArmM1AscentAvail OR ArmM1DescendAvail
 // doit pouvoir armer l'homme-mort (DeadmanArmed) pour autoriser le mouvement benne !
 ArmBucketBusy := (instBucket.Lifecycle.Busy OR BenneBusyFallEdge.Q)
                  AND NOT MaintN2
+                 AND NOT PRG_02_Acquisition.Data.MachineHoming.Active
                  AND (PRG_03_Modes_Cycle.Data.Auth.Mode <> E_Mode.SEMI_AUTO)
                  AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqOpen
                  AND NOT PRG_03_Modes_Cycle.Data.ReqProgram.ReqBucket.ReqClose;
@@ -1257,8 +1333,9 @@ MaintenanceMaxStepDescent := 1;
 // palier 5 accessible non reference : les caps de position (SlowdownMaxStep,
 // SyncDeviationWarn) sont eux-memes inactifs sans reference fiable. Debridage assume
 // plus tard sur capteur haut actif (position redevenue connue).
-IF NOT (PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable
-        AND PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable) THEN
+IF PRG_02_Acquisition.Data.MachineHoming.Active
+   OR NOT (PRG_02_Acquisition.Data.EncoderM1.HomedAndReliable
+           AND PRG_02_Acquisition.Data.EncoderM2.HomedAndReliable) THEN
     CommonMaxStepAscent  := 1;
     CommonMaxStepDescent := 1;
 END_IF;
@@ -1336,7 +1413,8 @@ END_IF;
 // = fermeture, descente M2 = ouverture. Les zones sont calculées sur la position :
 // si M1/M2 ne sont pas référencés, la position n'a pas de sens → repli palier 1 partout.
 IF ManualBucketJogActive THEN
-    IF NOT (PRG_02_Acquisition.Data.EncoderM1.Homed AND PRG_02_Acquisition.Data.EncoderM2.Homed) THEN
+    IF PRG_02_Acquisition.Data.MachineHoming.Active
+       OR NOT (PRG_02_Acquisition.Data.EncoderM1.Homed AND PRG_02_Acquisition.Data.EncoderM2.Homed) THEN
         M2MaxStepUp   := 1;
         M2MaxStepDown := 1;
     ELSE
@@ -1629,7 +1707,7 @@ WinchM1FinalInterlockRequest.RequestedContactor2 := instWinchM1.Contactor2;
 WinchM1FinalInterlockRequest.RequestedContactor3 := instWinchM1.Contactor3;
 WinchM1FinalInterlockRequest.RequestedContactor4 := instWinchM1.Contactor4;
 WinchM1FinalInterlockRequest.RequestedStep := instWinchM1.StepNumber;
-WinchM1FinalInterlockRequest.PowerCutOff := instSafetyWinchM1.PowerCutOff AND NOT MaintN2;
+WinchM1FinalInterlockRequest.PowerCutOff := instSafetyWinchM1.PowerCutOff;
 WinchM1FinalInterlockRequest.AscentPermit := EffectivePermitM1_Ascent;
 WinchM1FinalInterlockRequest.DescendPermit := EffectivePermitM1_Descend;
 
@@ -1650,7 +1728,7 @@ WinchM2FinalInterlockRequest.RequestedContactor2 := instWinchM2.Contactor2;
 WinchM2FinalInterlockRequest.RequestedContactor3 := instWinchM2.Contactor3;
 WinchM2FinalInterlockRequest.RequestedContactor4 := instWinchM2.Contactor4;
 WinchM2FinalInterlockRequest.RequestedStep := instWinchM2.StepNumber;
-WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff AND NOT MaintN2;
+WinchM2FinalInterlockRequest.PowerCutOff := instSafetyWinchM2.PowerCutOff;
 WinchM2FinalInterlockRequest.AscentPermit := M2AscentPermitApplied;
 WinchM2FinalInterlockRequest.DescendPermit := M2DescendPermitApplied;
 

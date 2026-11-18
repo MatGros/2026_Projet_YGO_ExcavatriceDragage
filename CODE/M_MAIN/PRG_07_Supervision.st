@@ -106,6 +106,7 @@ END_VAR
 VAR
     // ═══ T330 — contexte machine (reglages, constantes et memoires portes par instCfgT330Normalizer) ═══
     T330InHoming              : BOOL;  // . [LOC] Homing en cours (cycle machine complet OU transaction preset)
+    HomingProvisionalHmi      : BOOL;  // . [LOC] Zero 0m HX1 provisoire actif (masque voyants IHM Homed avant HX4)
     SyncHmiErrorIdInjected    : WORD;  // . [LOC] Memorisation injection defaut synchro IHM (test / diagnostic)
 END_VAR
 
@@ -383,15 +384,9 @@ SimBypassRise(CLK := SimulationBypassEffective);
 SimBypassFall(CLK := SimulationBypassEffective);
 
 IF SimBypassRise.Q THEN
-    // 🧪 Bypass sim étendu aux tests Meca (Meca A-E via Safety ; NoMovement/
-    // OppositeDir via Process) pour travailler sans faux blocage en banc.
-    // Les trois limites banc demandées sont écrites depuis leur producteur unique.
-    // Elles restent strictement inertes hors SimulationBypassEffective.
-    GVL_IHM.M1TreuilRetenue.Bypass.Safety  := TRUE;
+    // Bypass sim banc limite a Process + FDC logiciel/bas ; TopLimitSwitch et Safety (Meca D) restent actifs.
     GVL_IHM.M1TreuilRetenue.Bypass.Process := TRUE;
-    GVL_IHM.M2TreuilBenne.Bypass.Safety    := TRUE;
     GVL_IHM.M2TreuilBenne.Bypass.Process   := TRUE;
-    GVL_IHM.Commun.Bypass.TopLimitSwitch   := TRUE;
     GVL_IHM.Commun.Bypass.TopLimitSoftware := TRUE;
     GVL_IHM.Commun.Bypass.CableLimitSwitch := TRUE;
 END_IF;
@@ -429,6 +424,7 @@ GVL_IHM.Commun.HeartbeatIhmElapsed       := instDiagIhmHeartbeat.TimeSinceIhmEdg
 GVL_IHM.Commun.TglHeartbeatPlc           := instDiagIhmHeartbeat.TglHeartbeatPlc;
 
 // ---------- §3c. Preflight machine à l'arrêt ----------
+HomingProvisionalHmi := PRG_02_Acquisition.Data.MachineHoming.ProvisionalActive;
 instPreflight(
     Execute                   := GVL_IHM.Commun.Preflight.BtnRun,
     MachineIsStill            := (PRG_04_Treuils_Benne.Data.WinchM1State.StepNumber = 0)
@@ -449,8 +445,8 @@ instPreflight(
     PowerContactorEngaged     := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI,
     EncoderM1Operational      := PRG_02_Acquisition.Data.Network.EncoderM1.Operational,
     EncoderM2Operational      := PRG_02_Acquisition.Data.Network.EncoderM2.Operational,
-    HomedM1                   := PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed,
-    HomedM2                   := PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed,
+    HomedM1                   := PRG_04_Treuils_Benne.Data.WinchM1State.Encoder.Homed AND NOT HomingProvisionalHmi,
+    HomedM2                   := PRG_04_Treuils_Benne.Data.WinchM2State.Encoder.Homed AND NOT HomingProvisionalHmi,
     M1PositionInBounds        := NOT PRG_02_Acquisition.Data.EncoderM1.Measurement.EncoderIncoherent,
     M2PositionInBounds        := NOT PRG_02_Acquisition.Data.EncoderM2.Measurement.EncoderIncoherent
 );
@@ -517,6 +513,12 @@ IF FaultMachineReset_IHM THEN
     GVL_IHM.M1M2Sync.State.ErrorId := WORD#0;
 END_IF;
 GVL_IHM.M2TreuilBenne.Bucket.State := PRG_04_Treuils_Benne.Data.BucketState;
+IF HomingProvisionalHmi THEN
+    GVL_IHM.M1TreuilRetenue.State.Encoder.Homed := FALSE;
+    GVL_IHM.M2TreuilBenne.State.Encoder.Homed := FALSE;
+    GVL_IHM.M2TreuilBenne.Bucket.State.MechState.BucketReferenced := FALSE;
+    GVL_IHM.M2TreuilBenne.Bucket.State.M2PositionCorrectedValid := FALSE;
+END_IF;
 GVL_IHM.M3Translation.State := PRG_05_Translation.Data.TranslationState;
 
 // ---------- §3e-bis. Gel affichage position pendant transaction preset codeur (anti-clignotement, voir VAR) ----------
@@ -610,12 +612,29 @@ GVL_IHM.Emergency.State.OperatorMessage := PRG_06_Outputs.EmergencyOperatorMessa
 // OR avec les défauts d'arbitrage de mode (refus Semi-Auto, bascule de mode refusée) —
 // publiés par PRG_03 : sans eux ces refus restaient silencieux pour l'opérateur.
 GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
+                                      OR PRG_06_Outputs.EmergencyFault.Error
+                                      OR PRG_06_Outputs.EmergencyFault.Latched
                                       OR PRG_02_Acquisition.Data.InputModules.Fault
+                                      OR PRG_02_Acquisition.Data.MachineHoming.Failed
+                                      OR PRG_02_Acquisition.Data.EncoderM1.Fault.Error
+                                      OR PRG_02_Acquisition.Data.EncoderM2.Fault.Error
+                                      OR PRG_02_Acquisition.Data.Joystick.Fault.Latched
                                       OR PRG_03_Modes_Cycle.Data.ModesFault.Error
                                       OR PRG_03_Modes_Cycle.Data.ModesFault.Latched
                                       OR GVL_IHM.M1TreuilRetenue.Safety.Error
+                                      OR GVL_IHM.M1TreuilRetenue.Safety.ErrorOverspeed
+                                      OR (GVL_IHM.M1TreuilRetenue.Safety.LatchedId <> 16#0000)
+                                      OR GVL_IHM.M1TreuilRetenue.State.Error
+                                      OR GVL_IHM.M1TreuilRetenue.State.FinalInterlockError
                                       OR GVL_IHM.M2TreuilBenne.Safety.Error
+                                      OR GVL_IHM.M2TreuilBenne.Safety.ErrorOverspeed
+                                      OR (GVL_IHM.M2TreuilBenne.Safety.LatchedId <> 16#0000)
+                                      OR GVL_IHM.M2TreuilBenne.State.Error
+                                      OR GVL_IHM.M2TreuilBenne.State.FinalInterlockError
                                       OR GVL_IHM.M3Translation.Safety.Error
+                                      OR (GVL_IHM.M3Translation.Safety.LatchedId <> 16#0000)
+                                      OR GVL_IHM.M3Translation.State.Error
+                                      OR GVL_IHM.M3Translation.State.FinalInterlockError
                                       OR GVL_IHM.M1M2Sync.State.Error
                                       OR GVL_IHM.M2TreuilBenne.Bucket.State.Error
                                       OR GVL_IHM.CycleSemiAuto.State.Error
@@ -797,6 +816,13 @@ instHmiBannerFormatter(
     CycleChecksInhibited  := PRG_03_Modes_Cycle.Data.SequenceState.CycleChecksInhibited,
     MachineHomingStep        := PRG_02_Acquisition.Data.MachineHoming.Step,
     MachineHomingInstruction := PRG_02_Acquisition.Data.MachineHoming.Instruction,
+    MachineHomingFailed      := PRG_02_Acquisition.Data.MachineHoming.Failed,
+    MachineHomingProvisional := HomingProvisionalHmi,
+    WinchM1Error             := GVL_IHM.M1TreuilRetenue.State.Error OR GVL_IHM.M1TreuilRetenue.State.FinalInterlockError,
+    WinchM2Error             := GVL_IHM.M2TreuilBenne.State.Error OR GVL_IHM.M2TreuilBenne.State.FinalInterlockError,
+    EncoderM1Fault           := PRG_02_Acquisition.Data.EncoderM1.Fault.Error,
+    EncoderM2Fault           := PRG_02_Acquisition.Data.EncoderM2.Fault.Error,
+    JoystickLatchedFault     := PRG_02_Acquisition.Data.Joystick.Fault.Latched,
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
     CfgCorrectedT330      := instCfgT330Normalizer.CorrectedHeld,
     BypassWinchM1Active   := GVL_IHM.M1TreuilRetenue.Bypass.Global,
@@ -978,8 +1004,8 @@ instTroubleshootingView(
     CycleWinchSyncError  := PRG_04_Treuils_Benne.Data.WinchSyncError,
     JoystickDeadmanArmed := PRG_02_Acquisition.Data.Joystick.DeadmanArmed,
     JoystickAtNeutral    := PRG_02_Acquisition.Data.Joystick.AtNeutralXY,
-    HomedM1              := PRG_02_Acquisition.Data.EncoderM1.Homed,
-    HomedM2              := PRG_02_Acquisition.Data.EncoderM2.Homed,
+    HomedM1              := PRG_02_Acquisition.Data.EncoderM1.Homed AND NOT HomingProvisionalHmi,
+    HomedM2              := PRG_02_Acquisition.Data.EncoderM2.Homed AND NOT HomingProvisionalHmi,
     CfgTopLimitM         := _CommunCfgPersist.CfgCableLimitAscent_M,
     WinchM1Trace         := PRG_04_Treuils_Benne.Data.TraceM1,
     WinchM2Trace         := PRG_04_Treuils_Benne.Data.TraceM2,

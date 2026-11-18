@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-14T14:47:22.289191" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-14T14:47:22.289191">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T03:01:12.074407" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T03:01:12.074407">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -70,6 +70,14 @@ TRUE des qu'un referencement a reussi</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si incoherence detectee au redemarrage</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingProvisional">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE si zero provisoire 0m HX1 (avant HX4 8.5m)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -369,6 +377,28 @@ TRUE des qu'un referencement a reussi</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Levee de doute d'incoherence au boot (front)</xhtml>
               </documentation>
             </variable>
+            <variable name="InvalidateDatum">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] Invalidation explicite du datum (abandon avant calibration finale)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProvisionalHoming">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CMD] TRUE = preset provisoire (ex. 0m HX1), FALSE = definitif</xhtml>
+              </documentation>
+            </variable>
             <variable name="CfgHomingTargetM">
               <type>
                 <REAL />
@@ -561,6 +591,14 @@ TRUE des qu'un referencement a reussi</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [DIAG] Incoherence redemarrage a lever</xhtml>
               </documentation>
             </variable>
+            <variable name="HomingProvisional">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">&lt;-- [STAT] TRUE si datum provisoire RETAIN actif (HX1 0m)</xhtml>
+              </documentation>
+            </variable>
             <variable name="HomingRefRaw">
               <type>
                 <UDINT />
@@ -686,6 +724,14 @@ TRUE des qu'un referencement a reussi</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Verification preset en attente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="PendingProvisional">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Capture mode provisoire pendant verification preset</xhtml>
               </documentation>
             </variable>
             <variable name="PresetConfirmed">
@@ -922,6 +968,7 @@ IF NOT Enable THEN
     PresetVerifyTimer(IN := FALSE, PT := CST_PresetVerifyTime);
     Homed := Calib.Homed;
     HomingSuspect := Calib.HomingSuspect;
+    HomingProvisional := Calib.HomingProvisional;
     HomingRefRaw := Calib.HomingRefRaw;
     // PresetConfirmationFailed est un diagnostic latch : il est gelé hors Enable
     RETURN;
@@ -929,6 +976,16 @@ END_IF;
 
 Ready := Enable AND NOT Fault.Latched;
 {endregion}
+
+IF InvalidateDatum THEN
+    Calib.Homed              := FALSE;
+    Calib.HomingSuspect      := FALSE;
+    Calib.HomingProvisional  := FALSE;
+    PendingProvisional       := FALSE;
+    Lifecycle.Done           := FALSE;
+    PresetVerificationActive := FALSE;
+    PresetVerifyTimer(IN := FALSE, PT := CST_PresetVerifyTime);
+END_IF;
 
 {region "§3 Cohérence au redémarrage"}
 // 🔍 3. COHÉRENCE AU REDÉMARRAGE — une fois par session Enable, dès que le codeur répond
@@ -985,6 +1042,7 @@ IF HomingTrigger THEN
         PresetValue := RawPos;
         PresetRequest := TRUE;
         PresetVerificationActive := TRUE;
+        PendingProvisional := ProvisionalHoming;
         Lifecycle.Done := FALSE;
     END_IF;
 END_IF;
@@ -1018,17 +1076,20 @@ IF PresetVerificationActive AND PresetVerifyTimer.Q THEN
         Calib.HomingRefRaw := PendingHomingRefRaw;
         Calib.Homed := TRUE;
         Calib.HomingSuspect := FALSE;
+        Calib.HomingProvisional := PendingProvisional;
         Calib.LastKnownRawPos := RawPos;
         PresetConfirmationFailed := FALSE;
         PresetFailError := FALSE;
         Lifecycle.Done := TRUE;
     ELSE
         Calib.HomingSuspect := TRUE;
+        Calib.HomingProvisional := FALSE;
         PresetConfirmationFailed := TRUE;
         PresetFailError := TRUE;
         Lifecycle.Done := FALSE;
     END_IF;
 
+    PendingProvisional := FALSE;
     PresetVerificationActive := FALSE;
     PresetVerifyTimer(IN := FALSE, PT := CST_PresetVerifyTime);
 END_IF;
@@ -1043,6 +1104,7 @@ END_IF;
 Lifecycle.Busy := PresetVerificationActive;
 Homed := Calib.Homed AND NOT Calib.HomingSuspect;
 HomingSuspect := Calib.HomingSuspect;
+HomingProvisional := Calib.HomingProvisional;
 HomingRefRaw := Calib.HomingRefRaw;
 {endregion}
 </xhtml>
