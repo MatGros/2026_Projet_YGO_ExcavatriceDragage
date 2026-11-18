@@ -31,5 +31,6 @@ STRUCT
     ProvisionalActive   : BOOL;          (* TRUE tant que le zero 0m HX1 est provisoire avant HX4 8.5m *)
     TopContactLatched   : BOOL;          (* Contact TOP touche pendant cycle homing : degagement requis *)
     TopContactCount     : UINT;          (* Nombre de contacts capteur TOP pendant cycle homing (purge Reset) *)
+    ActionText          : STRING(120);   (* Consigne d action directe du GRAFCET pour bandeau operateur *)
 END_STRUCT
 END_TYPE

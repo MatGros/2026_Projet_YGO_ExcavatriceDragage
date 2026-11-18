@@ -28,7 +28,9 @@ VAR_INPUT
 
     // === PERMIS SECURITE ===
     TopPositionSensor           : BOOL;                                      // --> [SAFE] Capteur haut commun M1/M2 (TRUE = atteint)
+    TopHardStopLatched          : BOOL := FALSE;                             // --> [SAFE] Latch directionnel capteur haut (PRG_06_Outputs)
     WinchesMechanicallyStopped  : BOOL;                                      // --> [SAFE] M1 ET M2 arret mecanique confirme
+    BucketIsOpen                : BOOL := FALSE;                             // --> [HW] Benne ouverte confirmee (PRG_04_Treuils_Benne)
 
     // === ACQUISITION HOMING (M1 / M2) ===
     M1Status                    : ST_fbMachineHomingCycle_AxisHomingStatus;  // --> [HW] Statut homing axe M1
@@ -77,6 +79,7 @@ VAR_OUTPUT
     MachineHomingStepAtError    : E_MachineHomingStep := E_MachineHomingStep.IDLE;
     MachineHomingSeqStep        : E_MachineHomingTxState := E_MachineHomingTxState.HX0_REPOS;
     MachineHomingInstruction    : STRING(120);
+    MachineHomingActionText     : STRING(120);
     MachineHomingActive         : BOOL;
     MachineHomingLossSafeStop   : BOOL;
     MachineHomingFailed         : BOOL;
@@ -128,14 +131,17 @@ VAR
     Step1MoveCutoff             : BOOL;
     Step1PresetIssued           : BOOL;
     Step2SlackCutoff            : BOOL;
+    Step3BucketOpenDone         : BOOL;
     Step3ClearanceDone          : BOOL;
     Step4PresetIssued           : BOOL;
+    Step4AutoConfirmPending     : BOOL;
     ProvisionalDatumActive      : BOOL;
     ProvisionalAborted          : BOOL;
     ForceStepClamped            : INT;
 
     // === TEMPORISATIONS ===
     EntryHoldTimer              : TON;
+    RecoveryHoldTimer           : TON;
     StepValidateHoldTimer       : TON;
     Step1MoveTimer              : TON;
     Step2SlackTimer             : TON;
@@ -152,6 +158,7 @@ VAR
 
     // === CALCULS AFFICHAGE ===
     EntryRemSec                 : INT;
+    RecoveryRemSec              : INT;
     ValRemSec                   : INT;
     Step1RemSec                 : INT;
     Step3RemSec                 : INT;
@@ -160,6 +167,9 @@ VAR
     BothAxesHomed               : BOOL;
     CommitOrOffsetValid         : BOOL;
     ClimbPermit                 : BOOL;
+    TopBlockedAtEntry           : BOOL;
+    RecoveryCauseGone           : BOOL;
+    EffectiveResetPulse         : BOOL;
     Step1MovingCmd              : BOOL;
     Step2SlackCmd               : BOOL;
     Step3DescendEngaged         : BOOL;
@@ -210,19 +220,23 @@ IF NOT FirstScanDone THEN
     Step1MoveCutoff      := FALSE;
     Step1PresetIssued    := FALSE;
     Step2SlackCutoff     := FALSE;
+    Step3BucketOpenDone  := FALSE;
     Step3ClearanceDone   := FALSE;
     Step3AccumTime       := T#0s;
     Step3SegTime         := T#0s;
     Step3RemainingTime   := T#0s;
     Step3TimerRunning    := FALSE;
     Step3Timer(IN := FALSE, PT := T#0s);
+    EntryHoldTimer(IN := FALSE, PT := T#0s);
+    RecoveryHoldTimer(IN := FALSE, PT := T#0s);
     StepValidateHoldTimer(IN := FALSE, PT := T#0s);
-    Step4PresetIssued    := FALSE;
-    ProvisionalDatumActive := FALSE;
-    ProvisionalAborted     := FALSE;
-    TopContactLatched      := FALSE;
-    TopContactCount        := 0;
-    PrevMode             := Mode;
+    Step4PresetIssued       := FALSE;
+    Step4AutoConfirmPending := FALSE;
+    ProvisionalDatumActive  := FALSE;
+    ProvisionalAborted      := FALSE;
+    TopContactLatched       := FALSE;
+    TopContactCount         := 0;
+    PrevMode                := Mode;
 END_IF;
 
 // Sorties impulsionnelles et permis remis a zero en tete de scan
@@ -291,17 +305,33 @@ HomeAxesTimedOut := (((SeqStep = E_MachineHomingTxState.HX1_BUCKET_PREPARE) AND 
                     AND (Cfg.CfgTimeoutHomeAxes > T#0s)
                     AND HomeAxesTimer.Q;
 
-// Violation couplage / selecteur (HX1=M2 seul, HX2/HX3=M1+M2 couple)
+// Violation couplage / selecteur (HX1 ou HX3A=M2 seul, HX2 ou HX3B=M1+M2 couple)
 CouplingViolationTimer(
     IN := ((((SeqStep = E_MachineHomingTxState.HX2_CLIMB_TO_TOP)
-             OR (SeqStep = E_MachineHomingTxState.HX3_TOP_CLEARANCE))
+             OR ((SeqStep = E_MachineHomingTxState.HX3_TOP_CLEARANCE) AND Step3BucketOpenDone))
             AND (JoystickWinchSelectArbitrated <> 0))
-           OR ((SeqStep = E_MachineHomingTxState.HX1_BUCKET_PREPARE)
+           OR (((SeqStep = E_MachineHomingTxState.HX1_BUCKET_PREPARE)
+                OR ((SeqStep = E_MachineHomingTxState.HX3_TOP_CLEARANCE) AND NOT Step3BucketOpenDone))
                AND (JoystickWinchSelectArbitrated <> 2)))
           AND (JoystickPull OR JoystickPush),
     PT := T#600ms
 );
 CouplingInterlockFault := CouplingViolationTimer.Q;
+
+TopBlockedAtEntry := TopPositionSensor OR TopHardStopLatched;
+RecoveryCauseGone := BootReady AND NOT AxisHomingError AND NOT TopBlockedAtEntry AND NOT HomingLossLatched;
+RecoveryHoldTimer(
+    IN := Enable
+          AND MaintenanceActive
+          AND (SeqStep = E_MachineHomingTxState.HX7_FAILED)
+          AND RecoveryCauseGone
+          AND RawBtnSeenReleased
+          AND RawDeadmanButton
+          AND NOT JoystickDeflected
+          AND WinchesMechanicallyStopped,
+    PT := Cfg.CfgEntryHoldTime
+);
+EffectiveResetPulse := ResetEdge.Q OR RecoveryHoldTimer.Q;
 
 // Changement de mode en cours de cycle (N1<->N2, DISABLE, SEMI_AUTO) : reset propre du graphe vers HX0
 ModeChangedInCycle := FirstScanDone AND (Mode <> PrevMode)
@@ -334,14 +364,14 @@ IF Enable THEN
 END_IF;
 MachineHomingLossSafeStop := HomingLossLatched AND NOT WinchesMechanicallyStopped;
 
-IF ResetEdge.Q AND WinchesMechanicallyStopped THEN
+IF EffectiveResetPulse AND WinchesMechanicallyStopped THEN
     HomingLossLatched   := FALSE;
     ReHomingAckRequired := FALSE;
 END_IF;
 {endregion}
 
 {region "§4 Purge sur Reset & Forcage mise en service"}
-IF ResetEdge.Q OR ModeChangedInCycle
+IF EffectiveResetPulse OR ModeChangedInCycle
    OR ((SeqStep <> E_MachineHomingTxState.HX0_REPOS) AND (SeqStep <> E_MachineHomingTxState.HX7_FAILED) AND NOT MaintenanceActive) THEN
     IF ProvisionalDatumActive OR Step1PresetIssued OR M1Status.HomingProvisional OR M2Status.HomingProvisional THEN
         InvalidateProvisionalDatum    := TRUE;
@@ -349,29 +379,31 @@ IF ResetEdge.Q OR ModeChangedInCycle
         ProvisionalDatumActive        := FALSE;
         ProvisionalAborted            := TRUE;
         CommitPublished               := FALSE;
-    ELSIF ResetEdge.Q THEN
+    ELSIF EffectiveResetPulse THEN
         ProvisionalAborted            := FALSE;
     END_IF;
-    IF ResetEdge.Q THEN
+    IF EffectiveResetPulse THEN
         MachineHomingFailed := FALSE;
         TopContactLatched   := FALSE;
         TopContactCount     := 0;
     END_IF;
-    HomingModeBActive   := FALSE;
-    Step1MoveCutoff     := FALSE;
-    Step1PresetIssued   := FALSE;
-    Step2SlackCutoff    := FALSE;
-    Step3ClearanceDone  := FALSE;
-    Step3AccumTime      := T#0s;
-    Step3SegTime        := T#0s;
-    Step3RemainingTime  := T#0s;
-    Step3TimerRunning   := FALSE;
+    HomingModeBActive       := FALSE;
+    Step1MoveCutoff         := FALSE;
+    Step1PresetIssued       := FALSE;
+    Step2SlackCutoff        := FALSE;
+    Step3BucketOpenDone     := FALSE;
+    Step3ClearanceDone      := FALSE;
+    Step3AccumTime          := T#0s;
+    Step3SegTime            := T#0s;
+    Step3RemainingTime      := T#0s;
+    Step3TimerRunning       := FALSE;
     Step3Timer(IN := FALSE, PT := T#0s);
     StepValidateHoldTimer(IN := FALSE, PT := T#0s);
-    Step4PresetIssued   := FALSE;
-    RawBtnSeenReleased  := NOT RawDeadmanButton;
-    SeqStep             := E_MachineHomingTxState.HX0_REPOS;
-    MachineHomingSeqStep := E_MachineHomingTxState.HX0_REPOS;
+    Step4PresetIssued       := FALSE;
+    Step4AutoConfirmPending := FALSE;
+    RawBtnSeenReleased      := NOT RawDeadmanButton;
+    SeqStep                 := E_MachineHomingTxState.HX0_REPOS;
+    MachineHomingSeqStep    := E_MachineHomingTxState.HX0_REPOS;
 END_IF;
 
 ForceStepApplyEdge(CLK := CfgForceStepApply);
@@ -385,15 +417,17 @@ IF Enable AND CfgCommissioningEnable AND ModeIsMaint2 AND ForceStepApplyEdge.Q T
         4: SeqStep := E_MachineHomingTxState.HX4_FINAL_CONFIRM;
         5: SeqStep := E_MachineHomingTxState.HX7_FAILED;
     END_CASE;
-    Step1MoveCutoff     := FALSE;
-    Step2SlackCutoff    := FALSE;
-    Step3ClearanceDone  := FALSE;
-    Step3AccumTime      := T#0s;
-    Step3SegTime        := T#0s;
-    Step3RemainingTime  := T#0s;
-    Step3TimerRunning   := FALSE;
+    Step1MoveCutoff         := FALSE;
+    Step2SlackCutoff        := FALSE;
+    Step3BucketOpenDone     := (ForceStepClamped = 3) AND BucketIsOpen;
+    Step3ClearanceDone      := FALSE;
+    Step3AccumTime          := T#0s;
+    Step3SegTime            := T#0s;
+    Step3RemainingTime      := T#0s;
+    Step3TimerRunning       := FALSE;
     Step3Timer(IN := FALSE, PT := T#0s);
-    Step4PresetIssued   := FALSE;
+    Step4PresetIssued       := FALSE;
+    Step4AutoConfirmPending := FALSE;
     IF (ForceStepClamped <= 1) AND (ProvisionalDatumActive OR Step1PresetIssued OR M1Status.HomingProvisional OR M2Status.HomingProvisional) THEN
         InvalidateProvisionalDatum    := TRUE;
         BucketCommit.CommitInvalidate := TRUE;
@@ -435,7 +469,7 @@ instCauses[CST_CauseCouplingFault].Active   := CouplingInterlockFault;
 instCauses[CST_CauseCouplingFault].Latching := TRUE;
 instCauses[CST_CauseCouplingFault].Texte    := 'Defaut de couplage treuils M1+M2 pendant referencement';
 
-instFault(Enable := Enable, Reset := Reset, Causes := instCauses);
+instFault(Enable := Enable, Reset := Reset OR RecoveryHoldTimer.Q, Causes := instCauses);
 Fault := instFault.Fault;
 {endregion}
 
@@ -468,22 +502,27 @@ IF NOT Enable THEN
     Lifecycle.Done := FALSE;
     MachineHomingActive := FALSE;
     M3Locked       := FALSE;
-    Step1MoveCutoff := FALSE;
-    Step1PresetIssued := FALSE;
-    Step2SlackCutoff := FALSE;
-    Step3ClearanceDone := FALSE;
-    Step3AccumTime := T#0s;
-    Step3SegTime := T#0s;
-    Step3RemainingTime := T#0s;
-    Step3TimerRunning := FALSE;
+    Step1MoveCutoff         := FALSE;
+    Step1PresetIssued       := FALSE;
+    Step2SlackCutoff        := FALSE;
+    Step3BucketOpenDone     := FALSE;
+    Step3ClearanceDone      := FALSE;
+    Step3AccumTime          := T#0s;
+    Step3SegTime            := T#0s;
+    Step3RemainingTime      := T#0s;
+    Step3TimerRunning       := FALSE;
     Step3Timer(IN := FALSE, PT := T#0s);
+    EntryHoldTimer(IN := FALSE, PT := T#0s);
+    RecoveryHoldTimer(IN := FALSE, PT := T#0s);
     StepValidateHoldTimer(IN := FALSE, PT := T#0s);
-    Step4PresetIssued := FALSE;
-    SeqStep         := E_MachineHomingTxState.HX0_REPOS;
-    MachineHomingSeqStep := E_MachineHomingTxState.HX0_REPOS;
-    MachineHomingStep := E_MachineHomingStep.IDLE;
+    Step4PresetIssued       := FALSE;
+    Step4AutoConfirmPending := FALSE;
+    SeqStep                 := E_MachineHomingTxState.HX0_REPOS;
+    MachineHomingSeqStep    := E_MachineHomingTxState.HX0_REPOS;
+    MachineHomingStep       := E_MachineHomingStep.IDLE;
     MachineHomingInstruction := 'Cycle homing desactive';
-    PrevMode := Mode;
+    MachineHomingActionText  := '';
+    PrevMode                := Mode;
     RETURN;
 END_IF;
 {endregion}
@@ -499,8 +538,8 @@ IF NOT RawDeadmanButton THEN
 END_IF;
 
 StepValidateAllowed := ((SeqStep = E_MachineHomingTxState.HX1_BUCKET_PREPARE) AND NOT Step1MoveCutoff AND NOT Step1PresetIssued)
-                    OR ((SeqStep = E_MachineHomingTxState.HX2_CLIMB_TO_TOP) AND CouplingSettleTimer.Q AND NOT TopPositionSensor)
-                    OR ((SeqStep = E_MachineHomingTxState.HX4_FINAL_CONFIRM) AND NOT Step4PresetIssued AND NOT TopPositionSensor);
+                    OR ((SeqStep = E_MachineHomingTxState.HX2_CLIMB_TO_TOP) AND CouplingSettleTimer.Q AND NOT TopBlockedAtEntry)
+                    OR ((SeqStep = E_MachineHomingTxState.HX4_FINAL_CONFIRM) AND NOT Step4PresetIssued AND NOT TopBlockedAtEntry);
 StepValidateHoldActive := Enable
                           AND MaintenanceActive
                           AND NOT Fault.Latched
@@ -529,10 +568,11 @@ CASE SeqStep OF
 
         EntryHoldTimer(
             IN := NOT MachineHomedRaw
-                  AND ModeIsMaint1
                   AND BootReady
                   AND NOT Fault.Latched
                   AND NOT MachineHomingFailed
+                  AND NOT TopBlockedAtEntry
+                  AND MaintenanceActive
                   AND RawBtnSeenReleased
                   AND RawDeadmanButton
                   AND NOT JoystickDeflected
@@ -540,20 +580,25 @@ CASE SeqStep OF
             PT := Cfg.CfgEntryHoldTime
         );
 
-        // Verrou absolu (D2) : impossible si machine deja referencee
-        IF NOT MachineHomedRaw AND BootReady AND NOT Fault.Latched AND NOT MachineHomingFailed THEN
-            IF (ModeIsMaint1 AND EntryHoldTimer.Q)
+        // Verrou absolu (D2) : impossible si machine deja referencee ou TOP non degage
+        IF NOT MachineHomedRaw AND BootReady AND NOT Fault.Latched AND NOT MachineHomingFailed AND NOT TopBlockedAtEntry THEN
+            IF (MaintenanceActive AND EntryHoldTimer.Q)
                OR (ModeIsMaint2 AND StartEdge.Q AND NOT JoystickDeflected AND WinchesMechanicallyStopped) THEN
-                Step1MoveCutoff        := FALSE;
-                Step1PresetIssued      := FALSE;
-                Step2SlackCutoff       := FALSE;
-                Step3ClearanceDone     := FALSE;
-                Step3AccumTime         := T#0s;
-                Step3SegTime           := T#0s;
-                Step4PresetIssued      := FALSE;
-                ProvisionalDatumActive := FALSE;
-                ProvisionalAborted     := FALSE;
-                RawBtnSeenReleased     := FALSE;
+                Step1MoveCutoff         := FALSE;
+                Step1PresetIssued       := FALSE;
+                Step2SlackCutoff        := FALSE;
+                Step3BucketOpenDone     := FALSE;
+                Step3ClearanceDone      := FALSE;
+                Step3AccumTime          := T#0s;
+                Step3SegTime            := T#0s;
+                Step3RemainingTime      := T#0s;
+                Step3TimerRunning       := FALSE;
+                Step3Timer(IN := FALSE, PT := T#0s);
+                Step4PresetIssued       := FALSE;
+                Step4AutoConfirmPending := FALSE;
+                ProvisionalDatumActive  := FALSE;
+                ProvisionalAborted      := FALSE;
+                RawBtnSeenReleased      := FALSE;
                 SeqStep := E_MachineHomingTxState.HX1_BUCKET_PREPARE;
             END_IF;
         END_IF;
@@ -633,7 +678,7 @@ CASE SeqStep OF
             Step2SlackCutoff := TRUE;
         END_IF;
 
-        AllowAscent  := CouplingSettleTimer.Q AND NOT TopPositionSensor;
+        AllowAscent  := CouplingSettleTimer.Q AND NOT TopBlockedAtEntry;
         AllowDescend := CouplingSettleTimer.Q AND NOT Step2SlackCutoff;
 
         IF TransactionAbort THEN
@@ -646,87 +691,101 @@ CASE SeqStep OF
             END_IF;
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HX7_FAILED;
-        ELSIF TopPositionSensor THEN
-            TopContactLatched  := TRUE;
-            TopContactCount    := TopContactCount + UINT#1;
-            AllowAscent        := FALSE;
-            Step3ClearanceDone := FALSE;
-            Step3AccumTime     := T#0s;
-            Step3SegTime       := T#0s;
-            Step3RemainingTime := Cfg.CfgTopClearanceTime;
-            Step3TimerRunning  := FALSE;
+        ELSIF TopBlockedAtEntry THEN
+            TopContactLatched   := TRUE;
+            TopContactCount     := TopContactCount + UINT#1;
+            AllowAscent         := FALSE;
+            Step3BucketOpenDone := BucketIsOpen;
+            Step3ClearanceDone  := FALSE;
+            Step3AccumTime      := T#0s;
+            Step3SegTime        := T#0s;
+            Step3RemainingTime  := Cfg.CfgTopClearanceTime;
+            Step3TimerRunning   := FALSE;
             Step3Timer(IN := FALSE, PT := T#0s);
             SeqStep := E_MachineHomingTxState.HX3_TOP_CLEARANCE;
         ELSIF ValidatePressed AND CouplingSettleTimer.Q AND NOT JoystickDeflected
-              AND WinchesMechanicallyStopped AND NOT TopPositionSensor THEN
-            Step4PresetIssued  := FALSE;
-            RawBtnSeenReleased := FALSE;
+              AND WinchesMechanicallyStopped AND NOT TopBlockedAtEntry THEN
+            Step4PresetIssued       := FALSE;
+            Step4AutoConfirmPending := TRUE;
+            RawBtnSeenReleased      := NOT RawDeadmanButton;
             SeqStep := E_MachineHomingTxState.HX4_FINAL_CONFIRM;
         END_IF;
 
     E_MachineHomingTxState.HX3_TOP_CLEARANCE:
-        // Contact TOP touche : montee strictement interdite, descente accumulee ~4s
-        // apres relachement capteur TOP (independant des codeurs), puis retour HX1.
-        CmdWinchSelect := 0;
-        SoftLimitsOff  := TRUE;
-        AllowAscent    := FALSE;
+        // Contact TOP touche : 1) ouvrir benne prudemment (M2 seul, si pas deja ouverte),
+        // puis 2) descente couplee M1+M2 accumulee ~4s apres capteur libre -> retour HX1.
+        SoftLimitsOff := TRUE;
+        AllowAscent   := FALSE;
 
-        IF TopPositionSensor THEN
-            Step3AccumTime     := T#0s;
-            Step3SegTime       := T#0s;
-            Step3RemainingTime := Cfg.CfgTopClearanceTime;
-            Step3ClearanceDone := FALSE;
-            Step3TimerRunning  := FALSE;
+        IF NOT Step3BucketOpenDone AND BucketIsOpen AND NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
+            Step3BucketOpenDone := TRUE;
+        END_IF;
+
+        IF NOT Step3BucketOpenDone THEN
+            CmdWinchSelect := 2;
+            AllowDescend   := TRUE;
+            Step3TimerRunning := FALSE;
             Step3Timer(IN := FALSE, PT := T#0s);
         ELSE
-            Step3DescendEngaged := NOT Step3ClearanceDone
-                                   AND (JoystickWinchSelectArbitrated = 0)
-                                   AND DeadmanArmed
-                                   AND JoystickPush AND NOT JoystickPull;
+            CmdWinchSelect := 0;
 
-            IF Step3DescendEngaged THEN
-                IF NOT Step3TimerRunning THEN
+            IF TopPositionSensor THEN
+                Step3AccumTime     := T#0s;
+                Step3SegTime       := T#0s;
+                Step3RemainingTime := Cfg.CfgTopClearanceTime;
+                Step3ClearanceDone := FALSE;
+                Step3TimerRunning  := FALSE;
+                Step3Timer(IN := FALSE, PT := T#0s);
+            ELSE
+                Step3DescendEngaged := NOT Step3ClearanceDone
+                                       AND (JoystickWinchSelectArbitrated = 0)
+                                       AND DeadmanArmed
+                                       AND JoystickPush AND NOT JoystickPull;
+
+                IF Step3DescendEngaged THEN
+                    IF NOT Step3TimerRunning THEN
+                        IF Step3AccumTime >= Cfg.CfgTopClearanceTime THEN
+                            Step3RemainingTime := T#0s;
+                            Step3ClearanceDone := TRUE;
+                        ELSE
+                            Step3RemainingTime := Cfg.CfgTopClearanceTime - Step3AccumTime;
+                        END_IF;
+                        Step3Timer(IN := FALSE, PT := T#0s);
+                        Step3TimerRunning := NOT Step3ClearanceDone;
+                    END_IF;
+                    IF Step3TimerRunning THEN
+                        Step3Timer(IN := TRUE, PT := Step3RemainingTime);
+                        Step3SegTime := Step3Timer.ET;
+                        IF Step3Timer.Q THEN
+                            Step3ClearanceDone := TRUE;
+                            Step3AccumTime     := Cfg.CfgTopClearanceTime;
+                            Step3SegTime       := T#0s;
+                            Step3TimerRunning  := FALSE;
+                            Step3Timer(IN := FALSE, PT := T#0s);
+                        END_IF;
+                    END_IF;
+                ELSE
+                    IF Step3TimerRunning THEN
+                        Step3Timer(IN := TRUE, PT := Step3RemainingTime);
+                        Step3AccumTime := Step3AccumTime + Step3Timer.ET;
+                        IF Step3AccumTime >= Cfg.CfgTopClearanceTime THEN
+                            Step3AccumTime     := Cfg.CfgTopClearanceTime;
+                            Step3ClearanceDone := TRUE;
+                        END_IF;
+                        Step3SegTime      := T#0s;
+                        Step3TimerRunning := FALSE;
+                        Step3Timer(IN := FALSE, PT := T#0s);
+                    END_IF;
                     IF Step3AccumTime >= Cfg.CfgTopClearanceTime THEN
                         Step3RemainingTime := T#0s;
-                        Step3ClearanceDone := TRUE;
                     ELSE
                         Step3RemainingTime := Cfg.CfgTopClearanceTime - Step3AccumTime;
                     END_IF;
-                    Step3Timer(IN := FALSE, PT := T#0s);
-                    Step3TimerRunning := NOT Step3ClearanceDone;
-                END_IF;
-                IF Step3TimerRunning THEN
-                    Step3Timer(IN := TRUE, PT := Step3RemainingTime);
-                    Step3SegTime := Step3Timer.ET;
-                    IF Step3Timer.Q THEN
-                        Step3ClearanceDone := TRUE;
-                        Step3AccumTime     := Cfg.CfgTopClearanceTime;
-                        Step3SegTime       := T#0s;
-                        Step3TimerRunning  := FALSE;
-                        Step3Timer(IN := FALSE, PT := T#0s);
-                    END_IF;
-                END_IF;
-            ELSE
-                IF Step3TimerRunning THEN
-                    Step3Timer(IN := TRUE, PT := Step3RemainingTime);
-                    Step3AccumTime := Step3AccumTime + Step3Timer.ET;
-                    IF Step3AccumTime >= Cfg.CfgTopClearanceTime THEN
-                        Step3AccumTime     := Cfg.CfgTopClearanceTime;
-                        Step3ClearanceDone := TRUE;
-                    END_IF;
-                    Step3SegTime      := T#0s;
-                    Step3TimerRunning := FALSE;
-                    Step3Timer(IN := FALSE, PT := T#0s);
-                END_IF;
-                IF Step3AccumTime >= Cfg.CfgTopClearanceTime THEN
-                    Step3RemainingTime := T#0s;
-                ELSE
-                    Step3RemainingTime := Cfg.CfgTopClearanceTime - Step3AccumTime;
                 END_IF;
             END_IF;
-        END_IF;
 
-        AllowDescend := NOT Step3ClearanceDone;
+            AllowDescend := NOT Step3ClearanceDone;
+        END_IF;
 
         IF TransactionAbort THEN
             IF ProvisionalDatumActive THEN
@@ -736,17 +795,20 @@ CASE SeqStep OF
                 ProvisionalAborted            := TRUE;
                 CommitPublished               := FALSE;
             END_IF;
+            Step3BucketOpenDone := FALSE;
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HX7_FAILED;
-        ELSIF Step3ClearanceDone AND NOT TopPositionSensor AND NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
-            TopContactLatched  := FALSE;
-            Step1MoveCutoff    := FALSE;
-            RawBtnSeenReleased := NOT RawDeadmanButton;
+        ELSIF Step3BucketOpenDone AND Step3ClearanceDone AND NOT TopPositionSensor AND NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
+            TopContactLatched   := FALSE;
+            Step1MoveCutoff     := FALSE;
+            Step3BucketOpenDone := FALSE;
+            RawBtnSeenReleased  := NOT RawDeadmanButton;
             SeqStep := E_MachineHomingTxState.HX1_BUCKET_PREPARE;
         END_IF;
 
     E_MachineHomingTxState.HX4_FINAL_CONFIRM:
-        // Zero mouvement : avertissement + validation finale -> ecriture 8.5m M1 + (8.5m + OffsetCloseM) M2
+        // Zero mouvement : validation unique heritee de HX2 (ou explicite en forcage step 4)
+        // -> ecriture 8.5m M1 + (8.5m + OffsetCloseM) M2 + CommitClose
         CmdWinchSelect := 0;
         SoftLimitsOff  := FALSE;
         AllowAscent    := FALSE;
@@ -760,10 +822,11 @@ CASE SeqStep OF
                 ProvisionalAborted            := TRUE;
                 CommitPublished               := FALSE;
             END_IF;
-            Step4PresetIssued   := FALSE;
-            MachineHomingFailed := TRUE;
+            Step4PresetIssued       := FALSE;
+            Step4AutoConfirmPending := FALSE;
+            MachineHomingFailed     := TRUE;
             SeqStep := E_MachineHomingTxState.HX7_FAILED;
-        ELSIF TopPositionSensor THEN
+        ELSIF TopBlockedAtEntry THEN
             // Surcourse detectee pendant l'attente -> repli degagement Step 3, annule preset HX4 si arme
             TopContactLatched  := TRUE;
             TopContactCount    := TopContactCount + UINT#1;
@@ -774,16 +837,19 @@ CASE SeqStep OF
                 ProvisionalAborted            := TRUE;
                 CommitPublished               := FALSE;
             END_IF;
-            Step4PresetIssued  := FALSE;
-            Step3ClearanceDone := FALSE;
-            Step3AccumTime     := T#0s;
-            Step3SegTime       := T#0s;
-            Step3RemainingTime := Cfg.CfgTopClearanceTime;
-            Step3TimerRunning  := FALSE;
+            Step4PresetIssued       := FALSE;
+            Step4AutoConfirmPending := FALSE;
+            Step3BucketOpenDone     := BucketIsOpen;
+            Step3ClearanceDone      := FALSE;
+            Step3AccumTime          := T#0s;
+            Step3SegTime            := T#0s;
+            Step3RemainingTime      := Cfg.CfgTopClearanceTime;
+            Step3TimerRunning       := FALSE;
             Step3Timer(IN := FALSE, PT := T#0s);
             SeqStep := E_MachineHomingTxState.HX3_TOP_CLEARANCE;
         ELSIF NOT Step4PresetIssued THEN
-            IF ValidatePressed AND NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
+            IF (Step4AutoConfirmPending OR ValidatePressed) AND NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
+                Step4AutoConfirmPending   := FALSE;
                 M1Demand.HomeReq          := TRUE;
                 M1Demand.UseDynamicTarget := TRUE;
                 M1Demand.DynamicTarget_M  := Cfg.CfgTopHomingTargetM1_M;
@@ -793,13 +859,14 @@ CASE SeqStep OF
                 Step4PresetIssued := TRUE;
             END_IF;
         ELSIF BothAxesHomed AND M1Status.HomingDone AND M2Status.HomingDone
-              AND NOT M1Status.HomingBusy AND NOT M2Status.HomingBusy AND NOT TopPositionSensor THEN
+              AND NOT M1Status.HomingBusy AND NOT M2Status.HomingBusy AND NOT TopBlockedAtEntry THEN
             BucketCommit.CommitClose := TRUE;
             CommitPublished          := TRUE;
             ProvisionalDatumActive   := FALSE;
             ProvisionalAborted       := FALSE;
             ReHomingAckRequired      := FALSE;
             Step4PresetIssued        := FALSE;
+            Step4AutoConfirmPending  := FALSE;
             RawBtnSeenReleased       := NOT RawDeadmanButton;
             SeqStep := E_MachineHomingTxState.HX0_REPOS;
         END_IF;
@@ -828,13 +895,18 @@ IF (SeqStep = E_MachineHomingTxState.HX1_BUCKET_PREPARE) THEN
 ELSIF (SeqStep = E_MachineHomingTxState.HX2_CLIMB_TO_TOP) THEN
     CmdWinchSelect := 0;
     SoftLimitsOff  := TRUE;
-    AllowAscent    := CouplingSettleTimer.Q AND NOT TopPositionSensor;
+    AllowAscent    := CouplingSettleTimer.Q AND NOT TopBlockedAtEntry;
     AllowDescend   := CouplingSettleTimer.Q AND NOT Step2SlackCutoff;
 ELSIF (SeqStep = E_MachineHomingTxState.HX3_TOP_CLEARANCE) THEN
-    CmdWinchSelect := 0;
+    IF NOT Step3BucketOpenDone THEN
+        CmdWinchSelect := 2;
+        AllowDescend   := TRUE;
+    ELSE
+        CmdWinchSelect := 0;
+        AllowDescend   := NOT Step3ClearanceDone;
+    END_IF;
     SoftLimitsOff  := TRUE;
     AllowAscent    := FALSE;
-    AllowDescend   := NOT Step3ClearanceDone;
 ELSIF (SeqStep = E_MachineHomingTxState.HX4_FINAL_CONFIRM) THEN
     CmdWinchSelect := 0;
     SoftLimitsOff  := FALSE;
@@ -868,105 +940,189 @@ MachineHomingSeqStep := SeqStep;
 {endregion}
 
 {region "§10 Guide operateur — messages ASCII sans accents"}
-IF Fault.Latched THEN
+IF Fault.Latched OR MachineHomingFailed OR (SeqStep = E_MachineHomingTxState.HX7_FAILED) THEN
     MachineHomingStep := E_MachineHomingStep.FAILED;
-    MachineHomingInstruction := 'Echec homing - Acquitter (Reset)';
-ELSIF MachineHomingFailed OR (SeqStep = E_MachineHomingTxState.HX7_FAILED) THEN
-    MachineHomingStep := E_MachineHomingStep.FAILED;
-    MachineHomingInstruction := 'HX7 - Homing abandonne - Acquitter Reset';
+    IF RecoveryHoldTimer.ET > T#0s THEN
+        RecoveryRemSec := DINT_TO_INT((TIME_TO_DINT(Cfg.CfgEntryHoldTime - RecoveryHoldTimer.ET) + DINT#999) / DINT#1000);
+        IF RecoveryRemSec < 0 THEN RecoveryRemSec := 0; END_IF;
+        MachineHomingInstruction := CONCAT('HX7 - Acquittement homing: ',
+                                           CONCAT(INT_TO_STRING(RecoveryRemSec), 's'));
+        MachineHomingActionText  := CONCAT('[HOMING] RELACHER=ANNULER - Acquitter dans ',
+                                           CONCAT(INT_TO_STRING(RecoveryRemSec), 's'));
+    ELSIF TopBlockedAtEntry THEN
+        MachineHomingInstruction := 'HX7 - CAPTEUR TOP NON DEGAGE - Echec homing';
+        IF ModeIsMaint2 THEN
+            MachineHomingActionText := '[TREUIL] DESCENDRE pour degager capteur TOP puis Reset';
+        ELSE
+            MachineHomingActionText := '[SECURITE] TOP NON DEGAGE - Passer N2 pour descendre + Reset';
+        END_IF;
+    ELSIF RecoveryCauseGone THEN
+        MachineHomingInstruction := 'HX7 - Echec homing - Tenir homme-mort 5s neutre (ou Reset)';
+        MachineHomingActionText  := '[HOMING] Echec - Relacher puis HOMME-MORT 5s NEUTRE (ou Reset)';
+    ELSE
+        MachineHomingInstruction := 'HX7 - Defaut codeur actif - Verifier puis Reset';
+        MachineHomingActionText  := '[HOMING] Defaut actif - Attendre retour codeurs puis Reset';
+    END_IF;
 ELSIF MachineHomingLossSafeStop THEN
     MachineHomingStep := E_MachineHomingStep.LOSS_SAFESTOP;
     MachineHomingInstruction := 'Reference perdue - Arret controle';
+    MachineHomingActionText  := '[SECURITE] Reference perdue en mouvement - Acquitter (Reset)';
 ELSIF MachineHomed AND NOT CycleRunning THEN
     MachineHomingStep := E_MachineHomingStep.VALID;
     MachineHomingInstruction := 'Homing fait';
+    MachineHomingActionText  := '';
 ELSIF (SeqStep = E_MachineHomingTxState.HX1_BUCKET_PREPARE) THEN
     MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
     IF Step1PresetIssued THEN
         MachineHomingInstruction := 'HX1 - Prise 0m codeurs + benne fermee...';
+        MachineHomingActionText  := '[HOMING] Enregistrement reference 0m + benne fermee...';
     ELSIF Step1MoveCutoff THEN
-        MachineHomingInstruction := 'HX1 - Delai 20s atteint: relacher neutre et BP';
+        MachineHomingInstruction := 'HX1 - DELAI 20s ATTEINT: relacher neutre et homme-mort';
+        MachineHomingActionText  := '[HOMING] RELACHER joystick au neutre et homme-mort pour continuer';
     ELSIF StepValidateHoldActive THEN
         ValRemSec := DINT_TO_INT((TIME_TO_DINT(Cfg.CfgEntryHoldTime - StepValidateHoldTimer.ET) + DINT#999) / DINT#1000);
         IF ValRemSec < 0 THEN ValRemSec := 0; END_IF;
-        MachineHomingInstruction := CONCAT('HX1 - Validation neutre: ',
-                                           CONCAT(INT_TO_STRING(ValRemSec), 's (lacher=annul.)'));
+        MachineHomingInstruction := CONCAT('HX1 - CONFIRMATION BENNE FERMEE (0m): ',
+                                           CONCAT(INT_TO_STRING(ValRemSec), 's'));
+        MachineHomingActionText  := CONCAT('[BENNE] Tenir HOMME-MORT neutre: ',
+                                           CONCAT(INT_TO_STRING(ValRemSec), 's = VALIDER FERMEE'));
     ELSE
         Step1RemSec := DINT_TO_INT((TIME_TO_DINT(Cfg.CfgBucketPrepareTimeout - Step1MoveTimer.ET) + DINT#999) / DINT#1000);
         IF Step1RemSec < 0 THEN Step1RemSec := 0; END_IF;
-        MachineHomingInstruction := CONCAT('HX1 - Benne M2 ',
-                                           CONCAT(INT_TO_STRING(Step1RemSec), 's (SANS BUTEES) | BP 5s neutre'));
+        MachineHomingInstruction := CONCAT('HX1 - FERMER BENNE M2 ',
+                                           CONCAT(INT_TO_STRING(Step1RemSec), 's (AUCUNE BUTEE!)'));
+        MachineHomingActionText  := '[BENNE] FERMER PRUDEMMENT (SANS BUTEES) puis HOMME-MORT 5s NEUTRE = 0m';
     END_IF;
 ELSIF (SeqStep = E_MachineHomingTxState.HX2_CLIMB_TO_TOP) THEN
     MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
     IF Step2SlackCutoff THEN
         MachineHomingInstruction := 'HX2 - Detente 2s atteinte: relacher neutre';
-    ELSIF TopContactLatched AND TopPositionSensor THEN
+        MachineHomingActionText  := '[TREUIL] RELACHER joystick au neutre pour rearmer descente';
+    ELSIF TopContactLatched AND TopBlockedAtEntry THEN
         MachineHomingInstruction := 'HX2 - Refus montee: contact TOP encore actif';
+        MachineHomingActionText  := '[SECURITE] TOP actif - OUVRIR benne puis plonger pour degager';
     ELSIF StepValidateHoldActive THEN
         ValRemSec := DINT_TO_INT((TIME_TO_DINT(Cfg.CfgEntryHoldTime - StepValidateHoldTimer.ET) + DINT#999) / DINT#1000);
         IF ValRemSec < 0 THEN ValRemSec := 0; END_IF;
-        MachineHomingInstruction := CONCAT('HX2 [PROV 0m] Valid 8.5m: ',
+        MachineHomingInstruction := CONCAT('HX2 - CALIBRATION FINALE 8.5m: ',
                                            CONCAT(INT_TO_STRING(ValRemSec), 's'));
+        MachineHomingActionText  := CONCAT('[HOMING] Tenir HOMME-MORT neutre: ',
+                                           CONCAT(INT_TO_STRING(ValRemSec), 's = VALIDER 8.5m'));
     ELSIF TopContactCount > 0 THEN
         MachineHomingInstruction := CONCAT('HX2 - Approche plus basse (TOP:',
                                            CONCAT(UINT_TO_STRING(TopContactCount), ')'));
+        MachineHomingActionText  := '[TREUIL] MONTER SOUS TOP (NE PAS TOUCHER) puis HOMME-MORT 5s NEUTRE';
     ELSE
-        MachineHomingInstruction := 'HX2 [PROV 0m] Monter < TOP (non ref) | BP 5s';
+        MachineHomingInstruction := 'HX2 - MONTER LENTEMENT SOUS CAPTEUR TOP (AUCUNE BUTEE)';
+        MachineHomingActionText  := '[TREUIL] MONTER SOUS TOP sans le toucher puis HOMME-MORT 5s NEUTRE';
     END_IF;
 ELSIF (SeqStep = E_MachineHomingTxState.HX3_TOP_CLEARANCE) THEN
     MachineHomingStep := E_MachineHomingStep.HOMING_IN_PROGRESS;
-    IF TopPositionSensor THEN
-        MachineHomingInstruction := 'HX3 - TOP touche: position perdue, degager capteur';
+    IF NOT Step3BucketOpenDone THEN
+        IF BucketIsOpen THEN
+            MachineHomingInstruction := 'HX3 - Benne ouverte: relacher neutre pour plonger';
+            MachineHomingActionText  := '[BENNE] BENNE OUVERTE - Relacher joystick au neutre pour plonger';
+        ELSE
+            MachineHomingInstruction := 'HX3 - TOP touche: OUVRIR BENNE PRUDEMMENT (M2 seul)';
+            MachineHomingActionText  := '[BENNE] OUVRIR BENNE PRUDEMMENT (M2 seul) avant plongee degagement';
+        END_IF;
+    ELSIF TopPositionSensor THEN
+        MachineHomingInstruction := 'HX3 - TOP touche: plonger/descendre couple pour degager';
+        MachineHomingActionText  := '[TREUIL] PLONGER / DESCENDRE COUPLE pour degager capteur TOP';
     ELSIF Step3ClearanceDone THEN
         MachineHomingInstruction := 'HX3 - Degagement OK, relacher neutre -> retour HX1';
+        MachineHomingActionText  := '[TREUIL] RELACHER joystick au neutre -> retour fermeture benne';
     ELSE
         Step3RemSec := DINT_TO_INT((TIME_TO_DINT(Step3RemainingTime - Step3SegTime) + DINT#999) / DINT#1000);
         IF Step3RemSec < 0 THEN Step3RemSec := 0; END_IF;
         MachineHomingInstruction := CONCAT('HX3 - Continuer descente degagement: ',
                                            CONCAT(INT_TO_STRING(Step3RemSec), 's'));
+        MachineHomingActionText  := CONCAT('[TREUIL] DESCENDRE pour degager TOP: ',
+                                           CONCAT(INT_TO_STRING(Step3RemSec), 's'));
     END_IF;
 ELSIF (SeqStep = E_MachineHomingTxState.HX4_FINAL_CONFIRM) THEN
     MachineHomingStep := E_MachineHomingStep.AWAIT_BUCKET_CONFIRM;
-    IF Step4PresetIssued THEN
+    IF Step4PresetIssued OR Step4AutoConfirmPending THEN
         MachineHomingInstruction := 'HX4 - Ecriture references 8.5m + benne...';
+        MachineHomingActionText  := '[HOMING] Calibration 8.5m + benne fermee en cours...';
     ELSIF StepValidateHoldActive THEN
         ValRemSec := DINT_TO_INT((TIME_TO_DINT(Cfg.CfgEntryHoldTime - StepValidateHoldTimer.ET) + DINT#999) / DINT#1000);
         IF ValRemSec < 0 THEN ValRemSec := 0; END_IF;
-        MachineHomingInstruction := CONCAT('HX4 [NON REF] 8.5m+benne: ',
+        MachineHomingInstruction := CONCAT('HX4 - Calibrer 8.5m + benne: ',
+                                           CONCAT(INT_TO_STRING(ValRemSec), 's'));
+        MachineHomingActionText  := CONCAT('[HOMING] Tenir HOMME-MORT neutre: ',
                                            CONCAT(INT_TO_STRING(ValRemSec), 's'));
     ELSE
-        MachineHomingInstruction := 'HX4 [NON REF] Calibrer 8.5m+benne? BP 5s';
+        MachineHomingInstruction := 'HX4 - Calibrer 8.5m + benne? Homme-mort 5s neutre';
+        MachineHomingActionText  := '[HOMING] Tenir HOMME-MORT 5s NEUTRE = calibrer 8.5m';
+    END_IF;
+ELSIF TopBlockedAtEntry THEN
+    MachineHomingStep := E_MachineHomingStep.BOTH_NOT_HOMED;
+    IF ModeIsMaint2 THEN
+        MachineHomingInstruction := 'HX0 - CAPTEUR TOP NON DEGAGE (homing bloque)';
+        MachineHomingActionText  := '[TREUIL] DESCENDRE pour degager capteur TOP puis Reset';
+    ELSIF ModeIsMaint1 THEN
+        MachineHomingInstruction := 'HX0 - CAPTEUR TOP NON DEGAGE (homing bloque)';
+        MachineHomingActionText  := '[SECURITE] TOP NON DEGAGE - Passer N2 pour descendre + Reset';
+    ELSE
+        MachineHomingInstruction := 'HX0 - CAPTEUR TOP NON DEGAGE - Passer N2';
+        MachineHomingActionText  := '[SECURITE] TOP NON DEGAGE - Passer N2 pour descendre';
     END_IF;
 ELSIF ModeIsMaint1 THEN
     MachineHomingStep := E_MachineHomingStep.BOTH_NOT_HOMED;
     IF NOT BootReady THEN
         MachineHomingInstruction := 'HX0 - Attente prets codeurs/boot...';
+        MachineHomingActionText  := '[HOMING] Attente codeurs prets...';
+    ELSIF EntryHoldTimer.ET >= T#1500ms THEN
+        EntryRemSec := DINT_TO_INT((TIME_TO_DINT(Cfg.CfgEntryHoldTime - EntryHoldTimer.ET) + DINT#999) / DINT#1000);
+        IF EntryRemSec < 0 THEN EntryRemSec := 0; END_IF;
+        MachineHomingInstruction := CONCAT('HX0 - LANCEMENT HOMING DANS ',
+                                           CONCAT(INT_TO_STRING(EntryRemSec), 's (lacher=annul.)'));
+        MachineHomingActionText  := CONCAT('[HOMING] LANCEMENT DANS ',
+                                           CONCAT(INT_TO_STRING(EntryRemSec), 's - LACHER POUR ANNULER'));
     ELSIF ProvisionalAborted AND NOT RawDeadmanButton THEN
         MachineHomingInstruction := 'HX0 - Altimetrie non calibree: re-referencer';
+        MachineHomingActionText  := '[HOMING] Tenir HOMME-MORT 5s NEUTRE pour relancer';
     ELSIF RawDeadmanButton AND NOT JoystickDeflected AND RawBtnSeenReleased THEN
         EntryRemSec := DINT_TO_INT((TIME_TO_DINT(Cfg.CfgEntryHoldTime - EntryHoldTimer.ET) + DINT#999) / DINT#1000);
         IF EntryRemSec < 0 THEN EntryRemSec := 0; END_IF;
-        MachineHomingInstruction := CONCAT('HX0 - Maintien BP neutre: ',
+        MachineHomingInstruction := CONCAT('HX0 - Maintien homme-mort neutre: ',
                                            CONCAT(INT_TO_STRING(EntryRemSec), 's (secours: N2)'));
+        MachineHomingActionText  := CONCAT('[HOMING] Maintenir HOMME-MORT neutre: ',
+                                           CONCAT(INT_TO_STRING(EntryRemSec), 's'));
     ELSE
         EntryRemSec := DINT_TO_INT((TIME_TO_DINT(Cfg.CfgEntryHoldTime) + DINT#999) / DINT#1000);
-        MachineHomingInstruction := CONCAT('HX0 - Maintenir BP joy ',
-                                           CONCAT(INT_TO_STRING(EntryRemSec), 's neutre (ou passer N2)'));
+        MachineHomingInstruction := CONCAT('HX0 - Tenir homme-mort ',
+                                           CONCAT(INT_TO_STRING(EntryRemSec), 's neutre (ou N2)'));
+        MachineHomingActionText  := '[HOMING] Tenir HOMME-MORT 5s NEUTRE pour lancer (ou N2)';
     END_IF;
 ELSIF ModeIsMaint2 THEN
     MachineHomingStep := E_MachineHomingStep.BOTH_NOT_HOMED;
-    IF ProvisionalAborted THEN
+    IF NOT BootReady THEN
+        MachineHomingInstruction := 'HX0 - Attente prets codeurs/boot (N2 libre)';
+        MachineHomingActionText  := '[HOMING] Attente codeurs prets...';
+    ELSIF EntryHoldTimer.ET >= T#1500ms THEN
+        EntryRemSec := DINT_TO_INT((TIME_TO_DINT(Cfg.CfgEntryHoldTime - EntryHoldTimer.ET) + DINT#999) / DINT#1000);
+        IF EntryRemSec < 0 THEN EntryRemSec := 0; END_IF;
+        MachineHomingInstruction := CONCAT('HX0 - LANCEMENT HOMING DANS ',
+                                           CONCAT(INT_TO_STRING(EntryRemSec), 's (lacher=annul.)'));
+        MachineHomingActionText  := CONCAT('[HOMING] LANCEMENT DANS ',
+                                           CONCAT(INT_TO_STRING(EntryRemSec), 's - LACHER POUR ANNULER'));
+    ELSIF ProvisionalAborted THEN
         MachineHomingInstruction := 'HX0 - Altimetrie non calibree (N2 secours libre)';
+        MachineHomingActionText  := '[HOMING] N2 libre - Homme-mort 5s neutre ou Start IHM';
     ELSE
-        MachineHomingInstruction := 'HX0 - N2 libre actif | Lancer homing (Start IHM)';
+        MachineHomingInstruction := 'HX0 - N2 libre actif | Homing: homme-mort 5s ou Start';
+        MachineHomingActionText  := '[HOMING] N2 libre - Homme-mort 5s neutre ou Start IHM';
     END_IF;
 ELSE
     MachineHomingStep := E_MachineHomingStep.BOTH_NOT_HOMED;
     IF ProvisionalAborted THEN
         MachineHomingInstruction := 'HX0 - Altimetrie non calibree: passer N1/N2';
+        MachineHomingActionText  := '[HOMING] Non calibre - Passer en MAINT_N1 ou MAINT_N2';
     ELSE
         MachineHomingInstruction := 'HX0 - Non reference : passer en MAINT_N1 ou N2';
+        MachineHomingActionText  := '[HOMING] Non reference - Passer en MAINT_N1 ou MAINT_N2';
     END_IF;
 END_IF;
 

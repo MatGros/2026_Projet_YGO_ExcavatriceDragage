@@ -567,9 +567,7 @@ MachineHomingMechanicalStopOk := HwIn.Winch.M1_ContactorsReleased_DI AND NOT HwI
 BucketReferenceOpenEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmOpenPos);
 BucketReferenceCloseEdge(CLK := GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmClosePos);
 BucketReferenceRequested := (BucketReferenceOpenEdge.Q XOR BucketReferenceCloseEdge.Q)
-                          AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-                          AND NOT instCycleMachineHoming.MachineHomingActive
-                          AND MachineHomingMechanicalStopOk;
+                          AND (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2);
 IF BucketReferenceOpenEdge.Q THEN
     // Symetrique du CLOSE ci-dessous : Delta attendu benne ouverte = OffsetOpenM (butee
     // physique reelle ~2.25 m), pas 0. L'ancien preset (M1 sans offset) forcait Delta=0
@@ -596,7 +594,9 @@ instCycleMachineHoming(
     // Garde boot : aucun homing/G7 tant que acquisition + codeurs ne sont pas valides.
     BootReady                  := Data.DataValid AND Data.EncoderM1.Ready AND Data.EncoderM2.Ready,
     TopPositionSensor          := NOT HwIn.Winch.M1M2_TopPositionFree_DI,
+    TopHardStopLatched         := PRG_06_Outputs.Data.TopHardStopLatched,
     WinchesMechanicallyStopped  := MachineHomingMechanicalStopOk,
+    BucketIsOpen               := PRG_04_Treuils_Benne.Data.BucketState.MechState.IsOpen,
     M1Status                   := MachineHomingM1Status,
     M2Status                   := MachineHomingM2Status,
     // Reference benne PERSISTANTE (survit coupure puissance) et non le flag LIVE
@@ -647,6 +647,7 @@ Data.MachineHoming.BucketRefInvalidate := instCycleMachineHoming.BucketCommit.Co
 Data.MachineHoming.ProvisionalActive   := instEncoderM1.HomingProvisional OR instEncoderM2.HomingProvisional;
 Data.MachineHoming.TopContactLatched   := instCycleMachineHoming.TopContactLatched;
 Data.MachineHoming.TopContactCount     := instCycleMachineHoming.TopContactCount;
+Data.MachineHoming.ActionText          := instCycleMachineHoming.MachineHomingActionText;
 HwInM1.RawPosIn          := HwIn.Winch.COD1_PosValue;
 HwInM1.SpdValueIn        := HwIn.Winch.COD1_SpdValue;
 HwInM1.AlarmsIn          := HwIn.Winch.COD1_Alarms;
@@ -656,17 +657,15 @@ HwInM1.PresetStatusBit    := FALSE;
 instEncoderM1(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    // Homing unitaire M1 : autorise en MAINT_N2 uniquement (BtnHomingAtZero a l'arret ou BtnHome au capteur haut).
-    // Le cycle machine (instCycleMachineHoming.M1Demand.HomeReq) reste autorise en N1/N2 via cible dynamique Step 4.
-    HomingPermit          := (((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-                               AND ((GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero AND MachineHomingMechanicalStopOk)
-                                    OR (GVL_IHM.M1TreuilRetenue.Cmd.BtnHome AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
-                              OR instCycleMachineHoming.M1Demand.HomeReq),
+    // Homing unitaire M1 : autorise en MAINT_N2 sans condition (et cycle machine via M1Demand.HomeReq).
+    HomingPermit          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                              OR instCycleMachineHoming.M1Demand.HomeReq,
     HomingAtTargetM       := GVL_IHM.M1TreuilRetenue.Cmd.BtnHome
                              OR GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero
                              OR instCycleMachineHoming.M1Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
-    ConfirmCoherence      := GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
+    ConfirmCoherence      := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                             AND GVL_IHM.M1TreuilRetenue.Cmd.BtnConfirmCoherence,
     InvalidateDatum       := instCycleMachineHoming.InvalidateProvisionalDatum,
     ProvisionalHoming     := instCycleMachineHoming.M1Demand.Provisional,
     CfgHomingTargetM      := SEL(GVL_IHM.M1TreuilRetenue.Cmd.BtnHomingAtZero,
@@ -710,17 +709,16 @@ HwInM2.PresetStatusBit    := FALSE;
 instEncoderM2(
     Enable                := TRUE,
     Reset                 := PRG_07_Supervision.FaultMachineReset_IHM,
-    // Homing unitaire M2 (benne) : autorise en MAINT_N2 uniquement (benne / zero / capteur haut).
-    HomingPermit          := (((PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
-                               AND (((GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero OR BucketReferenceRequested) AND MachineHomingMechanicalStopOk)
-                                    OR (GVL_IHM.M2TreuilBenne.Cmd.BtnHome AND NOT HwIn.Winch.M1M2_TopPositionFree_DI)))
-                              OR instCycleMachineHoming.M2Demand.HomeReq),
+    // Homing unitaire M2 (benne) : autorise en MAINT_N2 sans condition (et cycle machine via M2Demand.HomeReq).
+    HomingPermit          := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                              OR instCycleMachineHoming.M2Demand.HomeReq,
     HomingAtTargetM       := GVL_IHM.M2TreuilBenne.Cmd.BtnHome
                              OR GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero
                              OR BucketReferenceRequested
                              OR instCycleMachineHoming.M2Demand.HomeReq,
     HomingAtZero          := GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,
-    ConfirmCoherence      := GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
+    ConfirmCoherence      := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+                             AND GVL_IHM.M2TreuilBenne.Cmd.BtnConfirmCoherence,
     InvalidateDatum       := instCycleMachineHoming.InvalidateProvisionalDatum,
     ProvisionalHoming     := instCycleMachineHoming.M2Demand.Provisional,
     CfgHomingTargetM      := SEL(GVL_IHM.M2TreuilBenne.Cmd.BtnHomingAtZero,

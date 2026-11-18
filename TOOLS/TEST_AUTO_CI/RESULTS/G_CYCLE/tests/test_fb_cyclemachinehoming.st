@@ -293,48 +293,63 @@ TEST 'TC-P09-H007 : HX2 contact TopPositionSensor coupe montee, ne pose aucun pr
 END_TEST
 
 
-(* ================= H008 : HX3 descente 4s accumules -> retour HX1 ======= *)
-TEST 'TC-P09-H008 : HX3 montee interdite, pause 2s+2s apres release TOP, re-contact remet a 0, retour HX1'
+(* ================= H008 : HX3 ouverture benne M2 puis descente 4s -> HX1 === *)
+TEST 'TC-P09-H008 : HX3 ouvre benne M2 puis descente 4s apres release TOP, retour HX1'
     Fb(Enable := TRUE, Reset := TRUE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
        WinchesMechanicallyStopped := TRUE, Cfg := Cfg);
-    (* Forcage mise en service en HX3 pour tester Step 3 directement *)
+    (* Forcage mise en service en HX3 (benne fermee) -> phase A ouverture benne M2 *)
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
-       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 3, CfgForceStepApply := TRUE, Cfg := Cfg);
+       CfgCommissioningEnable := TRUE, CfgForceStepTarget := 3, CfgForceStepApply := TRUE,
+       BucketIsOpen := FALSE, Cfg := Cfg);
     ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX3_TOP_CLEARANCE, 'En HX3');
+    ASSERT_EQ(Fb.CmdWinchSelect, 2, 'HX3A : selecteur M2 seul pour ouvrir benne');
     ASSERT_FALSE(Fb.AllowAscent, 'HX3 : montee strictement interdite');
+    ASSERT_TRUE(Fb.AllowDescend, 'HX3A : ouverture benne M2 autorisee');
+
+    (* Une fois benne ouverte au neutre -> phase B couple M1+M2 *)
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       CfgForceStepApply := FALSE, WinchesMechanicallyStopped := TRUE, JoystickDeflected := FALSE,
+       BucketIsOpen := TRUE, TopPositionSensor := TRUE, Cfg := Cfg);
+    ASSERT_EQ(Fb.CmdWinchSelect, 0, 'HX3B : couple M1+M2 apres benne ouverte');
 
     (* Tant que TOP=TRUE, le timer 4s n avance pas *)
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
-       CfgForceStepApply := FALSE, JoystickWinchSelectArbitrated := 0,
+       JoystickWinchSelectArbitrated := 0, BucketIsOpen := TRUE,
        DeadmanArmed := TRUE, JoystickPush := TRUE, JoystickDeflected := TRUE, TopPositionSensor := TRUE, Cfg := Cfg);
     ADVANCE_TIME(5000000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
-       JoystickWinchSelectArbitrated := 0, DeadmanArmed := TRUE, JoystickPush := TRUE, JoystickDeflected := TRUE,
+       JoystickWinchSelectArbitrated := 0, BucketIsOpen := TRUE,
+       DeadmanArmed := TRUE, JoystickPush := TRUE, JoystickDeflected := TRUE,
        TopPositionSensor := TRUE, Cfg := Cfg);
     ASSERT_TRUE(Fb.AllowDescend, 'Tant que TOP=TRUE, degagement non fini');
 
     (* TOP relache -> descente 2.5s puis pause au neutre -> reste en HX3 *)
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
-       JoystickWinchSelectArbitrated := 0, DeadmanArmed := TRUE, JoystickPush := TRUE, JoystickDeflected := TRUE,
+       JoystickWinchSelectArbitrated := 0, BucketIsOpen := TRUE,
+       DeadmanArmed := TRUE, JoystickPush := TRUE, JoystickDeflected := TRUE,
        TopPositionSensor := FALSE, Cfg := Cfg);
     ADVANCE_TIME(2500000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
-       JoystickWinchSelectArbitrated := 0, DeadmanArmed := FALSE, JoystickPush := FALSE, JoystickDeflected := FALSE,
+       JoystickWinchSelectArbitrated := 0, BucketIsOpen := TRUE,
+       DeadmanArmed := FALSE, JoystickPush := FALSE, JoystickDeflected := FALSE,
        WinchesMechanicallyStopped := TRUE, TopPositionSensor := FALSE, Cfg := Cfg);
     ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX3_TOP_CLEARANCE, '2.5s < 4s : reste HX3');
 
     (* Reprise 1.6s (cumul > 4s) -> AllowDescend coupe ; relacher neutre -> retour HX1 *)
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
-       JoystickWinchSelectArbitrated := 0, DeadmanArmed := TRUE, JoystickPush := TRUE, JoystickDeflected := TRUE,
+       JoystickWinchSelectArbitrated := 0, BucketIsOpen := TRUE,
+       DeadmanArmed := TRUE, JoystickPush := TRUE, JoystickDeflected := TRUE,
        TopPositionSensor := FALSE, Cfg := Cfg);
     ADVANCE_TIME(1600000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
-       JoystickWinchSelectArbitrated := 0, DeadmanArmed := TRUE, JoystickPush := TRUE, JoystickDeflected := TRUE,
+       JoystickWinchSelectArbitrated := 0, BucketIsOpen := TRUE,
+       DeadmanArmed := TRUE, JoystickPush := TRUE, JoystickDeflected := TRUE,
        TopPositionSensor := FALSE, Cfg := Cfg);
     ASSERT_FALSE(Fb.AllowDescend, 'Cumul 4.1s >= 4s -> coupe descente');
 
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
-       JoystickWinchSelectArbitrated := 0, DeadmanArmed := FALSE, JoystickPush := FALSE, JoystickDeflected := FALSE,
+       JoystickWinchSelectArbitrated := 0, BucketIsOpen := TRUE,
+       DeadmanArmed := FALSE, JoystickPush := FALSE, JoystickDeflected := FALSE,
        WinchesMechanicallyStopped := TRUE, TopPositionSensor := FALSE, Cfg := Cfg);
     ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX1_BUCKET_PREPARE, 'Apres 4s + neutre -> retour HX1');
 END_TEST
@@ -389,15 +404,14 @@ TEST 'TC-P09-H010 : HX4 confirmation finale ecrit 8.5m M1 + 23.5m M2 puis Commit
     ADVANCE_TIME(350000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
        JoystickWinchSelectArbitrated := 0, WinchesMechanicallyStopped := TRUE, Cfg := Cfg);
+    (* Validation unique en HX2 -> entre HX4 et lance directement 8.5m M1 + 23.5m M2 *)
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
        JoystickWinchSelectArbitrated := 0, WinchesMechanicallyStopped := TRUE, BtnValidation := TRUE, Cfg := Cfg);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
-       JoystickWinchSelectArbitrated := 0, WinchesMechanicallyStopped := TRUE, BtnValidation := FALSE, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX4_FINAL_CONFIRM, 'Validation HX2 -> HX4');
 
-    (* Second BtnValidation en HX4 : ecrit 8.5m M1 + 23.5m M2 *)
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
-       JoystickWinchSelectArbitrated := 0, WinchesMechanicallyStopped := TRUE, BtnValidation := TRUE, TopPositionSensor := FALSE, Cfg := Cfg);
-    ASSERT_TRUE(Fb.M1Demand.HomeReq, 'HX4 : M1 HomeReq emis');
+       JoystickWinchSelectArbitrated := 0, WinchesMechanicallyStopped := TRUE, BtnValidation := FALSE, TopPositionSensor := FALSE, Cfg := Cfg);
+    ASSERT_TRUE(Fb.M1Demand.HomeReq, 'HX4 : M1 HomeReq emis automatiquement sans double validation');
     ASSERT_TRUE(Fb.M1Demand.UseDynamicTarget, 'HX4 : M1 UseDynamicTarget TRUE');
     ASSERT_EQ(Fb.M1Demand.DynamicTarget_M, 8.5, 'HX4 : M1 cible 8.5m');
     ASSERT_TRUE(Fb.M2Demand.HomeReq, 'HX4 : M2 HomeReq emis');
@@ -570,16 +584,11 @@ TEST 'TC-P09-H015 : Cycle complet 100pct joystick BP 5s neutre HX0->HX1->HX2->HX
        JoystickWinchSelectArbitrated := 0, WinchesMechanicallyStopped := TRUE, RawDeadmanButton := TRUE, M1Status := StHomed, M2Status := StHomed, Cfg := Cfg);
     ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX4_FINAL_CONFIRM, 'HX2 -> HX4 sur BP 5s neutre');
 
-    (* Relachement + maintien 5s au neutre -> Preset 8.5m + CommitClose *)
+    (* Validation unique HX2 enchaint automatiquement preset 8.5m sans second appui 5s *)
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
        WinchesMechanicallyStopped := TRUE, RawDeadmanButton := FALSE, TopPositionSensor := FALSE, M1Status := StHomed, M2Status := StHomed, Cfg := Cfg);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
-       WinchesMechanicallyStopped := TRUE, RawDeadmanButton := TRUE, TopPositionSensor := FALSE, M1Status := StHomed, M2Status := StHomed, Cfg := Cfg);
-    ADVANCE_TIME(5100000000);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
-       WinchesMechanicallyStopped := TRUE, RawDeadmanButton := TRUE, TopPositionSensor := FALSE, M1Status := StHomed, M2Status := StHomed, Cfg := Cfg);
-    ASSERT_TRUE(Fb.M1Demand.HomeReq, 'HX4 BP 5s : M1 HomeReq emis');
-    ASSERT_TRUE(Fb.M2Demand.HomeReq, 'HX4 BP 5s : M2 HomeReq emis');
+    ASSERT_TRUE(Fb.M1Demand.HomeReq, 'HX4 auto : M1 HomeReq emis');
+    ASSERT_TRUE(Fb.M2Demand.HomeReq, 'HX4 auto : M2 HomeReq emis');
 
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
        WinchesMechanicallyStopped := TRUE, RawDeadmanButton := FALSE, TopPositionSensor := FALSE,
@@ -649,9 +658,7 @@ TEST 'TC-P09-H017 : Reboot avec HomingProvisional RETAIN purge le zero provisoir
     ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX4_FINAL_CONFIRM, 'En HX4');
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
        WinchesMechanicallyStopped := TRUE, BtnValidation := FALSE, M1Status := StHomed, M2Status := StHomed, Cfg := Cfg);
-    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
-       WinchesMechanicallyStopped := TRUE, BtnValidation := TRUE, M1Status := StHomed, M2Status := StHomed, Cfg := Cfg);
-    ASSERT_TRUE(Fb.M1Demand.HomeReq, 'Preset HX4 lance');
+    ASSERT_TRUE(Fb.M1Demand.HomeReq, 'Preset HX4 lance automatiquement');
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
        WinchesMechanicallyStopped := TRUE, BtnValidation := FALSE, TopPositionSensor := TRUE,
        M1Status := StBusy, M2Status := StBusy, Cfg := Cfg);
@@ -673,26 +680,33 @@ TEST 'TC-P09-H018 : T417-C A1 TopContactLatched + compteur TOP + 3 libelles homi
        JoystickWinchSelectArbitrated := 0, WinchesMechanicallyStopped := TRUE, Cfg := Cfg);
     ADVANCE_TIME(350000000);
 
-    // 1er contact TOP en HX2 -> TopContactLatched := TRUE, TopContactCount := 1, passage HX3 + libelle 1
+    // 1er contact TOP en HX2 -> TopContactLatched := TRUE, TopContactCount := 1, passage HX3 + ouverture benne
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
        JoystickWinchSelectArbitrated := 0, DeadmanArmed := TRUE, JoystickPull := TRUE, JoystickDeflected := TRUE,
-       TopPositionSensor := TRUE, Cfg := Cfg);
+       TopPositionSensor := TRUE, BucketIsOpen := FALSE, Cfg := Cfg);
     ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX3_TOP_CLEARANCE, 'Contact TOP -> HX3');
     ASSERT_TRUE(Fb.TopContactLatched, 'Contact TOP arme TopContactLatched');
     ASSERT_EQ(Fb.TopContactCount, 1, 'Compteur contacts TOP = 1');
-    ASSERT_EQ(Fb.MachineHomingInstruction, 'HX3 - TOP touche: position perdue, degager capteur', 'Libelle latch HX3');
+    ASSERT_EQ(Fb.CmdWinchSelect, 2, 'HX3A : ouvre benne M2 d abord');
+    ASSERT_EQ(Fb.MachineHomingInstruction, 'HX3 - TOP touche: OUVRIR BENNE PRUDEMMENT (M2 seul)', 'Libelle ouverture HX3A');
 
-    // Degagement 4s hors capteur puis neutre -> retour HX1, TopContactLatched purge, compteur conserve
+    // Benne ouverte au neutre -> bascule HX3B couplee M1+M2 puis degagement 4s hors capteur
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, JoystickDeflected := FALSE,
+       BucketIsOpen := TRUE, TopPositionSensor := TRUE, Cfg := Cfg);
+    ASSERT_EQ(Fb.CmdWinchSelect, 0, 'HX3B : passe en couple M1+M2');
+    ASSERT_EQ(Fb.MachineHomingInstruction, 'HX3 - TOP touche: plonger/descendre couple pour degager', 'Libelle latch HX3B');
+
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
        JoystickWinchSelectArbitrated := 0, DeadmanArmed := TRUE, JoystickPull := FALSE, JoystickPush := TRUE, JoystickDeflected := TRUE,
-       TopPositionSensor := FALSE, Cfg := Cfg);
+       BucketIsOpen := TRUE, TopPositionSensor := FALSE, Cfg := Cfg);
     ADVANCE_TIME(4100000000);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
        JoystickWinchSelectArbitrated := 0, DeadmanArmed := TRUE, JoystickPull := FALSE, JoystickPush := TRUE, JoystickDeflected := TRUE,
-       TopPositionSensor := FALSE, Cfg := Cfg);
+       BucketIsOpen := TRUE, TopPositionSensor := FALSE, Cfg := Cfg);
     Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
        JoystickWinchSelectArbitrated := 0, DeadmanArmed := FALSE, JoystickPull := FALSE, JoystickPush := FALSE, JoystickDeflected := FALSE,
-       WinchesMechanicallyStopped := TRUE, TopPositionSensor := FALSE, Cfg := Cfg);
+       WinchesMechanicallyStopped := TRUE, BucketIsOpen := TRUE, TopPositionSensor := FALSE, Cfg := Cfg);
     ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX1_BUCKET_PREPARE, 'Retour HX1 apres degagement');
     ASSERT_FALSE(Fb.TopContactLatched, 'Degagement reussi -> TopContactLatched efface');
     ASSERT_EQ(Fb.TopContactCount, 1, 'Compteur TOP conserve apres retour HX1');
@@ -714,4 +728,71 @@ TEST 'TC-P09-H018 : T417-C A1 TopContactLatched + compteur TOP + 3 libelles homi
        WinchesMechanicallyStopped := TRUE, Cfg := Cfg);
     ASSERT_FALSE(Fb.TopContactLatched, 'Reset purge TopContactLatched');
     ASSERT_EQ(Fb.TopContactCount, 0, 'Reset purge TopContactCount');
+END_TEST
+
+(* ================= H019 : Verrou HX0 si TOP ou latch actif + N2 5s ====== *)
+TEST 'TC-P09-H019 : HX0 bloque si TOP ou TopHardStopLatched actif (N1 et N2) + entree 5s N2'
+    (* TopHardStopLatched TRUE en MAINT_N2 -> bloque StartRequest et 5s neutre, affiche CAPTEUR TOP NON DEGAGE *)
+    Fb(Enable := TRUE, Reset := TRUE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, TopHardStopLatched := TRUE, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, TopHardStopLatched := TRUE, StartRequest := TRUE, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX0_REPOS, 'TopHardStopLatched bloque StartRequest N2');
+    ASSERT_EQ(Fb.MachineHomingInstruction, 'HX0 - CAPTEUR TOP NON DEGAGE (homing bloque)', 'Message N2 TOP bloque');
+
+    (* Idem en MAINT_N1 *)
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, TopHardStopLatched := TRUE, RawDeadmanButton := TRUE, Cfg := Cfg);
+    ADVANCE_TIME(5500000000);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, TopHardStopLatched := TRUE, RawDeadmanButton := TRUE, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX0_REPOS, 'TopHardStopLatched bloque 5s N1');
+
+    (* Apres degagement latch + relachement BP -> 5s neutre en MAINT_N2 lance HX1 *)
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, TopHardStopLatched := FALSE, RawDeadmanButton := FALSE, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, TopHardStopLatched := FALSE, RawDeadmanButton := TRUE, Cfg := Cfg);
+    ADVANCE_TIME(5100000000);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, TopHardStopLatched := FALSE, RawDeadmanButton := TRUE, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX1_BUCKET_PREPARE, 'N2 5s neutre TOP libre -> HX1');
+END_TEST
+
+(* ================= H020 : Sortie HX7_FAILED par 5s neutre ============== *)
+TEST 'TC-P09-H020 : HX7_FAILED acquittable par maintien 5s neutre apres disparition cause + anti-collage'
+    Fb(Enable := TRUE, Reset := TRUE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, RawDeadmanButton := FALSE, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, RawDeadmanButton := TRUE, Cfg := Cfg);
+    ADVANCE_TIME(5100000000);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, RawDeadmanButton := TRUE, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX1_BUCKET_PREPARE, 'Entre HX1');
+
+    (* Defaut codeur M1 en cours de cycle -> HX7_FAILED *)
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, RawDeadmanButton := TRUE, M1Status := StErr, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX7_FAILED, 'Defaut codeur -> HX7');
+
+    (* Cause encore active -> meme 5s au neutre ne doit PAS acquitter *)
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, RawDeadmanButton := FALSE, M1Status := StErr, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, RawDeadmanButton := TRUE, M1Status := StErr, Cfg := Cfg);
+    ADVANCE_TIME(5500000000);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, RawDeadmanButton := TRUE, M1Status := StErr, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX7_FAILED, 'Cause active : reste HX7');
+
+    (* Cause disparue + relachement + 5s neutre -> retour HX0 sans re-entrer directement en HX1 *)
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, RawDeadmanButton := FALSE, M1Status := StNone, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, RawDeadmanButton := TRUE, M1Status := StNone, Cfg := Cfg);
+    ADVANCE_TIME(5100000000);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N1, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, RawDeadmanButton := TRUE, M1Status := StNone, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX0_REPOS, 'Cause disparue + 5s neutre -> retour HX0');
+    ASSERT_FALSE(Fb.MachineHomingFailed, 'MachineHomingFailed efface');
 END_TEST
