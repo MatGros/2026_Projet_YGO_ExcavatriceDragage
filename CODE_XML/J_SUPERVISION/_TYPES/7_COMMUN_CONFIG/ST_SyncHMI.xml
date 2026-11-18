@@ -228,6 +228,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarme synchro active</xhtml>
               </documentation>
             </variable>
+            <variable name="FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Défaut synchro latché (acquittable Reset)</xhtml>
+              </documentation>
+            </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />

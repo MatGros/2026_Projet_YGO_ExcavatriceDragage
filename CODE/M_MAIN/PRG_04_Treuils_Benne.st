@@ -1847,6 +1847,7 @@ SyncState.SyncWarn := instWinchSync.SyncWarn;
 SyncState.SyncDeviationWarn := instWinchSync.SyncDeviationWarn;
 SyncState.Ready := instWinchSync.Ready;
 SyncState.Error := instWinchSync.Fault.Error;
+SyncState.FaultLatched := instWinchSync.Fault.Latched;
 SyncState.ErrorId := instWinchSync.Fault.ErrorId;
 IF instWinchSync.Fault.Error THEN
     SyncState.FBState := E_State.ERROR;
@@ -1886,6 +1887,7 @@ BucketState.Busy := instBucket.Lifecycle.Busy;
 BucketState.Done := instBucket.Lifecycle.Done;
 Data.BucketCloseReached := instBucket.CloseReached;
 BucketState.Error := instBucket.Fault.Error;
+BucketState.FaultLatched := instBucket.Fault.Latched;
 BucketState.ErrorId := instBucket.Fault.ErrorId;
 BucketState.RemainingTravel_M := instBucket.RemainingTravelM;
 BucketState.DeltaPosition_M := instBucket.DeltaPosition_M;

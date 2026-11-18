@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.568430" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.568430">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T10:48:22.963774" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T10:48:22.963774">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -72,6 +72,14 @@
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarme synchro active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Défaut synchro latché (acquittable Reset)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">

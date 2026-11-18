@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T03:25:23.274921" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T03:25:23.274921">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T10:49:46.937094" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T10:49:46.937094">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1856,6 +1856,14 @@ fournie par la configuration persistante de l'appelant.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Capteur de position haute commun M1+M2 détecté</xhtml>
               </documentation>
             </variable>
+            <variable name="TopHardStopLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Latch directionnel capteur position haute commun M1+M2 actif</xhtml>
+              </documentation>
+            </variable>
             <variable name="BrakeThermalFault">
               <type>
                 <BOOL />
@@ -2164,6 +2172,204 @@ Réglage mode confirmation preset, ponté vers GVL_PERSISTENT</xhtml>
    GVL_PERSISTENT via FB_CfgPersistBridge_fbJoystick_Cfg. La calibration du neutre reste
    dans GVL_PERSISTENT (bouton Calibrate). Pas de Bypass (concept absent de ce struct).
    ═══════════════════════════════════════════════════════════════</xhtml>
+        </documentation>
+      </dataType>
+      <dataType name="ST_MachineHoming">
+        <baseType>
+          <struct>
+            <variable name="Homed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Qualification conjointe reference machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SetPosBucketOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valider position actuelle = reference benne ouverte</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SetPosBucketClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Valider position actuelle = reference benne fermee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Active">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Homing conjoint en cours</xhtml>
+              </documentation>
+            </variable>
+            <variable name="HomingLoss">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Perte reference en mouvement : arret controle SafeStop</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Step">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Etape guidee reference (echelle de priorite E_MachineHomingStep)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Instruction">
+              <type>
+                <string length="120" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Consigne IHM reference</xhtml>
+              </documentation>
+            </variable>
+            <variable name="Failed">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Transaction reference abandonnee</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SeqStep">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Step GRAFCET courant (E_MachineHomingTxState HX0..HXF)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="M3Locked">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Translation M3 interdite pendant le cycle de homing machine</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdWinchM1">
+              <type>
+                <derived name="ST_ProgramWinchRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre treuil M1 couple palier 1 (HX2 montee / HX3 descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdWinchM2">
+              <type>
+                <derived name="ST_ProgramWinchRequest" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre treuil M2 couple palier 1 (HX2 montee / HX3 descente)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdBucketOpen">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre ouverture benne palier 1 sans FDC soft</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdBucketClose">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre fermeture benne palier 1 sans FDC soft (HX1)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CmdWinchSelect">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Override selecteur treuil cycle homing (-1=neutre, 0=couple, 2=benne)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AllowAscent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation montee par etape GRAFCET homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="AllowDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Autorisation descente par etape GRAFCET homing</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SoftLimitsOff">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Inhibition limites soft position (HX1..HX3 uniquement, hors capteur TOP)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketRefInvalidate">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Revoque reference benne sur abandon cycle avant HX4</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ProvisionalActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE tant que le zero 0m HX1 est provisoire avant HX4 8.5m</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopContactLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact TOP touche pendant cycle homing : degagement requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopContactCount">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de contacts capteur TOP pendant cycle homing (purge Reset)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>719346ef-3775-5b4e-ac3c-37b255640eba</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🧭 ST_MachineHoming — Etat publie du homing conjoint machine (M1/M2/benne)
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les 8 sorties homing a plat de PRG_02_Acquisition en
+             un bus struct unique, publie sur le bus inter-PRG.
+   🔒 Sécurité : Homed = qualification conjointe reference machine (gate SEMI_AUTO).
+                 HomingLoss = perte reference en mouvement : arret controle SafeStop.
+   📄 Doc métier : DOC/AF/AF_Partie-09_Fonction_Encoder_v2.4.md (F09.08)
+   =======================================================================</xhtml>
         </documentation>
       </dataType>
       <dataType name="ST_Modes_Autorisations">
@@ -2556,6 +2762,14 @@ Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Requête coupure métier (arrêt d'urgence) — consommé par FB_SimBench</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopHardStopLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Latch directionnel capteur position haute M1/M2 (montee bloquee jusqu'au degagement)</xhtml>
               </documentation>
             </variable>
           </struct>
@@ -5126,6 +5340,57 @@ Seuils de changement de palier (0..100%)</xhtml>
    ═══════════════════════════════════════════════════════════════</xhtml>
         </documentation>
       </dataType>
+      <dataType name="ST_ProgramWinchRequest">
+        <baseType>
+          <struct>
+            <variable name="RunRequest">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Ordre marche demandé par le programme</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqAscent">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande montée</xhtml>
+              </documentation>
+            </variable>
+            <variable name="ReqDescend">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Demande descente</xhtml>
+              </documentation>
+            </variable>
+            <variable name="StepTgt">
+              <type>
+                <INT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Palier de vitesse cible demandé (1 à 5, 0 = arrêt)</xhtml>
+              </documentation>
+            </variable>
+          </struct>
+        </baseType>
+        <addData>
+          <data name="http://www.3s-software.com/plcopenxml/objectid" handleUnknown="discard">
+            <ObjectId>edbf7141-2109-5344-bf49-1cd29f4686cd</ObjectId>
+          </data>
+        </addData>
+        <documentation>
+          <xhtml xmlns="http://www.w3.org/1999/xhtml">=======================================================================
+   🔌 ST_ProgramWinchRequest — Demande de mouvement treuil par le programme
+   ───────────────────────────────────────────────────────────────
+   🎯 Rôle : Regroupe les demandes logiques de treuil formulées par le séquenceur
+   📄 Référentiel : DOC/WFLOW/CONTRACTS/INTERPRG_CONTRACT_PRG03_MODES_CYCLE_v1.0.md
+   =======================================================================</xhtml>
+        </documentation>
+      </dataType>
       <dataType name="E_WinchTraceBlockReason">
         <baseType>
           <enum>
@@ -5335,6 +5600,14 @@ Seuils de changement de palier (0..100%)</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarme synchro active</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Défaut synchro latché (acquittable Reset)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -6623,6 +6896,14 @@ Gain consommé par l'estimateur, m/(Hz.s)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut treuil</xhtml>
               </documentation>
             </variable>
+            <variable name="FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Défaut treuil latché (acquittable Reset)</xhtml>
+              </documentation>
+            </variable>
             <variable name="RelayFwd">
               <type>
                 <BOOL />
@@ -7343,6 +7624,14 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne en défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Défaut benne latché (acquittable Reset)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">
@@ -8889,6 +9178,7 @@ GVL_IHM.M3Translation.Bypass.ContactorFeedback   := GVL_Simulation.SimulationMod
 // l'état des bypasss réellement consommés par FB_Safety_Winch.
 GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_IHM.Commun.Bypass.SlackCable;
 GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_IHM.Commun.Bypass.TopLimitSwitch;
+GVL_IHM.Commun.TopHardStopLatched                := PRG_06_Outputs.Data.TopHardStopLatched;
 GVL_IHM.Commun.WinchInputSourceChanged           := PRG_02_Acquisition.Data.InputSource.WinchInputSourceChanged;
 
 // ---------- §3e. Structures d'état &amp; safety (recopies directes des bus) ----------
@@ -9010,8 +9300,11 @@ GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
                                       OR PRG_06_Outputs.EmergencyFault.Latched
                                       OR PRG_02_Acquisition.Data.InputModules.Fault
                                       OR PRG_02_Acquisition.Data.MachineHoming.Failed
+                                      OR PRG_02_Acquisition.Data.MachineHoming.HomingLoss
                                       OR PRG_02_Acquisition.Data.EncoderM1.Fault.Error
+                                      OR PRG_02_Acquisition.Data.EncoderM1.Fault.Latched
                                       OR PRG_02_Acquisition.Data.EncoderM2.Fault.Error
+                                      OR PRG_02_Acquisition.Data.EncoderM2.Fault.Latched
                                       OR PRG_02_Acquisition.Data.Joystick.Fault.Latched
                                       OR PRG_03_Modes_Cycle.Data.ModesFault.Error
                                       OR PRG_03_Modes_Cycle.Data.ModesFault.Latched
@@ -9019,18 +9312,22 @@ GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
                                       OR GVL_IHM.M1TreuilRetenue.Safety.ErrorOverspeed
                                       OR (GVL_IHM.M1TreuilRetenue.Safety.LatchedId &lt;&gt; 16#0000)
                                       OR GVL_IHM.M1TreuilRetenue.State.Error
+                                      OR GVL_IHM.M1TreuilRetenue.State.FaultLatched
                                       OR GVL_IHM.M1TreuilRetenue.State.FinalInterlockError
                                       OR GVL_IHM.M2TreuilBenne.Safety.Error
                                       OR GVL_IHM.M2TreuilBenne.Safety.ErrorOverspeed
                                       OR (GVL_IHM.M2TreuilBenne.Safety.LatchedId &lt;&gt; 16#0000)
                                       OR GVL_IHM.M2TreuilBenne.State.Error
+                                      OR GVL_IHM.M2TreuilBenne.State.FaultLatched
                                       OR GVL_IHM.M2TreuilBenne.State.FinalInterlockError
                                       OR GVL_IHM.M3Translation.Safety.Error
                                       OR (GVL_IHM.M3Translation.Safety.LatchedId &lt;&gt; 16#0000)
                                       OR GVL_IHM.M3Translation.State.Error
                                       OR GVL_IHM.M3Translation.State.FinalInterlockError
                                       OR GVL_IHM.M1M2Sync.State.Error
+                                      OR GVL_IHM.M1M2Sync.State.FaultLatched
                                       OR GVL_IHM.M2TreuilBenne.Bucket.State.Error
+                                      OR GVL_IHM.M2TreuilBenne.Bucket.State.FaultLatched
                                       OR GVL_IHM.CycleSemiAuto.State.Error
                                       OR GVL_IHM.JOY1Joystick.State.Error;
 // Miroir IHM des états de maintenance (AF-05 §4bis, producteur FB_Modes via PRG_03)
@@ -9211,11 +9508,16 @@ instHmiBannerFormatter(
     MachineHomingStep        := PRG_02_Acquisition.Data.MachineHoming.Step,
     MachineHomingInstruction := PRG_02_Acquisition.Data.MachineHoming.Instruction,
     MachineHomingFailed      := PRG_02_Acquisition.Data.MachineHoming.Failed,
+    MachineHomingLoss        := PRG_02_Acquisition.Data.MachineHoming.HomingLoss,
     MachineHomingProvisional := HomingProvisionalHmi,
-    WinchM1Error             := GVL_IHM.M1TreuilRetenue.State.Error OR GVL_IHM.M1TreuilRetenue.State.FinalInterlockError,
-    WinchM2Error             := GVL_IHM.M2TreuilBenne.State.Error OR GVL_IHM.M2TreuilBenne.State.FinalInterlockError,
-    EncoderM1Fault           := PRG_02_Acquisition.Data.EncoderM1.Fault.Error,
-    EncoderM2Fault           := PRG_02_Acquisition.Data.EncoderM2.Fault.Error,
+    TopHardStopLatched       := PRG_06_Outputs.Data.TopHardStopLatched,
+    TopPositionSensorActive  := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
+    WinchM1Error             := GVL_IHM.M1TreuilRetenue.State.Error OR GVL_IHM.M1TreuilRetenue.State.FaultLatched OR GVL_IHM.M1TreuilRetenue.State.FinalInterlockError,
+    WinchM2Error             := GVL_IHM.M2TreuilBenne.State.Error OR GVL_IHM.M2TreuilBenne.State.FaultLatched OR GVL_IHM.M2TreuilBenne.State.FinalInterlockError,
+    SyncFaultLatched         := GVL_IHM.M1M2Sync.State.FaultLatched,
+    BucketFaultLatched       := GVL_IHM.M2TreuilBenne.Bucket.State.FaultLatched,
+    EncoderM1Fault           := PRG_02_Acquisition.Data.EncoderM1.Fault.Error OR PRG_02_Acquisition.Data.EncoderM1.Fault.Latched,
+    EncoderM2Fault           := PRG_02_Acquisition.Data.EncoderM2.Fault.Error OR PRG_02_Acquisition.Data.EncoderM2.Fault.Latched,
     JoystickLatchedFault     := PRG_02_Acquisition.Data.Joystick.Fault.Latched,
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
     CfgCorrectedT330      := instCfgT330Normalizer.CorrectedHeld,
@@ -9403,7 +9705,8 @@ instTroubleshootingView(
     CfgTopLimitM         := _CommunCfgPersist.CfgCableLimitAscent_M,
     WinchM1Trace         := PRG_04_Treuils_Benne.Data.TraceM1,
     WinchM2Trace         := PRG_04_Treuils_Benne.Data.TraceM2,
-    TranslationTrace     := PRG_05_Translation.Data.TranslationTrace
+    TranslationTrace     := PRG_05_Translation.Data.TranslationTrace,
+    MachineHoming        := PRG_02_Acquisition.Data.MachineHoming
 );
 
 // 🧭 Guide de lecture du snapshot : ouvrir FB_TroubleshootingGuide dans l'IDE.
@@ -10906,6 +11209,17 @@ END_IF;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Echec ou abandon cycle homing machine</xhtml>
               </documentation>
             </variable>
+            <variable name="MachineHomingLoss">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Perte reference en mouvement (HomingLoss)</xhtml>
+              </documentation>
+            </variable>
             <variable name="MachineHomingProvisional">
               <type>
                 <BOOL />
@@ -10915,6 +11229,28 @@ END_IF;
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Zero provisoire 0m HX1 actif (machine non encore calibree)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopHardStopLatched">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Latch directionnel capteur TOP actif (montee bloquee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopPositionSensorActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur position haute physique au contact</xhtml>
               </documentation>
             </variable>
             <variable name="WinchM1Error">
@@ -10937,6 +11273,28 @@ END_IF;
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Defaut commande/barriere treuil M2 (FB_Winch/Interlock)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncFaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Defaut synchro M1/M2 latche (Reset requis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketFaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Defaut benne latche (Reset requis)</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderM1Fault">
@@ -12302,6 +12660,8 @@ IF ModeChangePendingBlocked AND ModeChangeBlockReason &lt;&gt; '' THEN
     SpecialConditionCandidate := ModeChangeBlockReason;
 ELSIF CycleChecksInhibited THEN
     SpecialConditionCandidate := 'ESSAI CYCLE : CONTROLES INHIBES';
+ELSIF TopHardStopLatched THEN
+    SpecialConditionCandidate := 'ATTENTION: Capteur TOP franchi - redescendre';
 ELSIF MachineHomingProvisional THEN
     SpecialConditionCandidate := 'ATTENTION: Ref 0m PROVISOIRE - Non calibre';
 ELSIF AnyBypassActive THEN
@@ -12587,6 +12947,8 @@ ELSIF NOT PowerContactorEngaged THEN
 ELSIF SafeStopActive THEN
     IF SyncContactorDiag.MismatchLevel &gt;= 1 THEN
         OperatorActionCandidate := '[SYNC] Discordance contacteurs M1/M2 - Acquitter SafeStop';
+    ELSIF WinchM1Safety.SlackCable OR WinchM2Safety.SlackCable THEN
+        OperatorActionCandidate := '[TREUIL] Mou de cable detecte - retendre ou acquitter';
     ELSE
         OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
     END_IF;
@@ -12613,6 +12975,10 @@ ELSIF DirectionBlocked THEN
         ELSE
             OperatorActionCandidate := '[TREUIL] Descente interdite';
         END_IF;
+    ELSIF TopHardStopLatched THEN
+        OperatorActionCandidate := 'Position haute deja depassee - redescendre pour degager';
+    ELSIF TopPositionSensorActive THEN
+        OperatorActionCandidate := '[TREUIL] Montee interdite - capteur haut';
     ELSIF TopLimitReached THEN
         // 🛡️ Montée bloquée par butée logicielle haute (agrégat M1/M2) — cause exposée par le safety.
         OperatorActionCandidate := '[TREUIL] Montée interdite - limite haute';
@@ -12712,6 +13078,8 @@ ELSIF ArmingPermitDenied THEN
     ELSE
         OperatorActionCandidate := '[JOYSTICK] Armement refusé : mouvements non autorisés';
     END_CASE;
+ELSIF TopHardStopLatched THEN
+    OperatorActionCandidate := 'Position haute deja depassee - redescendre pour degager';
 ELSIF NOT DeadmanArmed THEN
     OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
 ELSIF ((WinchM1Safety.ErrorId OR WinchM2Safety.ErrorId) AND CST_WinchErrorIdCableLimitDescent) &lt;&gt; 16#0000 THEN
@@ -12743,7 +13111,7 @@ END_IF;
 // sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
 PowerOrChainFault := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny);
 HardwareModuleOrBusFault := (NOT LocalIoValid OR NOT Vh0800Valid OR NOT Vh0808Valid OR NOT Vh0008ErValid OR NOT Vh0008Er1Valid OR NOT CanBusValid OR NOT Joy1Valid OR NOT EcatBusValid OR NOT EncM1Valid OR NOT EncM2Valid OR NOT VarM3Valid);
-CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked OR ArmingPermitDenied);
+CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked OR ArmingPermitDenied OR TopHardStopLatched);
 
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
@@ -13065,6 +13433,9 @@ END_IF;
 IF MachineHomingFailed AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[HOMING] Echec ou abandon referencement machine - Reset'; AlarmCount := AlarmCount + 1;
 END_IF;
+IF MachineHomingLoss AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HOMING] Perte reference en mouvement - Reset'; AlarmCount := AlarmCount + 1;
+END_IF;
 IF WinchM1Error AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] Defaut commande ou barriere finale treuil'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -13079,6 +13450,12 @@ IF EncoderM2Fault AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
 END_IF;
 IF JoystickLatchedFault AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[JOYSTICK] Defaut joystick latche - Reset'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF SyncFaultLatched AND ((SyncErrorId AND 16#0003) = 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[SYNC] Defaut synchro treuils latche - Reset'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF BucketFaultLatched AND ((BucketErrorId AND 16#001F) = 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[BENNE] Defaut benne latche - Reset'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5i. Collecte [HISTO] — défauts latched passés (LatchedId AND NOT ErrorId)
@@ -13199,7 +13576,30 @@ IF (HistoM3 AND 16#0080) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes)
     AlarmArray[AlarmCount] := '[HISTO] [M3] ErrorID:08 - capteurs incoherents'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5j. Rotation carrousel — un message à la fois, maintien AlarmHoldTime
+// 5j. Collecte [W] — Warnings non bloquants (apres bloquants et [HISTO], AF-07 §6)
+IF (WinchM1Safety.SlackCable OR ((WinchM1Safety.ErrorId AND 16#0008) &lt;&gt; 16#0000)) AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M1] Mou de cable detecte'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (WinchM2Safety.SlackCable OR ((WinchM2Safety.ErrorId AND 16#0008) &lt;&gt; 16#0000)) AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M2] Mou de cable detecte'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((WinchM1Safety.ErrorId AND 16#0020) &lt;&gt; 16#0000) AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M1] Capteur haut atteint'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((WinchM2Safety.ErrorId AND 16#0020) &lt;&gt; 16#0000) AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M2] Capteur haut atteint'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF TopHardStopLatched AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] Position haute deja depassee - redescendre'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.CableLimitAscent AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M1] Limite haute cable atteinte'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.CableLimitAscent AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M2] Limite haute cable atteinte'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// 5k. Rotation carrousel — un message à la fois, maintien AlarmHoldTime
 // Publication du tableau complet instantane dans le DUT IHM
 FOR i := AlarmCount TO (CST_NbMaxAlarmes - 1) DO
     AlarmArray[i] := '';
@@ -14805,6 +15205,14 @@ Ready := Enable;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Trace blocage translation M3</xhtml>
               </documentation>
             </variable>
+            <variable name="MachineHoming">
+              <type>
+                <derived name="ST_MachineHoming" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Etat public du cycle de homing conjoint</xhtml>
+              </documentation>
+            </variable>
           </inputVars>
           <outputVars>
             <variable name="Ready">
@@ -15175,6 +15583,8 @@ GVL_Troubleshooting.E_HomingM1.HomingDone      := WinchM1.State.Encoder.HomingDo
 GVL_Troubleshooting.E_HomingM1.HomingHomed     := WinchM1.State.Encoder.Homed;
 GVL_Troubleshooting.E_HomingM1.HomingSuspect   := WinchM1.State.Encoder.HomingSuspect;
 GVL_Troubleshooting.E_HomingM1.RejectErrorMask := WinchM1.State.Encoder.HomingErrorId;
+GVL_Troubleshooting.E_HomingM1.TopContactLatched := MachineHoming.TopContactLatched;
+GVL_Troubleshooting.E_HomingM1.TopContactCount   := MachineHoming.TopContactCount;
 
 // --- M2 ---
 GVL_Troubleshooting.F_HomingM2.Step1_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1) OR (Auth.Mode = E_Mode.MAINT_N2);
@@ -15201,6 +15611,8 @@ GVL_Troubleshooting.F_HomingM2.HomingDone      := WinchM2.State.Encoder.HomingDo
 GVL_Troubleshooting.F_HomingM2.HomingHomed     := WinchM2.State.Encoder.Homed;
 GVL_Troubleshooting.F_HomingM2.HomingSuspect   := WinchM2.State.Encoder.HomingSuspect;
 GVL_Troubleshooting.F_HomingM2.RejectErrorMask := WinchM2.State.Encoder.HomingErrorId;
+GVL_Troubleshooting.F_HomingM2.TopContactLatched := MachineHoming.TopContactLatched;
+GVL_Troubleshooting.F_HomingM2.TopContactCount   := MachineHoming.TopContactCount;
 
 {endregion}
 
@@ -16245,6 +16657,7 @@ TimeLast := TimeCurrent;
               <Object Name="ST_Modes_Autorisations" ObjectId="fd63c0a6-3caa-5a6f-9077-b79ee39469f5" />
               <Object Name="E_CycleDepthStopMode" ObjectId="a4e533cc-1a07-5fca-8da6-b652a120d4dd" />
               <Object Name="E_CycleSampleCountResetMode" ObjectId="ea6305ea-87dc-5770-9254-60521a6d4291" />
+              <Object Name="ST_ProgramWinchRequest" ObjectId="edbf7141-2109-5344-bf49-1cd29f4686cd" />
             </Folder>
             <Folder Name="2_TRANSLATION">
               <Object Name="ST_TranslationCfg" ObjectId="2d4e63ef-38b4-5f0c-b42d-ccf25658d58a" />
@@ -16315,6 +16728,7 @@ TimeLast := TimeCurrent;
           <Folder Name="_TYPES">
             <Object Name="E_AutoCycleStep" ObjectId="6e89b113-d6f1-5719-b130-7af999a1c7fd" />
             <Object Name="E_OperatorAxis" ObjectId="07a48a82-b7c8-54f5-9041-14c13244835f" />
+            <Object Name="ST_MachineHoming" ObjectId="719346ef-3775-5b4e-ac3c-37b255640eba" />
           </Folder>
         </Folder>
         <Folder Name="F_MODES">

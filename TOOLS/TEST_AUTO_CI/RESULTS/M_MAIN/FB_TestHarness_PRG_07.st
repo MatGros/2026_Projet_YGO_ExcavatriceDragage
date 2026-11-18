@@ -39,6 +39,7 @@ VAR_OUTPUT
     // === 🖥️ Bandeau IHM Produit ===
     Banner                  : ST_HmiBanner;
     FaultMachineReset_IHM   : BOOL;
+    AnyFaultActive          : BOOL;
 
     // === 🚨 Campagnes d'acquittement automatique borné (miroir PRG_07 §1c-1) ===
     BootAckPulse            : BOOL; // Impulsion émise par la campagne de démarrage à froid
@@ -166,12 +167,15 @@ instHmiBannerFormatter(
     MachineHomingStep     := AcqData.MachineHoming.Step,
     MachineHomingInstruction := AcqData.MachineHoming.Instruction,
     MachineHomingFailed   := AcqData.MachineHoming.Failed,
+    MachineHomingLoss     := AcqData.MachineHoming.HomingLoss,
     TopHardStopLatched    := TopHardStopLatched,
     TopPositionSensorActive := TopPositionSensorActive,
-    WinchM1Error          := WinchData.WinchM1State.Error OR WinchData.WinchM1State.FinalInterlockError,
-    WinchM2Error          := WinchData.WinchM2State.Error OR WinchData.WinchM2State.FinalInterlockError,
-    EncoderM1Fault        := AcqData.EncoderM1.Fault.Error,
-    EncoderM2Fault        := AcqData.EncoderM2.Fault.Error,
+    WinchM1Error          := WinchData.WinchM1State.Error OR WinchData.WinchM1State.FaultLatched OR WinchData.WinchM1State.FinalInterlockError,
+    WinchM2Error          := WinchData.WinchM2State.Error OR WinchData.WinchM2State.FaultLatched OR WinchData.WinchM2State.FinalInterlockError,
+    SyncFaultLatched      := WinchData.SyncState.FaultLatched,
+    BucketFaultLatched    := WinchData.BucketState.FaultLatched,
+    EncoderM1Fault        := AcqData.EncoderM1.Fault.Error OR AcqData.EncoderM1.Fault.Latched,
+    EncoderM2Fault        := AcqData.EncoderM2.Fault.Error OR AcqData.EncoderM2.Fault.Latched,
     JoystickLatchedFault  := AcqData.Joystick.Fault.Latched,
 
     
@@ -214,5 +218,33 @@ instHmiBannerFormatter(
 );
 
 Banner := instHmiBannerFormatter.Banner;
+AnyFaultActive := AcqData.InputModules.Fault
+                  OR AcqData.MachineHoming.Failed
+                  OR AcqData.MachineHoming.HomingLoss
+                  OR AcqData.EncoderM1.Fault.Error
+                  OR AcqData.EncoderM1.Fault.Latched
+                  OR AcqData.EncoderM2.Fault.Error
+                  OR AcqData.EncoderM2.Fault.Latched
+                  OR AcqData.Joystick.Fault.Latched
+                  OR WinchData.WinchM1Safety.Error
+                  OR WinchData.WinchM1Safety.ErrorOverspeed
+                  OR (WinchData.WinchM1Safety.LatchedId <> 16#0000)
+                  OR WinchData.WinchM1State.Error
+                  OR WinchData.WinchM1State.FaultLatched
+                  OR WinchData.WinchM1State.FinalInterlockError
+                  OR WinchData.WinchM2Safety.Error
+                  OR WinchData.WinchM2Safety.ErrorOverspeed
+                  OR (WinchData.WinchM2Safety.LatchedId <> 16#0000)
+                  OR WinchData.WinchM2State.Error
+                  OR WinchData.WinchM2State.FaultLatched
+                  OR WinchData.WinchM2State.FinalInterlockError
+                  OR TranslationData.TranslationSafety.Error
+                  OR (TranslationData.TranslationSafety.LatchedId <> 16#0000)
+                  OR TranslationData.TranslationState.Error
+                  OR TranslationData.TranslationState.FinalInterlockError
+                  OR WinchData.SyncState.Error
+                  OR WinchData.SyncState.FaultLatched
+                  OR WinchData.BucketState.Error
+                  OR WinchData.BucketState.FaultLatched;
 {endregion}
 END_FUNCTION_BLOCK

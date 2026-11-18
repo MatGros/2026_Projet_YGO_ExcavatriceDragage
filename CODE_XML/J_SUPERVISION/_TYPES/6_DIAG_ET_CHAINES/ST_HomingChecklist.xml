@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-06T13:00:42.552551" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-06T13:00:42.552551">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T10:35:06.243271" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T10:35:06.243271">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -158,6 +158,22 @@ TRUE = Prêt pour le homing ! ➔ Déclencher : GVL_IHM.M1TreuilRetenue.Cmd.BtnH
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">5. Code de rejet exact
 Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopContactLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact TOP touche pendant cycle homing (degagement en cours)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopContactCount">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compteur contacts capteur TOP pendant cycle homing</xhtml>
               </documentation>
             </variable>
           </struct>

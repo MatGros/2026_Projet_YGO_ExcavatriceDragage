@@ -25,11 +25,14 @@ VAR_INPUT
     MachineHomingStep        : INT;   // --> [HW] Étape guide homing machine (E_MachineHomingStep : 0..70, 60 = valide)
     MachineHomingInstruction : STRING(120);   // --> [HW] Consigne opérateur en clair produite par FB_CycleMachineHoming
     MachineHomingFailed      : BOOL := FALSE; // --> [DIAG] Echec ou abandon cycle homing machine
+    MachineHomingLoss        : BOOL := FALSE; // --> [DIAG] Perte reference en mouvement (HomingLoss)
     MachineHomingProvisional : BOOL := FALSE; // --> [DIAG] Zero provisoire 0m HX1 actif (machine non encore calibree)
     TopHardStopLatched       : BOOL := FALSE; // --> [SAFE] Latch directionnel capteur TOP actif (montee bloquee)
     TopPositionSensorActive  : BOOL := FALSE; // --> [HW] Capteur position haute physique au contact
     WinchM1Error             : BOOL := FALSE; // --> [DIAG] Defaut commande/barriere treuil M1 (FB_Winch/Interlock)
     WinchM2Error             : BOOL := FALSE; // --> [DIAG] Defaut commande/barriere treuil M2 (FB_Winch/Interlock)
+    SyncFaultLatched         : BOOL := FALSE; // --> [DIAG] Defaut synchro M1/M2 latche (Reset requis)
+    BucketFaultLatched       : BOOL := FALSE; // --> [DIAG] Defaut benne latche (Reset requis)
     EncoderM1Fault           : BOOL := FALSE; // --> [DIAG] Defaut codeur M1
     EncoderM2Fault           : BOOL := FALSE; // --> [DIAG] Defaut codeur M2
     JoystickLatchedFault     : BOOL := FALSE; // --> [DIAG] Defaut joystick latche
@@ -1220,6 +1223,9 @@ END_IF;
 IF MachineHomingFailed AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[HOMING] Echec ou abandon referencement machine - Reset'; AlarmCount := AlarmCount + 1;
 END_IF;
+IF MachineHomingLoss AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HOMING] Perte reference en mouvement - Reset'; AlarmCount := AlarmCount + 1;
+END_IF;
 IF WinchM1Error AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] Defaut commande ou barriere finale treuil'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -1234,6 +1240,12 @@ IF EncoderM2Fault AND (AlarmCount < CST_NbMaxAlarmes) THEN
 END_IF;
 IF JoystickLatchedFault AND (AlarmCount < CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[JOYSTICK] Defaut joystick latche - Reset'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF SyncFaultLatched AND ((SyncErrorId AND 16#0003) = 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[SYNC] Defaut synchro treuils latche - Reset'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF BucketFaultLatched AND ((BucketErrorId AND 16#001F) = 16#0000) AND (AlarmCount < CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[BENNE] Defaut benne latche - Reset'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5i. Collecte [HISTO] — défauts latched passés (LatchedId AND NOT ErrorId)

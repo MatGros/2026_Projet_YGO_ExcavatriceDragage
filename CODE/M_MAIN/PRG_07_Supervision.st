@@ -617,8 +617,11 @@ GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
                                       OR PRG_06_Outputs.EmergencyFault.Latched
                                       OR PRG_02_Acquisition.Data.InputModules.Fault
                                       OR PRG_02_Acquisition.Data.MachineHoming.Failed
+                                      OR PRG_02_Acquisition.Data.MachineHoming.HomingLoss
                                       OR PRG_02_Acquisition.Data.EncoderM1.Fault.Error
+                                      OR PRG_02_Acquisition.Data.EncoderM1.Fault.Latched
                                       OR PRG_02_Acquisition.Data.EncoderM2.Fault.Error
+                                      OR PRG_02_Acquisition.Data.EncoderM2.Fault.Latched
                                       OR PRG_02_Acquisition.Data.Joystick.Fault.Latched
                                       OR PRG_03_Modes_Cycle.Data.ModesFault.Error
                                       OR PRG_03_Modes_Cycle.Data.ModesFault.Latched
@@ -626,18 +629,22 @@ GVL_IHM.Modes.State.AnyFaultActive := PRG_06_Outputs.EmergencyDiag.Error
                                       OR GVL_IHM.M1TreuilRetenue.Safety.ErrorOverspeed
                                       OR (GVL_IHM.M1TreuilRetenue.Safety.LatchedId <> 16#0000)
                                       OR GVL_IHM.M1TreuilRetenue.State.Error
+                                      OR GVL_IHM.M1TreuilRetenue.State.FaultLatched
                                       OR GVL_IHM.M1TreuilRetenue.State.FinalInterlockError
                                       OR GVL_IHM.M2TreuilBenne.Safety.Error
                                       OR GVL_IHM.M2TreuilBenne.Safety.ErrorOverspeed
                                       OR (GVL_IHM.M2TreuilBenne.Safety.LatchedId <> 16#0000)
                                       OR GVL_IHM.M2TreuilBenne.State.Error
+                                      OR GVL_IHM.M2TreuilBenne.State.FaultLatched
                                       OR GVL_IHM.M2TreuilBenne.State.FinalInterlockError
                                       OR GVL_IHM.M3Translation.Safety.Error
                                       OR (GVL_IHM.M3Translation.Safety.LatchedId <> 16#0000)
                                       OR GVL_IHM.M3Translation.State.Error
                                       OR GVL_IHM.M3Translation.State.FinalInterlockError
                                       OR GVL_IHM.M1M2Sync.State.Error
+                                      OR GVL_IHM.M1M2Sync.State.FaultLatched
                                       OR GVL_IHM.M2TreuilBenne.Bucket.State.Error
+                                      OR GVL_IHM.M2TreuilBenne.Bucket.State.FaultLatched
                                       OR GVL_IHM.CycleSemiAuto.State.Error
                                       OR GVL_IHM.JOY1Joystick.State.Error;
 // Miroir IHM des états de maintenance (AF-05 §4bis, producteur FB_Modes via PRG_03)
@@ -818,13 +825,16 @@ instHmiBannerFormatter(
     MachineHomingStep        := PRG_02_Acquisition.Data.MachineHoming.Step,
     MachineHomingInstruction := PRG_02_Acquisition.Data.MachineHoming.Instruction,
     MachineHomingFailed      := PRG_02_Acquisition.Data.MachineHoming.Failed,
+    MachineHomingLoss        := PRG_02_Acquisition.Data.MachineHoming.HomingLoss,
     MachineHomingProvisional := HomingProvisionalHmi,
     TopHardStopLatched       := PRG_06_Outputs.Data.TopHardStopLatched,
     TopPositionSensorActive  := NOT PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI,
-    WinchM1Error             := GVL_IHM.M1TreuilRetenue.State.Error OR GVL_IHM.M1TreuilRetenue.State.FinalInterlockError,
-    WinchM2Error             := GVL_IHM.M2TreuilBenne.State.Error OR GVL_IHM.M2TreuilBenne.State.FinalInterlockError,
-    EncoderM1Fault           := PRG_02_Acquisition.Data.EncoderM1.Fault.Error,
-    EncoderM2Fault           := PRG_02_Acquisition.Data.EncoderM2.Fault.Error,
+    WinchM1Error             := GVL_IHM.M1TreuilRetenue.State.Error OR GVL_IHM.M1TreuilRetenue.State.FaultLatched OR GVL_IHM.M1TreuilRetenue.State.FinalInterlockError,
+    WinchM2Error             := GVL_IHM.M2TreuilBenne.State.Error OR GVL_IHM.M2TreuilBenne.State.FaultLatched OR GVL_IHM.M2TreuilBenne.State.FinalInterlockError,
+    SyncFaultLatched         := GVL_IHM.M1M2Sync.State.FaultLatched,
+    BucketFaultLatched       := GVL_IHM.M2TreuilBenne.Bucket.State.FaultLatched,
+    EncoderM1Fault           := PRG_02_Acquisition.Data.EncoderM1.Fault.Error OR PRG_02_Acquisition.Data.EncoderM1.Fault.Latched,
+    EncoderM2Fault           := PRG_02_Acquisition.Data.EncoderM2.Fault.Error OR PRG_02_Acquisition.Data.EncoderM2.Fault.Latched,
     JoystickLatchedFault     := PRG_02_Acquisition.Data.Joystick.Fault.Latched,
     BypassGlobalActive    := GVL_IHM.Network.Bypass.Global,
     CfgCorrectedT330      := instCfgT330Normalizer.CorrectedHeld,

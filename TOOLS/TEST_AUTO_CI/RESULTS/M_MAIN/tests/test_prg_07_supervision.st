@@ -1194,3 +1194,91 @@ END_VAR
     ASSERT_EQ(harness.Banner.AlarmBanner.AlarmArray[1], '[W] [M1] Mou de cable detecte',
               'A3bis : warning [W] conserve en second apres le bloquant');
 END_TEST
+
+TEST 'PRG_07_Supervision : T417-C Bloc 4 Voyant Reset etendu (AnyFaultActive sources latchees + non-regression)'
+VAR
+    netOk : ST_NetworkDiagHMI;
+END_VAR
+    netOk.InputModules.LocalDigitalIoOk := TRUE;
+    netOk.InputModules.Vh0800EndOk := TRUE;
+    netOk.InputModules.Vh0808EtpOk := TRUE;
+    netOk.InputModules.Vh0008ErOk := TRUE;
+    netOk.InputModules.Vh0008Er1Ok := TRUE;
+    netOk.BusCanOpen.Operational := TRUE;
+    netOk.Joystick.Operational := TRUE;
+    netOk.BusEthercat.Operational := TRUE;
+    netOk.EncoderM1.Operational := TRUE;
+    netOk.EncoderM2.Operational := TRUE;
+    netOk.VariateurM3.Operational := TRUE;
+
+    modesAuth.Mode := E_Mode.MAINT_N1;
+    winchData.WinchM1Safety.AscentPermit := TRUE;
+    winchData.WinchM1Safety.DescendPermit := TRUE;
+    winchData.WinchM2Safety.AscentPermit := TRUE;
+    winchData.WinchM2Safety.DescendPermit := TRUE;
+
+    // 1. Etat sain -> AnyFaultActive = FALSE
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, EmergencyChainClosed := TRUE,
+            PowerContactorEngaged := TRUE, Network := netOk);
+    ASSERT_FALSE(harness.AnyFaultActive, 'Nominal sans defaut -> voyant Reset eteint');
+
+    // 2. Homing Failed -> voyant ON puis OFF
+    acqData.MachineHoming.Failed := TRUE;
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, EmergencyChainClosed := TRUE,
+            PowerContactorEngaged := TRUE, Network := netOk);
+    ASSERT_TRUE(harness.AnyFaultActive, 'Homing Failed allume AnyFaultActive');
+    acqData.MachineHoming.Failed := FALSE;
+
+    // 3. HomingLoss -> voyant ON + message carrousel, puis OFF
+    acqData.MachineHoming.HomingLoss := TRUE;
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, EmergencyChainClosed := TRUE,
+            PowerContactorEngaged := TRUE, Network := netOk);
+    ASSERT_TRUE(harness.AnyFaultActive, 'HomingLoss allume AnyFaultActive');
+    ASSERT_EQ(harness.Banner.AlarmBanner.AlarmArray[0], '[HOMING] Perte reference en mouvement - Reset',
+              'HomingLoss publie au carrousel');
+    acqData.MachineHoming.HomingLoss := FALSE;
+
+    // 4. WinchM1.State.FaultLatched, Sync.FaultLatched, Bucket.FaultLatched, EncoderM1.Fault.Latched -> voyant ON puis OFF
+    winchData.WinchM1State.FaultLatched := TRUE;
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, EmergencyChainClosed := TRUE,
+            PowerContactorEngaged := TRUE, Network := netOk);
+    ASSERT_TRUE(harness.AnyFaultActive, 'WinchM1.FaultLatched allume AnyFaultActive');
+    winchData.WinchM1State.FaultLatched := FALSE;
+
+    winchData.SyncState.FaultLatched := TRUE;
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, EmergencyChainClosed := TRUE,
+            PowerContactorEngaged := TRUE, Network := netOk);
+    ASSERT_TRUE(harness.AnyFaultActive, 'Sync.FaultLatched allume AnyFaultActive');
+    winchData.SyncState.FaultLatched := FALSE;
+
+    winchData.BucketState.FaultLatched := TRUE;
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, EmergencyChainClosed := TRUE,
+            PowerContactorEngaged := TRUE, Network := netOk);
+    ASSERT_TRUE(harness.AnyFaultActive, 'Bucket.FaultLatched allume AnyFaultActive');
+    winchData.BucketState.FaultLatched := FALSE;
+
+    acqData.EncoderM1.Fault.Latched := TRUE;
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, EmergencyChainClosed := TRUE,
+            PowerContactorEngaged := TRUE, Network := netOk);
+    ASSERT_TRUE(harness.AnyFaultActive, 'EncoderM1.Fault.Latched allume AnyFaultActive');
+    acqData.EncoderM1.Fault.Latched := FALSE;
+
+    // 5. Non-regression : retour nominal -> voyant s eteint ; defaut live -> reste allume
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, EmergencyChainClosed := TRUE,
+            PowerContactorEngaged := TRUE, Network := netOk);
+    ASSERT_FALSE(harness.AnyFaultActive, 'Apres purge des latches -> AnyFaultActive retombe a FALSE');
+
+    acqData.InputModules.Fault := TRUE;
+    harness(AcqData := acqData, ModesAuth := modesAuth, WinchData := winchData,
+            TranslationData := translationData, EmergencyChainClosed := TRUE,
+            PowerContactorEngaged := TRUE, Network := netOk);
+    ASSERT_TRUE(harness.AnyFaultActive, 'Defaut LIVE actif garde AnyFaultActive = TRUE');
+END_TEST

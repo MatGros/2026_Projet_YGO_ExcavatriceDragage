@@ -16,6 +16,7 @@ STRUCT
     Busy                : BOOL;             (* ⚙️ Mouvement d'ouverture/fermeture en cours *)
     Done                : BOOL;             (* ✅ Mouvement terminé avec succès *)
     Error               : BOOL;             (* Benne en défaut *)
+    FaultLatched        : BOOL;             (* 🔒 Défaut benne latché (acquittable Reset) *)
     ErrorId             : WORD;             (* ❌ Code bitfield du défaut benne *)
     RemainingTravel_M     : REAL;             (* 📏 Distance restante avant cible (m) *)
     DeltaPosition_M       : REAL;             (* 📏 Écart réel signé M2 - M1 (mètres) — MESURE brute, base de l'état benne *)

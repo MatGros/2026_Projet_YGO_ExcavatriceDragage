@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-07T02:58:32.008981" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-11-07T02:58:32.008981">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T10:48:29.676375" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T10:48:29.676375">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -891,6 +891,14 @@ M1 : contacteurs retombés</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut treuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Défaut treuil latché (acquittable Reset)</xhtml>
               </documentation>
             </variable>
             <variable name="RelayFwd">
@@ -3009,6 +3017,7 @@ WinchM1State.Ready := WinchM1Ref.Ready;
 WinchM1State.Busy := (WinchM1Ref.StepNumber &gt; 0);
 WinchM1State.Done := FALSE;
 WinchM1State.Error := WinchM1Ref.Fault.Error;
+WinchM1State.FaultLatched := WinchM1Ref.Fault.Latched;
 WinchM1State.ErrorId := WinchM1Ref.Fault.ErrorId;
 WinchM1State.RelayFwd := WinchM1Ref.RelayFwd;
 WinchM1State.RelayRev := WinchM1Ref.RelayRev;
@@ -3076,6 +3085,7 @@ WinchM2State.Ready := WinchM2Ref.Ready;
 WinchM2State.Busy := (WinchM2Ref.StepNumber &gt; 0);
 WinchM2State.Done := FALSE;
 WinchM2State.Error := WinchM2Ref.Fault.Error;
+WinchM2State.FaultLatched := WinchM2Ref.Fault.Latched;
 WinchM2State.ErrorId := WinchM2Ref.Fault.ErrorId;
 WinchM2State.RelayFwd := WinchM2Ref.RelayFwd;
 WinchM2State.RelayRev := WinchM2Ref.RelayRev;
@@ -3614,8 +3624,30 @@ WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
                 <simpleValue value="FALSE" />
               </initialValue>
               <documentation>
-                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ESCALADE EXTERNE ===
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">=== ESCALADE EXTERNE &amp; CAPTEUR HAUT ===
 --&gt; [SAFE] Discordance contacteurs M1/M2 persistante (FB_SyncContactor niveau 2) -&gt; latch MecaE escalade (bit13 -&gt; PowerCutOff), meme routing/Reset/bypass que MecaE</xhtml>
+              </documentation>
+            </variable>
+            <variable name="CfgTopEscalateDelay">
+              <type>
+                <TIME />
+              </type>
+              <initialValue>
+                <simpleValue value="TIME#2s0ms" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [CFG] Delai escalade coupure puissance Meca D si non-arret materiel au capteur TOP (min 2s)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopHardStopLatched">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Latch directionnel capteur position haute M1/M2 (PRG_06_Outputs)</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderFaultBypass">
@@ -3940,6 +3972,14 @@ WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Delai confirmation arret fin de course haut</xhtml>
               </documentation>
             </variable>
+            <variable name="TonTopEscalate">
+              <type>
+                <derived name="TON" />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Delai 2s escalade PowerCutOff si non-arret reel au TOP (Option 2)</xhtml>
+              </documentation>
+            </variable>
             <variable name="TonMecaE">
               <type>
                 <derived name="TON" />
@@ -4035,6 +4075,14 @@ WinchM2Safety.BlockedBySafety    := M2BlockedBySafetyInfo;
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Condition active Meca D</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopEscalateActive">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [LOC] Non-arret materiel reel au contact/latch TOP (Option 2)</xhtml>
               </documentation>
             </variable>
             <variable name="OppositeDirectionActive">
@@ -4566,9 +4614,20 @@ IF NOT BypassGlobal THEN
             AND NOT (ReqDescend AND NOT ReqAscent)
             AND NOT (FwdRevSpeedFeedbackOff AND NOT BrakeFeedback);
         TonMecaD(IN := UncommandedActiveD, PT := PostRampTimeout);
-        IF TonMecaD.Q THEN MecaDFaultLatched := TRUE; END_IF;
+        TopEscalateActive := NOT (BenneBusy OR BenneHoldStillActive)
+            AND (NOT TopPositionSensor OR TopHardStopLatched)
+            AND NOT InReferencingMode
+            AND NOT BypassTopLimitSwitch
+            AND NOT (ReqDescend AND NOT ReqAscent)
+            AND NOT BrakeForceAllowed
+            AND (MovementCommanded
+                 OR NOT FwdRevSpeedFeedbackOff
+                 OR (MeasuredSpeedValid AND (MeasuredSpeedSignedMps &gt; UncommandedSpeedThresholdMps)));
+        TonTopEscalate(IN := TopEscalateActive, PT := CfgTopEscalateDelay);
+        IF TonMecaD.Q OR TonTopEscalate.Q THEN MecaDFaultLatched := TRUE; END_IF;
     ELSE
         TonMecaD(IN := FALSE);
+        TonTopEscalate(IN := FALSE);
     END_IF;
     instCauses[11].Active   := MecaDFaultLatched;
     instCauses[11].Latching := TRUE;
@@ -4645,6 +4704,7 @@ IF NOT BypassGlobal THEN
 ELSE
     TonMecaB(IN := FALSE);
     TonMecaD(IN := FALSE);
+    TonTopEscalate(IN := FALSE);
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
@@ -4722,6 +4782,7 @@ IF NOT Enable THEN
     PowerCutOff := FALSE;
     TonMecaB(IN := FALSE);
     TonMecaD(IN := FALSE);
+    TonTopEscalate(IN := FALSE);
     TonMecaE(IN := FALSE);
     TonOppositeDirection(IN := FALSE);
     TonNoMovement(IN := FALSE);
@@ -4761,7 +4822,7 @@ DescendPermit := NOT (
 
 AscentPermit := NOT (
     ((CauseTopLimitSwitchActive
-    OR (NOT TopPositionSensor AND NOT InReferencingMode))
+    OR ((NOT TopPositionSensor OR TopHardStopLatched) AND NOT InReferencingMode))
     AND NOT BypassTopLimitSwitch)
     // TopLimitM porte la relaxation 7,5-&gt;8,5 m en override N1 / bypass N2 : la butee
     // logicielle reste active a la valeur relevee. Bypasser le logiciel releve la butee,

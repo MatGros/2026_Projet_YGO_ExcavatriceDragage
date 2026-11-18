@@ -34,6 +34,14 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">⚠️ Capteur de position haute commun M1+M2 détecté</xhtml>
               </documentation>
             </variable>
+            <variable name="TopHardStopLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Latch directionnel capteur position haute commun M1+M2 actif</xhtml>
+              </documentation>
+            </variable>
             <variable name="BrakeThermalFault">
               <type>
                 <BOOL />
@@ -2495,6 +2503,22 @@ Zone Cmd = NON persistée : la consigne ne survit jamais à une coupure.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE tant que le zero 0m HX1 est provisoire avant HX4 8.5m</xhtml>
               </documentation>
             </variable>
+            <variable name="TopContactLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact TOP touche pendant cycle homing : degagement requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopContactCount">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de contacts capteur TOP pendant cycle homing (purge Reset)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -4324,6 +4348,14 @@ M1 : contacteurs retombés</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarme synchro active</xhtml>
               </documentation>
             </variable>
+            <variable name="FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Défaut synchro latché (acquittable Reset)</xhtml>
+              </documentation>
+            </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
@@ -6069,6 +6101,14 @@ Gain consommé par l'estimateur, m/(Hz.s)</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut treuil</xhtml>
               </documentation>
             </variable>
+            <variable name="FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Défaut treuil latché (acquittable Reset)</xhtml>
+              </documentation>
+            </variable>
             <variable name="RelayFwd">
               <type>
                 <BOOL />
@@ -7251,6 +7291,14 @@ Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Requête coupure métier (arrêt d'urgence) — consommé par FB_SimBench</xhtml>
               </documentation>
             </variable>
+            <variable name="TopHardStopLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Latch directionnel capteur position haute M1/M2 (montee bloquee jusqu'au degagement)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>
@@ -8097,6 +8145,14 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne en défaut</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Défaut benne latché (acquittable Reset)</xhtml>
               </documentation>
             </variable>
             <variable name="ErrorId">

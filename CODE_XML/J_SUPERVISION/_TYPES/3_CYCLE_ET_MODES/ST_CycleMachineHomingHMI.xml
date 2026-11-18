@@ -328,6 +328,22 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">TRUE tant que le zero 0m HX1 est provisoire avant HX4 8.5m</xhtml>
               </documentation>
             </variable>
+            <variable name="TopContactLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact TOP touche pendant cycle homing : degagement requis</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopContactCount">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Nombre de contacts capteur TOP pendant cycle homing (purge Reset)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

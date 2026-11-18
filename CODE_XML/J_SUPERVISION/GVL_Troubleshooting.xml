@@ -1197,6 +1197,22 @@ TRUE = Prêt pour le homing ! ➔ Déclencher : GVL_IHM.M1TreuilRetenue.Cmd.BtnH
 Bitmask d'erreur FB_Encoder_Homing.ErrorId</xhtml>
               </documentation>
             </variable>
+            <variable name="TopContactLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Contact TOP touche pendant cycle homing (degagement en cours)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopContactCount">
+              <type>
+                <UINT />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">Compteur contacts capteur TOP pendant cycle homing</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

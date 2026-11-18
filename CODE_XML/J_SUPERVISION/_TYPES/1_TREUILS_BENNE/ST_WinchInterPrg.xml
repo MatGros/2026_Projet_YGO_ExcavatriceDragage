@@ -628,6 +628,14 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne en défaut</xhtml>
               </documentation>
             </variable>
+            <variable name="FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Défaut benne latché (acquittable Reset)</xhtml>
+              </documentation>
+            </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
@@ -1119,6 +1127,14 @@ FB_TroubleshootingView / IHM (diagnostic « pourquoi ça n'arme pas »).</xhtml>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Alarme synchro active</xhtml>
               </documentation>
             </variable>
+            <variable name="FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Défaut synchro latché (acquittable Reset)</xhtml>
+              </documentation>
+            </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
@@ -1585,6 +1601,14 @@ TRUE = relais sens + C1..C4 tous retombés</xhtml>
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">❌ Code bitfield du défaut treuil</xhtml>
+              </documentation>
+            </variable>
+            <variable name="FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Défaut treuil latché (acquittable Reset)</xhtml>
               </documentation>
             </variable>
             <variable name="RelayFwd">

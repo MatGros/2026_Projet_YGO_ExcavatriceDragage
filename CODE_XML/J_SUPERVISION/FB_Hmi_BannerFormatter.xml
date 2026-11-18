@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T03:24:27.970003" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T03:24:27.970003">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T10:49:20.964832" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T10:49:20.964832">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1510,6 +1510,17 @@
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Echec ou abandon cycle homing machine</xhtml>
               </documentation>
             </variable>
+            <variable name="MachineHomingLoss">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Perte reference en mouvement (HomingLoss)</xhtml>
+              </documentation>
+            </variable>
             <variable name="MachineHomingProvisional">
               <type>
                 <BOOL />
@@ -1519,6 +1530,28 @@
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Zero provisoire 0m HX1 actif (machine non encore calibree)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopHardStopLatched">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [SAFE] Latch directionnel capteur TOP actif (montee bloquee)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopPositionSensorActive">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [HW] Capteur position haute physique au contact</xhtml>
               </documentation>
             </variable>
             <variable name="WinchM1Error">
@@ -1541,6 +1574,28 @@
               </initialValue>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Defaut commande/barriere treuil M2 (FB_Winch/Interlock)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="SyncFaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Defaut synchro M1/M2 latche (Reset requis)</xhtml>
+              </documentation>
+            </variable>
+            <variable name="BucketFaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <initialValue>
+                <simpleValue value="FALSE" />
+              </initialValue>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">--&gt; [DIAG] Defaut benne latche (Reset requis)</xhtml>
               </documentation>
             </variable>
             <variable name="EncoderM1Fault">
@@ -2906,6 +2961,8 @@ IF ModeChangePendingBlocked AND ModeChangeBlockReason &lt;&gt; '' THEN
     SpecialConditionCandidate := ModeChangeBlockReason;
 ELSIF CycleChecksInhibited THEN
     SpecialConditionCandidate := 'ESSAI CYCLE : CONTROLES INHIBES';
+ELSIF TopHardStopLatched THEN
+    SpecialConditionCandidate := 'ATTENTION: Capteur TOP franchi - redescendre';
 ELSIF MachineHomingProvisional THEN
     SpecialConditionCandidate := 'ATTENTION: Ref 0m PROVISOIRE - Non calibre';
 ELSIF AnyBypassActive THEN
@@ -3191,6 +3248,8 @@ ELSIF NOT PowerContactorEngaged THEN
 ELSIF SafeStopActive THEN
     IF SyncContactorDiag.MismatchLevel &gt;= 1 THEN
         OperatorActionCandidate := '[SYNC] Discordance contacteurs M1/M2 - Acquitter SafeStop';
+    ELSIF WinchM1Safety.SlackCable OR WinchM2Safety.SlackCable THEN
+        OperatorActionCandidate := '[TREUIL] Mou de cable detecte - retendre ou acquitter';
     ELSE
         OperatorActionCandidate := '[PUPITRE] Acquitter SafeStop';
     END_IF;
@@ -3217,6 +3276,10 @@ ELSIF DirectionBlocked THEN
         ELSE
             OperatorActionCandidate := '[TREUIL] Descente interdite';
         END_IF;
+    ELSIF TopHardStopLatched THEN
+        OperatorActionCandidate := 'Position haute deja depassee - redescendre pour degager';
+    ELSIF TopPositionSensorActive THEN
+        OperatorActionCandidate := '[TREUIL] Montee interdite - capteur haut';
     ELSIF TopLimitReached THEN
         // 🛡️ Montée bloquée par butée logicielle haute (agrégat M1/M2) — cause exposée par le safety.
         OperatorActionCandidate := '[TREUIL] Montée interdite - limite haute';
@@ -3316,6 +3379,8 @@ ELSIF ArmingPermitDenied THEN
     ELSE
         OperatorActionCandidate := '[JOYSTICK] Armement refusé : mouvements non autorisés';
     END_CASE;
+ELSIF TopHardStopLatched THEN
+    OperatorActionCandidate := 'Position haute deja depassee - redescendre pour degager';
 ELSIF NOT DeadmanArmed THEN
     OperatorActionCandidate := '[JOYSTICK] Appuyer homme-mort au neutre';
 ELSIF ((WinchM1Safety.ErrorId OR WinchM2Safety.ErrorId) AND CST_WinchErrorIdCableLimitDescent) &lt;&gt; 16#0000 THEN
@@ -3347,7 +3412,7 @@ END_IF;
 // sécurité (blocage de mouvement) → affichage IMMÉDIAT, comme un défaut.
 PowerOrChainFault := (NOT EmergencyChainClosed OR NOT PowerContactorEngaged OR PowerCutOffActiveAny);
 HardwareModuleOrBusFault := (NOT LocalIoValid OR NOT Vh0800Valid OR NOT Vh0808Valid OR NOT Vh0008ErValid OR NOT Vh0008Er1Valid OR NOT CanBusValid OR NOT Joy1Valid OR NOT EcatBusValid OR NOT EncM1Valid OR NOT EncM2Valid OR NOT VarM3Valid);
-CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked OR ArmingPermitDenied);
+CriticalActionActive := (PowerOrChainFault OR HardwareModuleOrBusFault OR SafeStopActive OR DirectionBlocked OR ArmingPermitDenied OR TopHardStopLatched);
 
 AntiFlickOperator(NewText := OperatorActionCandidate, ForceInstant := CriticalActionActive, HoldTime := CST_BannerHoldTime);
 Banner.OperatorActionText := AntiFlickOperator.Text;
@@ -3669,6 +3734,9 @@ END_IF;
 IF MachineHomingFailed AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[HOMING] Echec ou abandon referencement machine - Reset'; AlarmCount := AlarmCount + 1;
 END_IF;
+IF MachineHomingLoss AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[HOMING] Perte reference en mouvement - Reset'; AlarmCount := AlarmCount + 1;
+END_IF;
 IF WinchM1Error AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[M1] Defaut commande ou barriere finale treuil'; AlarmCount := AlarmCount + 1;
 END_IF;
@@ -3683,6 +3751,12 @@ IF EncoderM2Fault AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
 END_IF;
 IF JoystickLatchedFault AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
     AlarmArray[AlarmCount] := '[JOYSTICK] Defaut joystick latche - Reset'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF SyncFaultLatched AND ((SyncErrorId AND 16#0003) = 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[SYNC] Defaut synchro treuils latche - Reset'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF BucketFaultLatched AND ((BucketErrorId AND 16#001F) = 16#0000) AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[BENNE] Defaut benne latche - Reset'; AlarmCount := AlarmCount + 1;
 END_IF;
 
 // 5i. Collecte [HISTO] — défauts latched passés (LatchedId AND NOT ErrorId)
@@ -3803,7 +3877,30 @@ IF (HistoM3 AND 16#0080) &lt;&gt; 16#0000 AND (AlarmCount &lt; CST_NbMaxAlarmes)
     AlarmArray[AlarmCount] := '[HISTO] [M3] ErrorID:08 - capteurs incoherents'; AlarmCount := AlarmCount + 1;
 END_IF;
 
-// 5j. Rotation carrousel — un message à la fois, maintien AlarmHoldTime
+// 5j. Collecte [W] — Warnings non bloquants (apres bloquants et [HISTO], AF-07 §6)
+IF (WinchM1Safety.SlackCable OR ((WinchM1Safety.ErrorId AND 16#0008) &lt;&gt; 16#0000)) AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M1] Mou de cable detecte'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF (WinchM2Safety.SlackCable OR ((WinchM2Safety.ErrorId AND 16#0008) &lt;&gt; 16#0000)) AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M2] Mou de cable detecte'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((WinchM1Safety.ErrorId AND 16#0020) &lt;&gt; 16#0000) AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M1] Capteur haut atteint'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF ((WinchM2Safety.ErrorId AND 16#0020) &lt;&gt; 16#0000) AND LocalIoValid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M2] Capteur haut atteint'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF TopHardStopLatched AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] Position haute deja depassee - redescendre'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM1Safety.CableLimitAscent AND EncM1Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M1] Limite haute cable atteinte'; AlarmCount := AlarmCount + 1;
+END_IF;
+IF WinchM2Safety.CableLimitAscent AND EncM2Valid AND (AlarmCount &lt; CST_NbMaxAlarmes) THEN
+    AlarmArray[AlarmCount] := '[W] [M2] Limite haute cable atteinte'; AlarmCount := AlarmCount + 1;
+END_IF;
+
+// 5k. Rotation carrousel — un message à la fois, maintien AlarmHoldTime
 // Publication du tableau complet instantane dans le DUT IHM
 FOR i := AlarmCount TO (CST_NbMaxAlarmes - 1) DO
     AlarmArray[i] := '';

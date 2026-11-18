@@ -26,6 +26,7 @@ STRUCT
     Done                    : BOOL;             (* ✅ Action terminée *)
     Error                   : BOOL;             (* Treuil en défaut *)
     ErrorId                 : WORD;             (* ❌ Code bitfield du défaut treuil *)
+    FaultLatched            : BOOL;             (* 🔒 Défaut treuil latché (acquittable Reset) *)
 
     (* 🔌 Sorties Physiques / Indicateurs LEDs *)
     RelayFwd                : BOOL;             (* 🛗 Relais Ascending activé *)

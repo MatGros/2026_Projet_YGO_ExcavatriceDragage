@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-09-23T13:09:51.636412" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-09-23T13:09:51.636412">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T10:34:58.881626" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T10:34:58.881626">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -229,6 +229,14 @@ Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-
               </type>
               <documentation>
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Requête coupure métier (arrêt d'urgence) — consommé par FB_SimBench</xhtml>
+              </documentation>
+            </variable>
+            <variable name="TopHardStopLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Latch directionnel capteur position haute M1/M2 (montee bloquee jusqu'au degagement)</xhtml>
               </documentation>
             </variable>
           </struct>

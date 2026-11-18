@@ -729,6 +729,14 @@ Niveau 1 confirmé (debounce 500 ms) → SafeStop des 2 treuils (PRG_04, scan N-
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">🛑 Requête coupure métier (arrêt d'urgence) — consommé par FB_SimBench</xhtml>
               </documentation>
             </variable>
+            <variable name="TopHardStopLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Latch directionnel capteur position haute M1/M2 (montee bloquee jusqu'au degagement)</xhtml>
+              </documentation>
+            </variable>
           </struct>
         </baseType>
         <addData>

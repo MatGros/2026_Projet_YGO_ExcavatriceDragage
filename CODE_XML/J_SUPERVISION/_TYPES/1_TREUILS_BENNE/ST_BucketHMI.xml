@@ -307,6 +307,14 @@ M3 est stable à la Trémie. Indépendant du verrou descente treuil (WinchDescen
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">Benne en défaut</xhtml>
               </documentation>
             </variable>
+            <variable name="FaultLatched">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">🔒 Défaut benne latché (acquittable Reset)</xhtml>
+              </documentation>
+            </variable>
             <variable name="ErrorId">
               <type>
                 <WORD />
