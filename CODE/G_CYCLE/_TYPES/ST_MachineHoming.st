@@ -29,5 +29,7 @@ STRUCT
     SoftLimitsOff       : BOOL;          (* Inhibition limites soft position (HX1..HX3 uniquement, hors capteur TOP) *)
     BucketRefInvalidate : BOOL;          (* Revoque reference benne sur abandon cycle avant HX4 *)
     ProvisionalActive   : BOOL;          (* TRUE tant que le zero 0m HX1 est provisoire avant HX4 8.5m *)
+    TopContactLatched   : BOOL;          (* Contact TOP touche pendant cycle homing : degagement requis *)
+    TopContactCount     : UINT;          (* Nombre de contacts capteur TOP pendant cycle homing (purge Reset) *)
 END_STRUCT
 END_TYPE

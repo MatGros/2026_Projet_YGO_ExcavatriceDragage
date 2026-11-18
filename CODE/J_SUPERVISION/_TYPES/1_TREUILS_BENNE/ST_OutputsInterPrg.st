@@ -46,5 +46,6 @@ STRUCT
     EmergencyArmingCmd    : BOOL; // 🎯 Impulsion rearmement puissance AU
     TestCutActive         : BOOL; // 🧪 Test de redondance AU en cours (canal A ou B coupe) — consommé par FB_SimBench
     PowerCutOffRequest    : BOOL; // 🛑 Requête coupure métier (arrêt d'urgence) — consommé par FB_SimBench
+    TopHardStopLatched    : BOOL; // 🔒 Latch directionnel capteur position haute M1/M2 (montee bloquee jusqu'au degagement)
 END_STRUCT
 END_TYPE

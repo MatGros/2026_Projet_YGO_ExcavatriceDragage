@@ -17,6 +17,10 @@ VAR_INPUT
     
     // === 🛡️ Entrées Supervision / Reset ===
     FaultReset                       : BOOL := FALSE;
+    TopPositionFreeDI                : BOOL := TRUE;
+    BypassTopLimitSwitch             : BOOL := FALSE;
+    BypassM1TopLimitSwitch           : BOOL := FALSE;
+    BypassM2TopLimitSwitch           : BOOL := FALSE;
 END_VAR
 
 VAR_OUTPUT
@@ -33,19 +37,49 @@ VAR
     instWinchOutputInterlockM1       : FB_WinchOutputInterlock;
     instWinchOutputInterlockM2       : FB_WinchOutputInterlock;
     instTranslationOutputInterlockM3 : FB_TranslationOutputInterlock;
+    TopHardStopClearTimer            : TON;
+    TopBypassM1                      : BOOL;
+    TopBypassM2                      : BOOL;
+    TopBypassAll                     : BOOL;
+    M1_TopHardStopBlocked            : BOOL;
+    M2_TopHardStopBlocked            : BOOL;
+END_VAR
+
+VAR RETAIN
+    M1M2_TopHardStopLatched          : BOOL := FALSE;
 END_VAR
 
 {region "Corps d'exécution PRG_06 encapsulé"}
 // 1. Barrière M1
 M1InterlockEnable := WinchData.WinchM1FinalInterlockRequest.Enable
                      AND NOT WinchData.WinchM1FinalInterlockRequest.PowerCutOff;
+TopBypassM1 := BypassTopLimitSwitch OR BypassM1TopLimitSwitch;
+TopBypassM2 := BypassTopLimitSwitch OR BypassM2TopLimitSwitch;
+TopBypassAll := BypassTopLimitSwitch OR (TopBypassM1 AND TopBypassM2);
+IF NOT TopPositionFreeDI AND NOT TopBypassAll THEN
+    M1M2_TopHardStopLatched := TRUE;
+END_IF;
+TopHardStopClearTimer(
+    IN := M1M2_TopHardStopLatched
+          AND TopPositionFreeDI
+          AND (WinchData.WinchM1FinalInterlockRequest.RequestedRelayRev
+               OR WinchData.WinchM2FinalInterlockRequest.RequestedRelayRev)
+          AND NOT WinchData.WinchM1FinalInterlockRequest.RequestedRelayFwd
+          AND NOT WinchData.WinchM2FinalInterlockRequest.RequestedRelayFwd,
+    PT := T#3s
+);
+IF TopHardStopClearTimer.Q OR (FaultReset AND (TopPositionFreeDI OR TopBypassAll)) THEN
+    M1M2_TopHardStopLatched := FALSE;
+END_IF;
+M1_TopHardStopBlocked := (NOT TopPositionFreeDI OR M1M2_TopHardStopLatched) AND NOT TopBypassM1;
+M2_TopHardStopBlocked := (NOT TopPositionFreeDI OR M1M2_TopHardStopLatched) AND NOT TopBypassM2;
 
 instWinchOutputInterlockM1(
     Enable                     := M1InterlockEnable,
     Reset                      := FaultReset,
     PowerContactorEngaged      := WinchData.WinchM1FinalInterlockRequest.PowerContactorEngaged,
     SafeStop                   := WinchData.WinchM1FinalInterlockRequest.SafeStop,
-    AscentPermit               := WinchData.WinchM1FinalInterlockRequest.AscentPermit,
+    AscentPermit               := WinchData.WinchM1FinalInterlockRequest.AscentPermit AND NOT M1_TopHardStopBlocked,
     DescendPermit              := WinchData.WinchM1FinalInterlockRequest.DescendPermit,
     BrakeFeedback              := WinchData.WinchM1FinalInterlockRequest.BrakeFeedback,
     FwdRevSpeedFeedbackOff     := WinchData.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff,
@@ -75,7 +109,7 @@ instWinchOutputInterlockM2(
     Reset                      := FaultReset,
     PowerContactorEngaged      := WinchData.WinchM2FinalInterlockRequest.PowerContactorEngaged,
     SafeStop                   := WinchData.WinchM2FinalInterlockRequest.SafeStop,
-    AscentPermit               := WinchData.WinchM2FinalInterlockRequest.AscentPermit,
+    AscentPermit               := WinchData.WinchM2FinalInterlockRequest.AscentPermit AND NOT M2_TopHardStopBlocked,
     DescendPermit              := WinchData.WinchM2FinalInterlockRequest.DescendPermit,
     BrakeFeedback              := WinchData.WinchM2FinalInterlockRequest.BrakeFeedback,
     FwdRevSpeedFeedbackOff     := WinchData.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff,
@@ -112,6 +146,7 @@ instTranslationOutputInterlockM3(
 );
 
 Data.TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
+Data.TopHardStopLatched := M1M2_TopHardStopLatched;
 
 {endregion}
 END_FUNCTION_BLOCK

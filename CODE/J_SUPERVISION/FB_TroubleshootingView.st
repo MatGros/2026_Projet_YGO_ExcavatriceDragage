@@ -118,6 +118,7 @@ VAR_INPUT
     WinchM1Trace             : ST_TraceWinch;       (* --> [DIAG] Trace blocage treuil M1 *)
     WinchM2Trace             : ST_TraceWinch;       (* --> [DIAG] Trace blocage treuil M2 *)
     TranslationTrace         : ST_TraceTranslation; (* --> [DIAG] Trace blocage translation M3 *)
+    MachineHoming            : ST_MachineHoming;    (* --> [DIAG] Etat public du cycle de homing conjoint *)
 END_VAR
 VAR_OUTPUT
     Ready                    : BOOL; (* <-- [STAT] Diagnostic interne minimal — fiche §3 *)
@@ -456,6 +457,8 @@ GVL_Troubleshooting.E_HomingM1.HomingDone      := WinchM1.State.Encoder.HomingDo
 GVL_Troubleshooting.E_HomingM1.HomingHomed     := WinchM1.State.Encoder.Homed;
 GVL_Troubleshooting.E_HomingM1.HomingSuspect   := WinchM1.State.Encoder.HomingSuspect;
 GVL_Troubleshooting.E_HomingM1.RejectErrorMask := WinchM1.State.Encoder.HomingErrorId;
+GVL_Troubleshooting.E_HomingM1.TopContactLatched := MachineHoming.TopContactLatched;
+GVL_Troubleshooting.E_HomingM1.TopContactCount   := MachineHoming.TopContactCount;
 
 // --- M2 ---
 GVL_Troubleshooting.F_HomingM2.Step1_ModeAuthorized     := (Auth.Mode = E_Mode.MAINT_N1) OR (Auth.Mode = E_Mode.MAINT_N2);
@@ -482,6 +485,8 @@ GVL_Troubleshooting.F_HomingM2.HomingDone      := WinchM2.State.Encoder.HomingDo
 GVL_Troubleshooting.F_HomingM2.HomingHomed     := WinchM2.State.Encoder.Homed;
 GVL_Troubleshooting.F_HomingM2.HomingSuspect   := WinchM2.State.Encoder.HomingSuspect;
 GVL_Troubleshooting.F_HomingM2.RejectErrorMask := WinchM2.State.Encoder.HomingErrorId;
+GVL_Troubleshooting.F_HomingM2.TopContactLatched := MachineHoming.TopContactLatched;
+GVL_Troubleshooting.F_HomingM2.TopContactCount   := MachineHoming.TopContactCount;
 
 {endregion}
 

@@ -102,6 +102,10 @@ VAR_OUTPUT
 
     // === VERROU TRANSLATION ===
     M3Locked                    : BOOL;
+
+    // === LATCH & COMPTEUR CONTACT TOP HOMING ===
+    TopContactLatched           : BOOL;
+    TopContactCount             : UINT;
 END_VAR
 VAR
     // === SOUS-INSTANCES ===
@@ -216,6 +220,8 @@ IF NOT FirstScanDone THEN
     Step4PresetIssued    := FALSE;
     ProvisionalDatumActive := FALSE;
     ProvisionalAborted     := FALSE;
+    TopContactLatched      := FALSE;
+    TopContactCount        := 0;
     PrevMode             := Mode;
 END_IF;
 
@@ -348,6 +354,8 @@ IF ResetEdge.Q OR ModeChangedInCycle
     END_IF;
     IF ResetEdge.Q THEN
         MachineHomingFailed := FALSE;
+        TopContactLatched   := FALSE;
+        TopContactCount     := 0;
     END_IF;
     HomingModeBActive   := FALSE;
     Step1MoveCutoff     := FALSE;
@@ -639,6 +647,8 @@ CASE SeqStep OF
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HX7_FAILED;
         ELSIF TopPositionSensor THEN
+            TopContactLatched  := TRUE;
+            TopContactCount    := TopContactCount + UINT#1;
             AllowAscent        := FALSE;
             Step3ClearanceDone := FALSE;
             Step3AccumTime     := T#0s;
@@ -729,6 +739,7 @@ CASE SeqStep OF
             MachineHomingFailed := TRUE;
             SeqStep := E_MachineHomingTxState.HX7_FAILED;
         ELSIF Step3ClearanceDone AND NOT TopPositionSensor AND NOT JoystickDeflected AND WinchesMechanicallyStopped THEN
+            TopContactLatched  := FALSE;
             Step1MoveCutoff    := FALSE;
             RawBtnSeenReleased := NOT RawDeadmanButton;
             SeqStep := E_MachineHomingTxState.HX1_BUCKET_PREPARE;
@@ -754,6 +765,8 @@ CASE SeqStep OF
             SeqStep := E_MachineHomingTxState.HX7_FAILED;
         ELSIF TopPositionSensor THEN
             // Surcourse detectee pendant l'attente -> repli degagement Step 3, annule preset HX4 si arme
+            TopContactLatched  := TRUE;
+            TopContactCount    := TopContactCount + UINT#1;
             IF Step4PresetIssued THEN
                 InvalidateProvisionalDatum    := TRUE;
                 BucketCommit.CommitInvalidate := TRUE;
@@ -888,18 +901,23 @@ ELSIF (SeqStep = E_MachineHomingTxState.HX2_CLIMB_TO_TOP) THEN
     MachineHomingStep := E_MachineHomingStep.NEED_TOP_POSITION;
     IF Step2SlackCutoff THEN
         MachineHomingInstruction := 'HX2 - Detente 2s atteinte: relacher neutre';
+    ELSIF TopContactLatched AND TopPositionSensor THEN
+        MachineHomingInstruction := 'HX2 - Refus montee: contact TOP encore actif';
     ELSIF StepValidateHoldActive THEN
         ValRemSec := DINT_TO_INT((TIME_TO_DINT(Cfg.CfgEntryHoldTime - StepValidateHoldTimer.ET) + DINT#999) / DINT#1000);
         IF ValRemSec < 0 THEN ValRemSec := 0; END_IF;
         MachineHomingInstruction := CONCAT('HX2 [PROV 0m] Valid 8.5m: ',
                                            CONCAT(INT_TO_STRING(ValRemSec), 's'));
+    ELSIF TopContactCount > 0 THEN
+        MachineHomingInstruction := CONCAT('HX2 - Approche plus basse (TOP:',
+                                           CONCAT(UINT_TO_STRING(TopContactCount), ')'));
     ELSE
         MachineHomingInstruction := 'HX2 [PROV 0m] Monter < TOP (non ref) | BP 5s';
     END_IF;
 ELSIF (SeqStep = E_MachineHomingTxState.HX3_TOP_CLEARANCE) THEN
     MachineHomingStep := E_MachineHomingStep.HOMING_IN_PROGRESS;
     IF TopPositionSensor THEN
-        MachineHomingInstruction := 'HX3 - TOP touche! Descendre pour degager capteur';
+        MachineHomingInstruction := 'HX3 - TOP touche: position perdue, degager capteur';
     ELSIF Step3ClearanceDone THEN
         MachineHomingInstruction := 'HX3 - Degagement OK, relacher neutre -> retour HX1';
     ELSE

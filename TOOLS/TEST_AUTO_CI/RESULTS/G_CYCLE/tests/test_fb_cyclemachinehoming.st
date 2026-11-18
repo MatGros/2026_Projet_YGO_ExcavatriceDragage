@@ -659,3 +659,59 @@ TEST 'TC-P09-H017 : Reboot avec HomingProvisional RETAIN purge le zero provisoir
     ASSERT_TRUE(Fb.InvalidateProvisionalDatum, 'Surcourse pendant preset HX4 -> annule transaction codeur');
     ASSERT_FALSE(Fb.MachineHomed, 'Surcourse HX4 -> MachineHomed reste FALSE');
 END_TEST
+
+TEST 'TC-P09-H018 : T417-C A1 TopContactLatched + compteur TOP + 3 libelles homing + purge Reset'
+    Fb(Enable := TRUE, Reset := TRUE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, M1Status := StNone, M2Status := StNone, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, StartRequest := TRUE, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, StartRequest := FALSE, BtnValidation := TRUE, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, BtnValidation := FALSE, M1Status := StHomed, M2Status := StHomed, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       JoystickWinchSelectArbitrated := 0, WinchesMechanicallyStopped := TRUE, Cfg := Cfg);
+    ADVANCE_TIME(350000000);
+
+    // 1er contact TOP en HX2 -> TopContactLatched := TRUE, TopContactCount := 1, passage HX3 + libelle 1
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       JoystickWinchSelectArbitrated := 0, DeadmanArmed := TRUE, JoystickPull := TRUE, JoystickDeflected := TRUE,
+       TopPositionSensor := TRUE, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX3_TOP_CLEARANCE, 'Contact TOP -> HX3');
+    ASSERT_TRUE(Fb.TopContactLatched, 'Contact TOP arme TopContactLatched');
+    ASSERT_EQ(Fb.TopContactCount, 1, 'Compteur contacts TOP = 1');
+    ASSERT_EQ(Fb.MachineHomingInstruction, 'HX3 - TOP touche: position perdue, degager capteur', 'Libelle latch HX3');
+
+    // Degagement 4s hors capteur puis neutre -> retour HX1, TopContactLatched purge, compteur conserve
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       JoystickWinchSelectArbitrated := 0, DeadmanArmed := TRUE, JoystickPull := FALSE, JoystickPush := TRUE, JoystickDeflected := TRUE,
+       TopPositionSensor := FALSE, Cfg := Cfg);
+    ADVANCE_TIME(4100000000);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       JoystickWinchSelectArbitrated := 0, DeadmanArmed := TRUE, JoystickPull := FALSE, JoystickPush := TRUE, JoystickDeflected := TRUE,
+       TopPositionSensor := FALSE, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       JoystickWinchSelectArbitrated := 0, DeadmanArmed := FALSE, JoystickPull := FALSE, JoystickPush := FALSE, JoystickDeflected := FALSE,
+       WinchesMechanicallyStopped := TRUE, TopPositionSensor := FALSE, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX1_BUCKET_PREPARE, 'Retour HX1 apres degagement');
+    ASSERT_FALSE(Fb.TopContactLatched, 'Degagement reussi -> TopContactLatched efface');
+    ASSERT_EQ(Fb.TopContactCount, 1, 'Compteur TOP conserve apres retour HX1');
+
+    // Re-entree HX2 -> libelle compteur approche plus basse
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, BtnValidation := TRUE, Cfg := Cfg);
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, BtnValidation := FALSE, M1Status := StHomed, M2Status := StHomed, Cfg := Cfg);
+    ASSERT_EQ(Fb.MachineHomingSeqStep, E_MachineHomingTxState.HX2_CLIMB_TO_TOP, 'Retour en HX2');
+    ASSERT_EQ(Fb.MachineHomingInstruction, 'HX2 - Approche plus basse (TOP:1)', 'Libelle compteur HX2');
+
+    // 2eme contact TOP -> TopContactCount = 2 + Reset purge tout
+    Fb(Enable := TRUE, Reset := FALSE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       TopPositionSensor := TRUE, Cfg := Cfg);
+    ASSERT_EQ(Fb.TopContactCount, 2, '2eme contact TOP -> TopContactCount = 2');
+
+    Fb(Enable := TRUE, Reset := TRUE, Mode := E_Mode.MAINT_N2, BootReady := TRUE,
+       WinchesMechanicallyStopped := TRUE, Cfg := Cfg);
+    ASSERT_FALSE(Fb.TopContactLatched, 'Reset purge TopContactLatched');
+    ASSERT_EQ(Fb.TopContactCount, 0, 'Reset purge TopContactCount');
+END_TEST

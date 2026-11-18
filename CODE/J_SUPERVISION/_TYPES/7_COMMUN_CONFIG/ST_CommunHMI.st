@@ -14,6 +14,7 @@
 TYPE ST_CommunHMI :
 STRUCT
     TopPositionSensorActive   : BOOL; (* ⚠️ Capteur de position haute commun M1+M2 détecté *)
+    TopHardStopLatched        : BOOL; (* 🔒 Latch directionnel capteur position haute commun M1+M2 actif *)
     BrakeThermalFault         : BOOL; (* 🌡️ Défaut/perte thermique frein — retour unique commun M1/M2/M3, escalade PowerCutOff *)
     PhaseRotationFault        : BOOL; (* ⚡ Rotation de phase incorrecte — retour unique commun M1/M2/M3
                                           (auparavant invisible IHM, seulement décodable via SafetyErrorId bit4/bit2) *)

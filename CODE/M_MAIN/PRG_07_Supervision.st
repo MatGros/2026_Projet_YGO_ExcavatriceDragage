@@ -495,6 +495,7 @@ GVL_IHM.M3Translation.Bypass.ContactorFeedback   := GVL_Simulation.SimulationMod
 // l'état des bypasss réellement consommés par FB_Safety_Winch.
 GVL_IHM.Commun.SimSlackCableBypassActive         := GVL_IHM.Commun.Bypass.SlackCable;
 GVL_IHM.Commun.SimTopSensorBypassActive          := GVL_IHM.Commun.Bypass.TopLimitSwitch;
+GVL_IHM.Commun.TopHardStopLatched                := PRG_06_Outputs.Data.TopHardStopLatched;
 GVL_IHM.Commun.WinchInputSourceChanged           := PRG_02_Acquisition.Data.InputSource.WinchInputSourceChanged;
 
 // ---------- §3e. Structures d'état & safety (recopies directes des bus) ----------
@@ -1009,7 +1010,8 @@ instTroubleshootingView(
     CfgTopLimitM         := _CommunCfgPersist.CfgCableLimitAscent_M,
     WinchM1Trace         := PRG_04_Treuils_Benne.Data.TraceM1,
     WinchM2Trace         := PRG_04_Treuils_Benne.Data.TraceM2,
-    TranslationTrace     := PRG_05_Translation.Data.TranslationTrace
+    TranslationTrace     := PRG_05_Translation.Data.TranslationTrace,
+    MachineHoming        := PRG_02_Acquisition.Data.MachineHoming
 );
 
 // 🧭 Guide de lecture du snapshot : ouvrir FB_TroubleshootingGuide dans l'IDE.

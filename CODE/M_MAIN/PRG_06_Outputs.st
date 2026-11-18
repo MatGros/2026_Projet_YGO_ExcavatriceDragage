@@ -105,6 +105,15 @@ VAR
 
     // === 🔒 CONCORDANCE SORTIES TREUILS M1/M2 (§2ter) ===
     WinchOutputCoupled               : BOOL; // . [LOC] Treuils couples (synchro OU both) : arme instSyncContactorFinal
+
+    // === 🛑 LATCH DIRECTIONNEL CAPTEUR HAUT M1/M2 (§0) ===
+    TopHardStopClearTimer            : TON;  // . [LOC] Tempo descente continue hors capteur TOP (3 s) pour rearmer sans Reset
+    TopPositionFreeRaw               : BOOL; // . [LOC] Capteur TOP libre (TRUE = hors capteur)
+    TopBypassM1                      : BOOL; // . [LOC] Bypass capteur TOP effectif pour M1
+    TopBypassM2                      : BOOL; // . [LOC] Bypass capteur TOP effectif pour M2
+    TopBypassAll                     : BOOL; // . [LOC] Bypass capteur TOP commun ou double
+    M1_TopHardStopBlocked            : BOOL; // . [SAFE] Montee M1 bloquee par contact/latch TOP hors bypass
+    M2_TopHardStopBlocked            : BOOL; // . [SAFE] Montee M2 bloquee par contact/latch TOP hors bypass
 END_VAR
 
 VAR CONSTANT
@@ -112,11 +121,47 @@ VAR CONSTANT
     // Choisi STRICTEMENT sous la plus courte tempo de séquencement des interlocks
     // (BrakeTimeout 0,5 s) pour rester transparent en exploitation.
     CST_ContactorMinInterval         : TIME := T#400ms;
+    CST_TopHardStopClearDelay        : TIME := T#3s; // Descente continue hors capteur TOP pour rearmer sans Reset
 END_VAR
 
 VAR RETAIN
     M3_TremieHardStopLatched         : BOOL := FALSE; // . [SAFE] Latch directionnel Tremie RETAIN (survit au reboot)
+    M1M2_TopHardStopLatched          : BOOL := FALSE; // . [SAFE] Latch directionnel capteur TOP M1/M2 RETAIN (survit au reboot)
 END_VAR
+
+// ═══════════════════════════════════════════════════════════════
+// 🛑 §0 LATCH DIRECTIONNEL CAPTEUR TOP M1/M2 (anti-martelage)
+// ═══════════════════════════════════════════════════════════════
+TopPositionFreeRaw := PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI;
+TopBypassM1 := GVL_IHM.Commun.Bypass.TopLimitSwitch
+               OR GVL_IHM.M1TreuilRetenue.Bypass.TopLimitSwitch
+               OR GVL_IHM.M1TreuilRetenue.Bypass.Global;
+TopBypassM2 := GVL_IHM.Commun.Bypass.TopLimitSwitch
+               OR GVL_IHM.M2TreuilBenne.Bypass.TopLimitSwitch
+               OR GVL_IHM.M2TreuilBenne.Bypass.Global;
+TopBypassAll := GVL_IHM.Commun.Bypass.TopLimitSwitch
+                OR (TopBypassM1 AND TopBypassM2);
+
+IF NOT TopPositionFreeRaw AND NOT TopBypassAll THEN
+    M1M2_TopHardStopLatched := TRUE;
+END_IF;
+
+TopHardStopClearTimer(
+    IN := M1M2_TopHardStopLatched
+          AND TopPositionFreeRaw
+          AND (PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedRelayRev
+               OR PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedRelayRev)
+          AND NOT PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.RequestedRelayFwd
+          AND NOT PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.RequestedRelayFwd,
+    PT := CST_TopHardStopClearDelay
+);
+IF TopHardStopClearTimer.Q
+   OR (PRG_07_Supervision.FaultMachineReset_IHM AND (TopPositionFreeRaw OR TopBypassAll)) THEN
+    M1M2_TopHardStopLatched := FALSE;
+END_IF;
+
+M1_TopHardStopBlocked := (NOT TopPositionFreeRaw OR M1M2_TopHardStopLatched) AND NOT TopBypassM1;
+M2_TopHardStopBlocked := (NOT TopPositionFreeRaw OR M1M2_TopHardStopLatched) AND NOT TopBypassM2;
 
 // ═══════════════════════════════════════════════════════════════
 // 🛗 §1 TREUIL M1 (Retenue) — conditions + interlock + sorties
@@ -155,7 +200,8 @@ instWinchOutputInterlockM1(
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged      := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.PowerContactorEngaged,
     SafeStop                   := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.SafeStop,
-    AscentPermit               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.AscentPermit,
+    AscentPermit               := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.AscentPermit
+                                  AND NOT M1_TopHardStopBlocked,
     DescendPermit              := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.DescendPermit,
     BrakeFeedback              := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.BrakeFeedback,
     FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.Data.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff,
@@ -221,7 +267,8 @@ instWinchOutputInterlockM2(
     Reset                      := PRG_07_Supervision.FaultMachineReset_IHM,
     PowerContactorEngaged      := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.PowerContactorEngaged,
     SafeStop                   := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.SafeStop,
-    AscentPermit               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.AscentPermit,
+    AscentPermit               := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.AscentPermit
+                                  AND NOT M2_TopHardStopBlocked,
     DescendPermit              := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.DescendPermit,
     BrakeFeedback              := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.BrakeFeedback,
     FwdRevSpeedFeedbackOff     := PRG_04_Treuils_Benne.Data.WinchM2FinalInterlockRequest.FwdRevSpeedFeedbackOff,
@@ -556,6 +603,7 @@ Data.PowerKeepAliveBCmd    := PowerKeepAliveBCmd;
 Data.EmergencyArmingCmd    := EmergencyArmingCmd;
 Data.TestCutActive         := instSafetyEmergencyManagement.Cmd.TestCutActive;
 Data.PowerCutOffRequest    := PowerCutOffReq;
+Data.TopHardStopLatched    := M1M2_TopHardStopLatched;
 
 // ── Diagnostics chaîne AU (DUT structurés State/Diag, source unique) ──
 EmergencyState := instSafetyEmergencyManagement.Status.State;

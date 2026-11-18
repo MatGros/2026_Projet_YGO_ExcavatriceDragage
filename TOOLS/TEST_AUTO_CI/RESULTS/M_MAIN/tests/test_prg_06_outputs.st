@@ -77,3 +77,82 @@ TEST 'PRG_06_Outputs : Barriere de Securite Coupure Brutale PowerCutOff sur M1'
     ASSERT_FALSE(harness.Data.M1SpeedContactor1, 'Contacteur de vitesse coupe');
     ASSERT_FALSE(harness.Data.M1BrakeCmd, 'Frein M1 force a l arret (non desserre)');
 END_TEST
+
+TEST 'PRG_06_Outputs : T417-C A1 Feature Latch TOP anti-martelage (descente seule libre, 1 geste refus, Reset ou 3s OK)'
+    winchData.WinchM1FinalInterlockRequest.Enable := TRUE;
+    winchData.WinchM1FinalInterlockRequest.PowerContactorEngaged := TRUE;
+    winchData.WinchM1FinalInterlockRequest.AscentPermit := TRUE;
+    winchData.WinchM1FinalInterlockRequest.DescendPermit := TRUE;
+    winchData.WinchM1FinalInterlockRequest.BrakeFeedback := TRUE;
+    winchData.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff := TRUE;
+    winchData.WinchM1FinalInterlockRequest.RequestedRelayFwd := TRUE;
+    winchData.WinchM1FinalInterlockRequest.RequestedStep := 1;
+
+    // 1. Contact TOP actif (DI = FALSE) -> latch arme, montee immediate coupee
+    harness(WinchData := winchData, TranslationData := translationData, TopPositionFreeDI := FALSE);
+    ASSERT_TRUE(harness.Data.TopHardStopLatched, 'Contact TOP -> TopHardStopLatched TRUE');
+    ASSERT_FALSE(harness.Data.M1RelayFwd, 'Contact TOP -> M1RelayFwd coupe immediatement');
+
+    // 2. Relachement came apres 1 court geste descente (500ms < 3s), sans Reset -> latch persiste et bloque re-montee
+    winchData.WinchM1FinalInterlockRequest.RequestedRelayFwd := FALSE;
+    winchData.WinchM1FinalInterlockRequest.RequestedRelayRev := TRUE;
+    harness(WinchData := winchData, TranslationData := translationData, TopPositionFreeDI := TRUE);
+    ASSERT_TRUE(harness.Data.M1RelayRev, 'Descente toujours libre apres contact TOP');
+    ADVANCE_TIME(500000000);
+    harness(WinchData := winchData, TranslationData := translationData, TopPositionFreeDI := TRUE);
+    ASSERT_TRUE(harness.Data.TopHardStopLatched, 'Apres 0.5s descente sans Reset : latch reste arme');
+
+    // Tentative de re-montee (anti-martelage) -> refusee
+    winchData.WinchM1FinalInterlockRequest.RequestedRelayRev := FALSE;
+    winchData.WinchM1FinalInterlockRequest.RequestedRelayFwd := TRUE;
+    harness(WinchData := winchData, TranslationData := translationData, TopPositionFreeDI := TRUE);
+    ASSERT_TRUE(harness.Data.TopHardStopLatched, 'Latch actif tant que non degage');
+    ASSERT_FALSE(harness.Data.M1RelayFwd, 'Anti-martelage : re-montee refusee meme came relachee');
+
+    // Reset SUR capteur -> ne doit pas rearmer, puis relachement neutre + frein ferme + Reset HORS capteur
+    harness(WinchData := winchData, TranslationData := translationData, TopPositionFreeDI := FALSE, FaultReset := TRUE);
+    ASSERT_TRUE(harness.Data.TopHardStopLatched, 'Reset interdit tant que capteur TOP actif');
+
+    winchData.WinchM1FinalInterlockRequest.RequestedRelayFwd := FALSE;
+    winchData.WinchM1FinalInterlockRequest.BrakeFeedback := FALSE;
+    harness(WinchData := winchData, TranslationData := translationData, TopPositionFreeDI := TRUE, FaultReset := FALSE);
+    ADVANCE_TIME(1100000000);
+    harness(WinchData := winchData, TranslationData := translationData, TopPositionFreeDI := TRUE, FaultReset := TRUE);
+    ASSERT_FALSE(harness.Data.TopHardStopLatched, 'Reset hors capteur -> latch efface');
+
+    harness(WinchData := winchData, TranslationData := translationData, TopPositionFreeDI := TRUE, FaultReset := FALSE);
+    winchData.WinchM1FinalInterlockRequest.BrakeFeedback := TRUE;
+    winchData.WinchM1FinalInterlockRequest.RequestedRelayFwd := TRUE;
+    harness(WinchData := winchData, TranslationData := translationData, TopPositionFreeDI := TRUE, FaultReset := FALSE);
+    ASSERT_TRUE(harness.Data.M1RelayFwd, 'Apres Reset hors capteur : montee reautorisee');
+END_TEST
+
+TEST 'PRG_06_Outputs : T417-C A1 Non-Regression Bypass capteur TOP et descente continue 3s'
+    winchData.WinchM1FinalInterlockRequest.Enable := TRUE;
+    winchData.WinchM1FinalInterlockRequest.PowerContactorEngaged := TRUE;
+    winchData.WinchM1FinalInterlockRequest.AscentPermit := TRUE;
+    winchData.WinchM1FinalInterlockRequest.DescendPermit := TRUE;
+    winchData.WinchM1FinalInterlockRequest.BrakeFeedback := TRUE;
+    winchData.WinchM1FinalInterlockRequest.FwdRevSpeedFeedbackOff := TRUE;
+    winchData.WinchM1FinalInterlockRequest.RequestedStep := 1;
+
+    // 1. Armer latch sur contact TOP
+    winchData.WinchM1FinalInterlockRequest.RequestedRelayFwd := TRUE;
+    harness(WinchData := winchData, TranslationData := translationData, TopPositionFreeDI := FALSE);
+    ASSERT_TRUE(harness.Data.TopHardStopLatched, 'Latch arme');
+
+    // 2. Descente continue >= 3s hors capteur -> latch efface sans Reset (compatible HX3 homing)
+    winchData.WinchM1FinalInterlockRequest.RequestedRelayFwd := FALSE;
+    winchData.WinchM1FinalInterlockRequest.RequestedRelayRev := TRUE;
+    harness(WinchData := winchData, TranslationData := translationData, TopPositionFreeDI := TRUE);
+    ADVANCE_TIME(3100000000);
+    harness(WinchData := winchData, TranslationData := translationData, TopPositionFreeDI := TRUE);
+    ASSERT_FALSE(harness.Data.TopHardStopLatched, 'Descente soutenue 3s hors capteur efface latch');
+
+    // 3. Capteur bloque actif (casse) + BypassTopLimitSwitch -> montee possible (machine recuperable)
+    winchData.WinchM1FinalInterlockRequest.RequestedRelayRev := FALSE;
+    winchData.WinchM1FinalInterlockRequest.RequestedRelayFwd := TRUE;
+    harness(WinchData := winchData, TranslationData := translationData,
+            TopPositionFreeDI := FALSE, BypassTopLimitSwitch := TRUE);
+    ASSERT_TRUE(harness.Data.M1RelayFwd, 'Sous BypassTopLimitSwitch, capteur TOP casse ne bloque pas');
+END_TEST

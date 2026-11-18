@@ -1174,9 +1174,15 @@ IF MaintN2 THEN
     EffectivePermitM1_Descend := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
     EffectivePermitM2_Descend := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI;
     EffectivePermitM1_Ascent  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
-                                 AND (PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI OR BypassM1TopLimitSwitchEff);
+                                 AND ((PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI
+                                       AND NOT PRG_06_Outputs.Data.TopHardStopLatched)
+                                      OR BypassM1TopLimitSwitchEff
+                                      OR GVL_IHM.M1TreuilRetenue.Bypass.Global);
     EffectivePermitM2_Ascent  := PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
-                                 AND (PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI OR BypassM2TopLimitSwitchEff);
+                                 AND ((PRG_02_Acquisition.HwIn.Winch.M1M2_TopPositionFree_DI
+                                       AND NOT PRG_06_Outputs.Data.TopHardStopLatched)
+                                      OR BypassM2TopLimitSwitchEff
+                                      OR GVL_IHM.M2TreuilBenne.Bypass.Global);
 END_IF;
 
 // Si un cycle homing machine est actif (en N1 ou N2), appliquer ses permis par etape

@@ -32,5 +32,7 @@ STRUCT
 
     (* 5. Code de rejet exact *)
     RejectErrorMask              : WORD; (* Bitmask d'erreur FB_Encoder_Homing.ErrorId *)
+    TopContactLatched            : BOOL; (* Contact TOP touche pendant cycle homing (degagement en cours) *)
+    TopContactCount              : UINT; (* Compteur contacts capteur TOP pendant cycle homing *)
 END_STRUCT
 END_TYPE
