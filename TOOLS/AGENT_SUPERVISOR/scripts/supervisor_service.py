@@ -22,6 +22,12 @@ import time
 import urllib.request
 import uuid
 
+# R29 (2026-11-22) : memoire longue durable — archive JSONL interrogeable (texte integral).
+try:
+    from . import memory_archive
+except ImportError:
+    import memory_archive
+
 try:
     from .judge_prompt import OMNI_JUDGE_SYSTEM, BASELINE_OMNI_JUDGE_SYSTEM, capture_memory_sources, validate_state_update
     from .finding_lifecycle import prepare_alert, business_state, counts, record_event, revise, apply_reviews
@@ -815,6 +821,15 @@ def dossier_public(dossier) -> dict:
 # l alias porte le prefixe T000 (ex. T000-CC10). La detection est MECANIQUE : le juge ne
 # devine pas un role. Canonique des criteres : TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md
 # section "Identite de coordination & surveillance du Superviseur".
+MEMORY_SEARCH_NOTICE = (
+    "## MEMOIRE LONGUE DURABLE (T429, 2026-11-22) : les messages bruts de cette session sont "
+    "archives integralement (recherche a la demande : API /api/supervision/memory?id=…&q=terme "
+    "ou lecture du .jsonl agent-memory/<session>.jsonl). NE JAMAIS supposer qu'un fait ancien "
+    "est perdu : si une information manque, CHERCHEZ-LA dans l'archive au lieu de lire tout. "
+    "La memoire longue en session contient les RESUMES des fenetres recyclees ; un resume ne "
+    "remplace pas la preuve : retrouvez le message d'origine par recherche quand vous citez."
+)
+
 COORDINATION_JUDGE_NOTICE = (
     "## SESSION DE COORDINATION (role orchestrateur/coordinateur, alias T000-*/TORC-*) : le juge applique "
     "les criteres de gestion specifiques — (1) la session ne cloture ni un constat ni une tache "
@@ -935,6 +950,28 @@ def actor_of_alias(alias) -> str:
 _PERSONA_USAGE_CACHE = {}  # session_id -> (instant monotonic, payload) — R29 stabilite
 PERSONA_USAGE_TTL_SECONDS = 120
 _PERSONA_ENTRIES_CACHE = {'at': 0.0, 'entries': None}  # un SEUL scan du journal, partage
+
+
+MEMORY_SUMMARY_MAX_CHARS = 3000
+
+
+def build_window_summary(items) -> str:
+    """R29 (demande exploitant) : resume CONCIS, direct, TDAH-friendly d'une fenetre
+    recyclee ; budget alloue pour ne JAMAIS perdre d'information importante :
+    decisions, constats, objectifs, chiffres — puces courtes sous 3000 car au total."""
+    header = "Resume fenetre recyclee (%d message(s))" % len(items)
+    budget = max(200, (MEMORY_SUMMARY_MAX_CHARS - len(header) - 8 * len(items)) // max(1, len(items)))
+    lines = [header]
+    for item in items:
+        role = str(item.get("role") or "?")
+        text = " ".join(str(item.get("text") or "").split())
+        if len(text) > budget:
+            text = text[:budget].rstrip() + " […]"
+        lines.append("- [%s] %s" % (role, text))
+    summary = "\n".join(lines)
+    if len(summary) > MEMORY_SUMMARY_MAX_CHARS:
+        summary = summary[:MEMORY_SUMMARY_MAX_CHARS - 4].rstrip() + " […]"
+    return summary
 
 
 def persona_usage(session_id: str) -> list:
@@ -1323,11 +1360,14 @@ class Supervisor:
             raise ValueError("memory invalide")
         result=[]
         for item in messages:
-            if (not isinstance(item, dict) or item.get("kind") != "user_message"
+            # R29 (2026-11-22) : deux natures d'entrees — message user (fenetre passee)
+            # et RESUME de fenetre recyclee (kind summary).
+            kind = item.get("kind") if isinstance(item, dict) else None
+            if (not isinstance(item, dict) or kind not in ("user_message", "summary")
                     or not isinstance(item.get("text"), str) or len(item["text"]) > 3000
                     or not isinstance(item.get("observed_at"), str)):
                 raise ValueError("memory invalide")
-            result.append(dict(kind="user_message", text=item["text"], observed_at=item["observed_at"], event_id=item.get("event_id"), event_index=item.get("event_index")))
+            result.append(dict(kind=kind, text=item["text"], observed_at=item["observed_at"], event_id=item.get("event_id"), event_index=item.get("event_index")))
         return result
 
     @classmethod
@@ -1988,6 +2028,12 @@ class Supervisor:
                 self._persist()
             elif action == "start":
                 self.running = True
+                # R29 : migration idempotente — chaque element de memoire existant est
+                # deverse dans l'archive JSONL AVANT tout (zero perte de l'existant).
+                try:
+                    self._migrate_memory_archive()
+                except Exception:
+                    pass
                 if not self._threads:
                     for session in self.sessions.values():
                         for alert in session.get("alerts", []):
@@ -2065,8 +2111,9 @@ class Supervisor:
                 for session in self.sessions.values():
                     context = session["context"]
                     while context and (len(context) > settings["context_messages"] or sum(len(item["text"]) for item in context) > settings["context_chars"]):
-                        context.pop(0)
+                        popped = context.pop(0)
                         session["context_truncated"] = True
+                        self._recycle_context(session, [popped])
                 self._epoch += 1
                 self._chat_epoch += 1
                 self._chat_pending = None
@@ -2722,10 +2769,60 @@ class Supervisor:
         return (role == "assistant" and text.strip() in ("SUPERVISOR_ACK", "VEILLEUR_ACK")) or any(
             a.get("workflow", {}).get("delivery_message") == text for a in session.get("alerts", [])) or any(e.get("kind") == "delivery_attempt" and e.get("text") == text for e in session.get("events", []))
 
+    def _migrate_memory_archive(self):
+        """R29 : verse l'existant (memoire longue en etat) dans l'archive JSONL —
+        idempotent par event_id. L'archive devient la reference interrog eable ; la
+        memoire en etat garde ses entrees (aucune suppression : zero perte)."""
+        for session in self.sessions.values():
+            ident = str(session.get("id") or "")
+            if not ident:
+                continue
+            known = memory_archive.archived_event_ids(ident)
+            missing = []
+            for item in session.get("memory") or []:
+                if str(item.get("kind")) != "user_message":
+                    continue
+                event_id = str(item.get("event_id") or "")
+                if event_id and event_id in known:
+                    continue
+                missing.append(dict(role="user", text=str(item.get("text") or ""),
+                                    observed_at=str(item.get("observed_at") or ""),
+                                    event_id=event_id, event_index=item.get("event_index"),
+                                    generation=session.get("source_generation")))
+            if missing:
+                memory_archive.append(ident, missing)
+                record_event(session, "memory_archived_on_start",
+                             "%d element(s) de memoire longue verses dans l'archive interrogeable"
+                             % len(missing), timestamp())
+
+    def _recycle_context(self, session, popped):
+        """R29 (2026-11-22, demande exploitant) : la FENETRE recyclee laisse un RESUME
+        concis dans la memoire longue (jamais le texte brut tronque). Le texte integral
+        reste dans l'archive JSONL, interrogeable a la demande par les agents."""
+        items = [p for p in (popped or []) if isinstance(p, dict) and str(p.get("text") or "").strip()]
+        if not items:
+            return
+        summary = build_window_summary(items)
+        entry = dict(kind="summary", text=summary, observed_at=timestamp(),
+                     event_id="recycle:" + str(items[0].get("event_id") or "?") + ":" + str(len(items)),
+                     event_index=items[-1].get("event_index"))
+        session.setdefault("memory", []).append(entry)
+        session["memory"] = session["memory"][-memory_limit(self.judge_settings):]
+        record_event(session, "window_recycled",
+                     "Fenetre recyclee : %d message(s) resumes en memoire longue "
+                     "(texte integral consultable par recherche)" % len(items), timestamp())
+
     def _remember_source(self, session, message):
         ident = message.get("event_id")
         if message.get("parts", 1) > 1:
             ident = str(ident) + ":" + str(message.get("part", 1))
+        # R29 (2026-11-22) : archive DURABLE, texte INTEGRAL, jamais tronque a l'ecriture.
+        # Les agents/juges recherchent dedans a la demande (memory_archive.search).
+        memory_archive.append(session.get("id"), [dict(
+            role=message.get("role"), text=message.get("text", ""),
+            observed_at=message.get("observed_at", timestamp()),
+            event_id=ident, event_index=message.get("event_index"),
+            generation=session.get("source_generation"))])
         choice = message.get("historical_choice")
         if choice:
             previous = next((e for e in session.get("events", []) if e.get("source_id") == ident), None)
@@ -3042,8 +3139,9 @@ class Supervisor:
             if not recovering:
                 self._remember_source(session, session["context"][-1])
             while len(session["context"]) > self.judge_settings["context_messages"] or sum(len(x["text"]) for x in session["context"]) > self.judge_settings["context_chars"]:
-                session["context"].pop(0)
+                popped = session["context"].pop(0)
                 session["context_truncated"] = True
+                self._recycle_context(session, [popped])
             if not session["mission"]:
                 session["analysis_state"] = "context_required"
                 continue
@@ -3348,6 +3446,9 @@ class Supervisor:
                         # M15/R17 : le role coordination est annonce au juge, il ne se devine pas.
                         if is_coordination_session(session):
                             notices.append(dict(role="context_notice", text=COORDINATION_JUDGE_NOTICE))
+                        # R29 (2026-11-22) : tout juge sait que la memoire longue est
+                        # RECHERCHABLE — il cherche au lieu de supposer, et cite la source.
+                        notices.append(dict(role="context_notice", text=MEMORY_SEARCH_NOTICE))
                         session["judge_turn_count"] = session.get("judge_turn_count", 0) + 1
                         audit_interval = self.judge_settings.get("audit_interval", 8)
                         if session["judge_turn_count"] % audit_interval == 0:

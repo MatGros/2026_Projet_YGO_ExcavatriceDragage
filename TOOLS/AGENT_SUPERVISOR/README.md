@@ -35,6 +35,19 @@ permet de le remplacer sans perdre la mission ; une source unique est exigée.
 
 ## Affecter une conversation
 
+**Mémoire longue durable — QUAND l'utiliser (R29, 2026-11-22).** Chaque message observé est
+archivé **intégralement** (jamais tronqué) dans
+`%LOCALAPPDATA%\ExcavatriceDragage\agent-memory\<session>.jsonl` (JSONL, grep-able), sans plafond
+pratique. La **mémoire longue de session** ne contient que les **résumés** des fenêtres recyclées
+(≤ 3 000 caractères, concis TDAH-friendly, marqueur `[…]` si compression). Règles d'usage :
+1. Une information ancienne manque ? **Cherchez-la** — `GET /api/supervision/memory?id=<session>&q=<terme>&limit=20`
+   (API) ou `grep` dans le `.jsonl` — au lieu de supposer, de relire tout, ou de charger l'archive
+   entière dans un contexte.
+2. Un résumé n'est **pas** une preuve : avant de citer un fait, retrouvez le message d'origine
+   par recherche (la ligne d'archive porte date, rôle et event_id).
+3. Ne jamais importer l'archive complète dans un prompt : chercher, extraire le passage, citer.
+4. Chaque juge reçoit automatiquement la notice MEMOIRE LONGUE DURABLE (`memory_search_notice`).
+
 Dans Claude Code, Antigravity ou DSH, la skill utilisateur `/connect-session-supervisor` lance l'affectation
 depuis le chat courant. Elle exige une tâche formelle identifiable, ou une confirmation
 explicite avant un suivi sans tâche. Elle demande un alias s'il manque, n'utilise jamais

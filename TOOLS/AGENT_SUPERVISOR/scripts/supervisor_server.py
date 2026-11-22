@@ -133,6 +133,28 @@ class Handler(BaseHTTPRequestHandler):
             result.update(self.service_info())
             result['token'] = self.server.supervision_token
             return self.reply(200, result)
+        if path == '/api/supervision/memory':
+            # R29 (2026-11-22) : recherche A LA DEMANDE dans la memoire longue durable.
+            # Aucune lecture globale : statistiques + correspondances bornees.
+            query = parse_qs(urlparse(self.path).query)
+            sid = query.get('id', [''])[0]
+            try:
+                limit = int(query.get('limit', ['20'])[0])
+            except ValueError:
+                limit = 20
+            try:
+                import memory_archive
+            except ImportError:
+                from . import memory_archive
+            result = memory_archive.search(sid, query.get('q', [''])[0], limit=limit,
+                                           since=query.get('since', [''])[0])
+            result['stats'] = memory_archive.stats(sid)
+            session = next((s for s in self.server.supervision.sessions.values()
+                            if str(s.get('id')) == sid or str(s.get('native_id')) == sid), None)
+            result['summaries'] = [dict(text=item.get('text'), at=item.get('observed_at'))
+                                   for item in (session.get('memory') if session else []) or []
+                                   if str(item.get('kind')) == 'summary'][-20:]
+            return self.reply(200, result)
         if path == '/api/supervision/candidates':
             return self.reply(200, self.server.supervision.candidates())
         if path == '/api/supervision/history':
