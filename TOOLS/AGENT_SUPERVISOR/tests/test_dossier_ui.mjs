@@ -71,6 +71,12 @@ assert.match(html,/\.model-tag\.model-mmx\{color:#ffdd57\}/,'standard acteur MMX
 assert.match(html,/\.model-tag\.model-agy\{color:#8ab4f8\}/,'standard par acteur : texte colore seul');
 assert.doesNotMatch(html,/\.model-tag\{[^}]*background/,'remarque exploitant : plus de badge encadre, du texte colore');
 assert.match(html,/\.side-session-meta-row\{display:flex/,'le badge et la meta partagent une ligne');
+// R29 (2026-11-22) : jauges memoire en % + recherche dans l'archive integrale
+assert.ok(document.querySelectorAll('.memory-gauge').length >= 3,'jauges memoire : fenetre msg, fenetre car, longue');
+assert.match(text,/Fenêtre · messages observés : \d+\/12 · \d+%/,'jauge fenetre messages avec sa borne et son pourcentage');
+assert.match(text,/Mémoire longue · éléments : \d+\/20 · \d+%/,'jauge memoire longue avec borne et pourcentage');
+assert.ok(document.querySelector('.memory-search input'),'champ de recherche dans la memoire longue present');
+assert.ok((text.match(/Rechercher dans la mémoire longue/g)||[]).length>=1,'la recherche est annoncee');
 // R29 (demande exploitant 2026-11-16) : le MENU DE GAUCHE affiche le titre COMPLET
 // (display_title), pas l alias seul ; fallback alias quand le titre n est pas pose.
 const sidebarTitles=Array.from(document.querySelectorAll('.side-session .side-session-title')).map(el=>el.textContent);

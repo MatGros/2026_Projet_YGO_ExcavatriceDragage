@@ -190,6 +190,13 @@ details[open]>summary .fold-state-pill.when-open{border-color:var(--cyan);color:
 #paused-notice button{white-space:nowrap;padding:5px 12px;font-weight:600}
 .btn-sys-nav{background:rgba(255,255,255,0.08);border:1px solid var(--border);color:var(--text);font-size:12px;font-weight:600;padding:6px 12px;border-radius:6px;display:inline-flex;align-items:center;gap:6px;text-decoration:none;transition:all 0.2s ease-in-out;white-space:nowrap}.btn-sys-nav:hover{background:rgba(255,255,255,0.16);border-color:rgba(255,255,255,0.35);color:#fff;transform:translateY(-1px)}
 @media(max-width:700px){.app-main{padding:8px 12px 12px}.app-shell{grid-template-columns:1fr}.app-sidebar{position:static;height:auto}.flow-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.flow-feedback{white-space:normal}.session-fold>summary,.alert-history-fold>summary{flex-wrap:wrap}.alert-history-fold>summary span{flex:1 1 100%}.finding-actions>*{flex:1 1 auto}}
+/* R29 (2026-11-22) : jauges memoire + recherche dans l'archive */
+.memory-gauge{display:grid;gap:2px;margin:4px 0}
+.gauge-bar{height:6px;border-radius:3px;background:#2a2f3a;overflow:hidden}
+.gauge-fill{height:100%;border-radius:3px;transition:width .3s}
+.memory-search{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.memory-search input{flex:1 1 220px;min-width:0}
+.memory-search-results{margin-top:4px}
 </style></head>
 <!-- R30 : panneau rouge AFFICHE PAR DEFAUT ; le JS ne le cache que sur la preuve
 explicite update_available === false du snapshot FRAIS (jamais sur une snapshot
@@ -1324,6 +1331,19 @@ function render(snapshot,force=false){
    const longMem=(session.memory||[]);const longMemChars=longMem.reduce((sum,item)=>sum+String(item.text||'').length,0);
    const oldest=longMem.length?String(longMem[0].observed_at||'').slice(0,16):'—';
    memFold.append(element('p','📊 Mémoire longue : '+longMem.length+' élément(s) · ~'+longMemChars+' caractères · bornée à '+((snapshot.judge_settings||{}).memory_max_items||20)+' · plus ancien : '+oldest+' (les liens mémoire sont la liste ci-dessus).','hint'));
+   // R29 (2026-11-22, demande exploitant) : JAUGES % visibles — fenetre (messages, car),
+   // memoire longue ; vert < 80 %, orange >= 80 %, rouge >= 95 %. Recyclage annonce,
+   // et recherche A LA DEMANDE dans l'archive integrale (jamais de lecture globale).
+   const judgeCfg=snapshot.judge_settings||{};
+   const gauge=(label,value,max)=>{const pct=Math.min(100,Math.round(100*value/Math.max(1,max)));const row=element('div',undefined,'memory-gauge');row.append(element('span',label+' : '+value+'/'+max+' · '+pct+'%','hint'));const bar=element('div',undefined,'gauge-bar');const fill=element('div',undefined,'gauge-fill');fill.style.width=pct+'%';fill.style.background=pct>=95?'#ff626d':(pct>=80?'#ffb86b':'#8be9a4');bar.append(fill);row.append(bar);return row;};
+   const ctxCharsTotal=(session.context||[]).reduce((sum,item)=>sum+String(item.text||'').length,0);
+   memFold.append(gauge('Fenêtre · messages observés',(session.context||[]).length,Number(judgeCfg.context_messages)||12));
+   memFold.append(gauge('Fenêtre · caractères',ctxCharsTotal,Number(judgeCfg.context_chars)||12000));
+   memFold.append(gauge('Mémoire longue · éléments',longMem.length,Number(judgeCfg.memory_max_items)||20));
+   const recycled=(session.events||[]).filter(item=>item&&item.kind==='window_recycled');
+   if(recycled.length){memFold.append(element('p','♻️ Fenêtre recyclée '+recycled.length+' fois · dernière : '+String(recycled[recycled.length-1].created_at||'').slice(0,16)+' — messages évincés résumés en mémoire longue + texte intégral archivé (recherche ci-dessous).','hint'));}
+   const memorySearch=element('div',undefined,'memory-search');const memoryInput=element('input');memoryInput.type='search';memoryInput.placeholder='Rechercher dans la mémoire longue (archive intégrale)…';const memoryButton=element('button','Chercher');memoryButton.type='button';const memoryResults=element('div',undefined,'memory-search-results');memorySearch.append(memoryInput,memoryButton);memFold.append(memorySearch,memoryResults);
+   memoryButton.addEventListener('click',async()=>{const query=memoryInput.value.trim();memoryResults.textContent='Recherche…';try{const response=await fetch('/api/supervision/memory?id='+encodeURIComponent(session.id)+'&q='+encodeURIComponent(query)+'&limit=10');const data=await response.json();const stats=data.stats||{};memoryResults.replaceChildren(element('p','Archive : '+(stats.lines||0)+' message(s) intégraux · '+(stats.chars||0)+' caractères · plus ancien : '+(String(stats.oldest||'').slice(0,16)||'—'),'hint'));for(const match of data.matches||[]){memoryResults.append(element('p','['+(match.role||'?')+'] '+String(match.at||'').slice(0,16)+' — '+String(match.snippet||'').slice(0,220),'hint'));}if(!(data.matches||[]).length){memoryResults.append(element('p',query?'Aucune correspondance pour « '+query+' ».':'Sans terme : les messages les plus récents.','hint'));}}catch(error){memoryResults.textContent='Recherche indisponible : '+error;}});
    const groups=[
     {key:'fenêtre',label:'👁️ Fenêtre — ce que le juge voit maintenant',items:(session.context||[]).map(item=>({role:item.role,text:item.text||'',index:item.event_index,at:item.observed_at}))},
     {key:'longue',label:'🗂️ Mémoire longue — hors fenêtre',items:(session.memory||[]).map(item=>({role:item.kind||'mémoire',text:item.text||'',index:item.event_index,at:item.observed_at}))},
