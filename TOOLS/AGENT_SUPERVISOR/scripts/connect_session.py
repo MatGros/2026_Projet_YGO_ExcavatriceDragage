@@ -207,12 +207,12 @@ def populate_mission_from_contract(base_url: str, token: str, assignment_id: str
             structure = {
                 "subject": task_raw.strip(),
                 "task_ref": task_ref.strip(),
-                "primary_goal": (f"Coordination du projet par {task_ref.strip()} : piloter les taches "
+                "primary_goal": (f"Orchestration du projet par {task_ref.strip()} : piloter les taches "
                                   "du catalogue via le canal orchestrateur designe ; NE JAMAIS cloter "
                                   "un constat ni une tache soi-meme (regle 10)."),
                 "current_goal": "N/A — suivi au fil de l'eau, jalon porte par le pilotage orchestrateur",
-                "milestone": "Coordination (sans contrat par conception — alias T000*/TORC*)",
-                "scope_permissions": ("Coordination : DOC/WFLOW/TASKS via API Task Manager, chat agent, "
+                "milestone": "Orchestration (sans contrat par conception — alias T000*/TORC*)",
+                "scope_permissions": ("Orchestration : DOC/WFLOW/TASKS via API Task Manager, chat agent, "
                                        "journal ; lecture seule partout ailleurs"),
                 "constraints": "Orchestrateur hors catalogue : pas de contrat, regles de gouvernance obligatoires",
                 "criteria": ("Criteres de gestion : (1) clotures par l'exploitant ou un juge code ; "
@@ -220,10 +220,10 @@ def populate_mission_from_contract(base_url: str, token: str, assignment_id: str
                               "(3) ne jamais contourner un verrou d'un autre acteur ; "
                               "(4) preuve = git diff reel, pas un rapport d'agent ; "
                               "(5) aucun commit ni push sans accord humain explicite."),
-                "evidence": "Template coordination pose par connect_session",
-                "unknowns": "Fiche coordination generique — ajustable par l'exploitant (pas de contrat)",
+                "evidence": "Template orchestrateur pose par connect_session",
+                "unknowns": "Fiche orchestrateur generique — ajustable par l'exploitant (pas de contrat)",
                 "next_step": "Pilotage du canal orchestrateur selon les criteres de gestion",
-                "extra": "Template coordination (T000*/TORC*) pose par connect_session",
+                "extra": "Template orchestrateur (T000*/TORC*) pose par connect_session",
             }
         else:
             # R29 (regle exploitant 2026-11-17) : AUCUN champ vide — chaque champ non
@@ -240,7 +240,7 @@ def populate_mission_from_contract(base_url: str, token: str, assignment_id: str
                 "criteria": na,
                 "evidence": "Fiche generee depuis connect_session sans contrat",
                 "unknowns": ("Fiche incomplete : contrat absent ou alias hors catalogue — a "
-                             "completer par l'exploitant (T000/TORC : sans contrat par conception)"),
+                             "completer par l'exploitant (orchestrateur hors catalogue : sans contrat par conception)"),
                 "next_step": "A cadrer avec l'exploitant si la tache est formelle",
                 "extra": "Fiche generee depuis connect_session sans contrat",
             }

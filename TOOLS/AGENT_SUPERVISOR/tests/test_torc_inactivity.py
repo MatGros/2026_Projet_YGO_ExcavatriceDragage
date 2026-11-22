@@ -1,5 +1,5 @@
 """R29/T427-CC02 (2026-11-17) : consigne a 3 constats.
-1. TORC = agent de coordination (is_coordination_session).
+1. TORC = agent de coordination (is_orchestrator_session).
 2. Attach sans contrat -> fiche EXPLICITEMENT incomplete, jamais {} muette.
 3. Veille d'inactivite : seuil 4 h coordination / criticite sinon ; constat unique.
 Preuves exigees par T427 dans la reponse RECU : sorties brutes citees.
@@ -23,19 +23,19 @@ if str(WORKFLOW) not in sys.path:
 
 from supervisor_service import (  # noqa: E402
     _inactivity_threshold_seconds, _seconds_since_last_activity,
-    is_coordination_session, timestamp)
+    is_orchestrator_session, timestamp)
 from connect_session import populate_mission_from_contract  # noqa: E402
 
 
 def test_torc_est_coordination():
-    """Constat 2 de T427 : is_coordination_session("TORC-CC10") == True (etait False)."""
-    assert is_coordination_session({"alias": "TORC-CC10"}) is True
-    assert is_coordination_session({"alias": "T000-CC10"}) is True
-    assert is_coordination_session({"alias": "TORC-CC10", "task_id": "TORC"}) is True
-    assert is_coordination_session({"alias": "T432-CDX02"}) is False
+    """Constat 2 de T427 : is_orchestrator_session("TORC-CC10") == True (etait False)."""
+    assert is_orchestrator_session({"alias": "TORC-CC10"}) is True
+    assert is_orchestrator_session({"alias": "T000-CC10"}) is True
+    assert is_orchestrator_session({"alias": "TORC-CC10", "task_id": "TORC"}) is True
+    assert is_orchestrator_session({"alias": "T432-CDX02"}) is False
 
 
-def test_fiche_torc_template_coordination():
+def test_fiche_torc_template_orchestrateur():
     """Constat 1 (T427) : TORC sans contrat -> fiche REMPLIE par le template coordination
     (l'outil connait les regles de gouvernance d'un orchestrateur), jamais {} muette."""
     posts = []
@@ -53,10 +53,10 @@ def test_fiche_torc_template_coordination():
     posted = posts[-1]
     structure = posted["structure"]
     assert structure, "structure jamais vide"
-    assert "Coordination du projet" in structure["primary_goal"], "objectif d'orchestrateur auto-rempli"
+    assert "Orchestration du projet" in structure["primary_goal"], "objectif d'orchestrateur auto-rempli"
     assert "(1) clotures par l'exploitant" in structure["criteria"], "les 5 regles de gouvernance sont dans la fiche"
-    assert "Coordination (sans contrat par conception" in structure["milestone"]
-    assert "Fiche coordination generique" in structure["unknowns"]
+    assert "Orchestration (sans contrat par conception" in structure["milestone"]
+    assert "Fiche orchestrateur generique" in structure["unknowns"]
 
 
 def test_torc_connect_serveur_isole(tmp_path):
@@ -84,7 +84,7 @@ def test_torc_connect_serveur_isole(tmp_path):
                 time.sleep(0.5)
         with _urllib.urlopen(base + '/api/supervision', timeout=10) as response:
             snapshot = _json.load(response)
-        mission = ("Coordination du projet par TORC-CC22 : piloter les taches du catalogue "
+        mission = ("Orchestration du projet par TORC-CC22 : piloter les taches du catalogue "
                    "via le canal orchestrateur designe ; NE JAMAIS cloter un constat ni une tache soi-meme (regle 10)")
         token = snapshot.get('token')
         request = _urllib.Request(base + '/api/supervision', data=_json.dumps({

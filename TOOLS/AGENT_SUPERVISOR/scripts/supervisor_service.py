@@ -303,7 +303,7 @@ def session_display_title_short(session) -> str:
 # M23/R26 (demande exploitant 2026-11-15) : la memoire longue devient CONFIGURABLE (defaut 20
 # inchange, elargissable pour un modele a grand contexte — ex. 1M tokens) ; les plafonds des
 # reglages de fenetre montent pareil. Les liens memoire sont visibles a l IHM avec des stats d etat.
-MEMORY_MAX_ITEMS = 20
+MEMORY_MAX_ITEMS = 1000
 
 
 def head_tail_text(text: str, limit: int = 3000) -> str:
@@ -330,7 +330,7 @@ def memory_limit(settings=None) -> int:
 
 DEFAULT_JUDGE_SETTINGS = dict(temperature=0, output_tokens=1600, timeout_seconds=30,
                               context_messages=12, context_chars=12000, model_context_tokens=32768,
-                              memory_max_items=20,
+                              memory_max_items=1000,
                               max_visible_closed_findings=5, audit_interval=8)
 
 
@@ -342,7 +342,7 @@ def validate_judge_settings(settings=None):
     result = dict(DEFAULT_JUDGE_SETTINGS, **settings)
     bounds = dict(temperature=(0, 1), output_tokens=(256, 8192), timeout_seconds=(5, 120),
                   context_messages=(4, 2000), context_chars=(2000, 1000000), model_context_tokens=(8192, 1048576),
-                  memory_max_items=(20, 500),
+                  memory_max_items=(100, 5000),
                   max_visible_closed_findings=(1, 50), audit_interval=(1, 50))
     for key, (low, high) in bounds.items():
         value = result[key]
@@ -821,6 +821,13 @@ def dossier_public(dossier) -> dict:
 # l alias porte le prefixe T000 (ex. T000-CC10). La detection est MECANIQUE : le juge ne
 # devine pas un role. Canonique des criteres : TOOLS/AGENT_WORKFLOW/skills/orchestrator/SKILL.md
 # section "Identite de coordination & surveillance du Superviseur".
+def is_coordination_session(session):
+    """Alias historique — ATTENTION TERMES (exploitant 2026-11-23) : "coordination"
+    est un POSTE (coordination d'une tache, workflow) ; ce predicat detecte un
+    ORCHESTRATEUR (T000-*/TORC-*). Nom canonique : is_orchestrator_session."""
+    return is_orchestrator_session(session)
+
+
 MEMORY_SEARCH_NOTICE = (
     "## MEMOIRE LONGUE DURABLE (T429, 2026-11-22) : les messages bruts de cette session sont "
     "archives integralement (recherche a la demande : API /api/supervision/memory?id=…&q=terme "
@@ -833,8 +840,8 @@ MEMORY_SEARCH_NOTICE = (
 # R29 (decision exploitant 2026-11-22) : un ORCHESTRATEUR a TOUJOURS un objectif de base
 # (affinable, jamais absent). Une fiche de coordination incomplete est donc COMPLETEE par
 # ce socle par defaut — on n'alerte pas "sans cadrage" sur une absence qui n'existe pas.
-COORDINATION_DEFAULT_CADRAGE = {
-    "primary_goal": ("Coordination du projet : piloter les taches du catalogue via le canal "
+ORCHESTRATOR_DEFAULT_SOCLE = {
+    "primary_goal": ("Orchestration du projet : piloter les taches du catalogue via le canal "
                      "orchestrateur designe ; NE JAMAIS cloturer un constat ni une tache "
                      "soi-meme (regle 10). Objectif de base — affinable par l'exploitant."),
     "criteria": ("Criteres de gestion : (1) clotures par l'exploitant ou un juge code ; "
@@ -842,12 +849,12 @@ COORDINATION_DEFAULT_CADRAGE = {
                  "(3) ne jamais contourner un verrou d'un autre acteur ; "
                  "(4) preuve = git diff reel, pas un rapport d'agent ; "
                  "(5) aucun commit ni push sans accord humain explicite."),
-    "scope_permissions": ("Coordination : DOC/WFLOW/TASKS via API Task Manager, chat agent, "
+    "scope_permissions": ("Orchestration : DOC/WFLOW/TASKS via API Task Manager, chat agent, "
                           "journal ; lecture seule partout ailleurs"),
 }
 
-COORDINATION_JUDGE_NOTICE = (
-    "## SESSION DE COORDINATION (role orchestrateur/coordinateur, alias T000-*/TORC-*) : le juge applique "
+ORCHESTRATOR_JUDGE_NOTICE = (
+    "## SESSION D'ORCHESTRATION (orchestrateur, alias T000-*/TORC-*) : le juge applique "
     "les criteres de gestion specifiques — (1) la session ne cloture ni un constat ni une tache "
     "elle-meme (la cloture revient a l exploitant ou a un juge enregistre par le code) ; (2) une fiche "
     "de tache ne se modifie que par le coordinateur designe via l API Task Manager, jamais par edition "
@@ -857,7 +864,7 @@ COORDINATION_JUDGE_NOTICE = (
 )
 
 
-def is_coordination_session(session) -> bool:
+def is_orchestrator_session(session) -> bool:
     """T429 M15/R17 : session de coordination = alias T000-*/TORC-* ou tache liee T000/TORC.
     R29/T427-CC02 (2026-11-17) : TORC est un orchestrateur HORS catalogue — il doit recevoir
     la notice de coordination et entrer dans la detection de conflits comme T000."""
@@ -876,7 +883,7 @@ def _inactivity_threshold_seconds(session) -> float:
     """R29/T427-CC02 : seuil d'inactivité — coordination (T000*/TORC*) 4 h,
     sinon la criticité du contrat lu via structure_quality (cache mtime),
     défaut 24 h hors catalogue."""
-    if is_coordination_session(session):
+    if is_orchestrator_session(session):
         return 4 * 3600
     hours = 24.0
     task_id = str(session.get("task_id") or "").strip()
@@ -1253,7 +1260,12 @@ class Supervisor:
             allow = data.get("allow_cloud", False)
             self._validate_model(model, allow)
             self.model, self.allow_cloud = model, allow
-            self.judge_settings = validate_judge_settings(data.get("judge_settings"))
+            raw_settings = data.get("judge_settings")
+            # R29 (exploitant 2026-11-23) : l'ancien plafond 20/100 est obsolete — releve
+            # AVANT validation (sinon l'etat historique est refuse et tout retombe).
+            if isinstance(raw_settings, dict) and int(raw_settings.get("memory_max_items") or 0) < 100:
+                raw_settings = dict(raw_settings, memory_max_items=MEMORY_MAX_ITEMS)
+            self.judge_settings = validate_judge_settings(raw_settings)
             for value in data.get("sessions", []):
                 if not isinstance(value, dict):
                     raise ValueError("Affectation persistante invalide")
@@ -2842,7 +2854,13 @@ class Supervisor:
                      event_id="recycle:" + str(items[0].get("event_id") or "?") + ":" + str(len(items)),
                      event_index=items[-1].get("event_index"))
         session.setdefault("memory", []).append(entry)
+        # R29 (exploitant 2026-11-23) : les resumes s'accumulent (plafond de securite eleve
+        # seulement), et chaque resume est aussi mirroré dans l'archive interrogeable.
         session["memory"] = session["memory"][-memory_limit(self.judge_settings):]
+        memory_archive.append(session.get("id"), [dict(
+            role="résumé", text=summary, observed_at=entry["observed_at"],
+            event_id=entry["event_id"], event_index=entry.get("event_index"),
+            generation=session.get("source_generation"))])
         record_event(session, "window_recycled",
                      "Fenetre recyclee : %d message(s) resumes en memoire longue "
                      "(texte integral consultable par recherche)" % len(items), timestamp())
@@ -2869,9 +2887,10 @@ class Supervisor:
             return
         event = record_event(session, "source_" + message["role"], message["text"], message.get("observed_at", timestamp()), source_id=ident, event_index=message.get("event_index"))
         if message["role"] == "user" and not any(m.get("event_id") == ident for m in session["memory"] if ident):
+            # R29 (exploitant 2026-11-23) : le message brut ne va PLUS dans la memoire longue
+            # (l'archive integrale le porte) ; la memoire longue ne recoit que les RESUMES
+            # de fenetres recyclees. Le cadrage (framing) reste alimente pour les constats.
             item = dict(kind="user_message", text=head_tail_text(message["text"]), observed_at=message.get("observed_at", timestamp()), event_id=ident, event_index=message.get("event_index"))
-            session["memory"].append(item)
-            session["memory"] = session["memory"][-memory_limit(self.judge_settings):]
             if not any(f.get("event_id") == ident for f in session["framing"] if ident):
                 session["framing"].append(dict(item, ref=event["ref"], version=len(session["framing"]) + 1))
         elif message["role"] == "tool":
@@ -3235,7 +3254,7 @@ class Supervisor:
                 continue
             alias = session.get("alias") or session.get("native_id") or str(session["id"])
             hours = round(threshold / 3600, 1)
-            kind = "seuil coordination (T000*/TORC*)" if is_coordination_session(session) else "seuil criticite"
+            kind = "seuil coordination (T000*/TORC*)" if is_orchestrator_session(session) else "seuil criticite"
             text = (f"{alias} : aucune activite depuis plus de {hours} h ({kind}) - "
                     "la session travaille-t-elle encore ? A relever par l'exploitant.")
             alert = dict(id=fingerprint[:24], fingerprint=fingerprint, model="service",
@@ -3250,10 +3269,10 @@ class Supervisor:
             record_event(session, "finding_created", text, timestamp(), alert_id=alert["id"], version=alert["version"])
             _trace(event="session_inactive", session=str(session["id"]), alias=alias, seuil_heures=hours)
 
-    def _detect_coordination_conflicts(self):
+    def _detect_orchestrator_conflicts(self):
         """T429 M15/R17 : deux sessions de coordination actives simultanement = conflit.
         Constat MECANIQUE (pas le juge), idempotent : cree une fois, reste jusqu a cloture humaine."""
-        coordination = [s for s in self.sessions.values() if s.get("enabled") and s.get("state") == "active" and is_coordination_session(s)]
+        coordination = [s for s in self.sessions.values() if s.get("enabled") and s.get("state") == "active" and is_orchestrator_session(s)]
         if len(coordination) < 2:
             return
         names = {}
@@ -3265,12 +3284,12 @@ class Supervisor:
             if next((a for a in session["alerts"] if a.get("fingerprint") == fingerprint), None):
                 continue
             me = names[str(session["id"])]
-            text = (me + " et " + ", ".join(others) + " : deux sessions de coordination (T000-*) sont "
+            text = (me + " et " + ", ".join(others) + " : deux orchestrateurs actifs (T000-*/TORC-*) sont "
                     "actives simultanement. Le projet designe UN coordinateur a la fois : remettre un "
                     "des deux perimetres et transmettre l etat.")
             alert = dict(id=fingerprint[:24], fingerprint=fingerprint, model="service",
                 severity="warning", reason=text, evidence=text, category="coordination_conflict",
-                title="Conflit de coordination", created_at=timestamp(), last_occurrence=timestamp(),
+                title="Conflit d'orchestrateurs", created_at=timestamp(), last_occurrence=timestamp(),
                 occurrences=1, disposition="new", acknowledged_at=None,
                 workflow=dict(status="informational", delivery_status="not_sent", choice=None, rationale="", chosen_at=None, response=""))
             alert["evidence_provenance"] = evidence_provenance(session, alert.get("evidence"))
@@ -3303,7 +3322,7 @@ class Supervisor:
                 session["cadrage_state"] = dict(
                     manquants=missing, at=timestamp(),
                     fiche_declaree_incomplete=declared_incomplete)
-                if not is_coordination_session(session):
+                if not is_orchestrator_session(session):
                     continue
                 # R29 (decision exploitant 2026-11-22) : une fiche marquee "Fiche incomplete"
                 # (pas de contrat, ex. TORC) n'est PAS une fiche sans objectif — le socle
@@ -3311,20 +3330,20 @@ class Supervisor:
                 if missing:
                     structure = dict(session.get("mission_structure") or {})
                     filled = []
-                    for champ, valeur in COORDINATION_DEFAULT_CADRAGE.items():
+                    for champ, valeur in ORCHESTRATOR_DEFAULT_SOCLE.items():
                         if not str(structure.get(champ) or "").strip():
                             structure[champ] = valeur
                             filled.append(champ)
                     if filled:
-                        structure.setdefault("milestone", "Coordination (socle par defaut)")
+                        structure.setdefault("milestone", "Orchestration (socle par defaut)")
                         structure["unknowns"] = (
-                            "Fiche completee par le socle coordination par defaut — affinable "
+                            "Fiche completee par le socle orchestrateur par defaut — affinable "
                             "par l'exploitant")
                         session["mission_structure"] = structure
                         session["mission_structure_origin"] = "mission"
                         session["mission_structure_updated_at"] = timestamp()
                         record_event(session, "cadrage_default_applied",
-                                     "Socle coordination applique (objectif/criteres/perimetre "
+                                     "Socle orchestrateur applique (objectif/criteres/perimetre "
                                      "par defaut, affinables) : " + ", ".join(filled), timestamp())
                         _trace(event="cadrage_default_applied", session=str(session["id"]),
                                champs=",".join(filled))
@@ -3355,7 +3374,7 @@ class Supervisor:
                     continue
                 alert = dict(id=fingerprint[:24], fingerprint=fingerprint, model="service",
                     severity="warning", reason=text, evidence=text, category="mission_non_cadree",
-                    title="Session de coordination sans cadrage", created_at=timestamp(), last_occurrence=timestamp(),
+                    title="Session d'orchestration sans cadrage", created_at=timestamp(), last_occurrence=timestamp(),
                     occurrences=1, disposition="new", acknowledged_at=None,
                     workflow=dict(status="informational", delivery_status="not_sent", choice=None, rationale="", chosen_at=None, response=""))
                 alert["evidence_provenance"] = evidence_provenance(session, alert.get("evidence"))
@@ -3390,7 +3409,7 @@ class Supervisor:
                 continue
             names = {str(s["id"]): (s.get("alias") or s.get("native_id") or str(s["id"])) for s in members}
             for session in members:
-                if is_coordination_session(session):
+                if is_orchestrator_session(session):
                     continue   # coordination_conflict couvre deja le cas T000-*
                 others = sorted(name for ident, name in names.items() if ident != str(session["id"]))
                 fingerprint = hashlib.sha256((str(session["id"]) + "\nactor_conflict\n" + actor).encode()).hexdigest()
@@ -3447,7 +3466,7 @@ class Supervisor:
                                                 messages_seen=after_messages-before_messages,
                                                 sessions_unavailable=sum(s["state"] not in ("active", "waiting") for s in enabled),
                                                 cycles=self.collector_stats["cycles"]+1)
-                    self._detect_coordination_conflicts()
+                    self._detect_orchestrator_conflicts()
                     self._detect_mission_cadrage()
                     self._detect_actor_conflicts()
                     self._detect_inactive_sessions()
@@ -3509,8 +3528,8 @@ class Supervisor:
                                          + str(dossier["total_caracteres"]) + " caracteres",
                                          refs=[f["path"] for f in dossier["fichiers"][-5:]])
                         # M15/R17 : le role coordination est annonce au juge, il ne se devine pas.
-                        if is_coordination_session(session):
-                            notices.append(dict(role="context_notice", text=COORDINATION_JUDGE_NOTICE))
+                        if is_orchestrator_session(session):
+                            notices.append(dict(role="context_notice", text=ORCHESTRATOR_JUDGE_NOTICE))
                         # R29 (2026-11-22) : tout juge sait que la memoire longue est
                         # RECHERCHABLE — il cherche au lieu de supposer, et cite la source.
                         notices.append(dict(role="context_notice", text=MEMORY_SEARCH_NOTICE))

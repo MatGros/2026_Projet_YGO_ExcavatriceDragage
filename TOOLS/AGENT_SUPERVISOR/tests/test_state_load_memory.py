@@ -59,10 +59,21 @@ def test_memoire_31_avec_reglage_100_charge_sans_perte(tmp_path):
 
 
 def test_memoire_au_dela_du_reglage_reste_refusee(tmp_path):
-    """La protection demeure : au-dela du REGLAGE, la borne reste stricte."""
+    """La protection demeure : au-dela du REGLAGE (1000), la borne reste stricte.
+    (R29 2026-11-23 : l'ancien plafond 20/100 est obsolete — migration douce vers 1000.)"""
+    path = _state_file(tmp_path, _memory_items(1500), settings_memory=1000)
+    service = m.Supervisor(path, roots={'claude': [tmp_path], 'codex': [], 'agy': [], 'dsh': []})
+    assert service.load_error is not None, "1500 items avec reglage 1000 : refus attendu"
+
+
+def test_reglage_ancien_20_migre_vers_1000(tmp_path):
+    """R29 : un etat persiste avec l'ancien plafond (<100) charge quand meme — le
+    reglage est releve au plafond de securite 1000, aucune session jetee."""
     path = _state_file(tmp_path, _memory_items(31), settings_memory=20)
     service = m.Supervisor(path, roots={'claude': [tmp_path], 'codex': [], 'agy': [], 'dsh': []})
-    assert service.load_error is not None, "31 items avec reglage 20 : refus attendu (borne inchangee)"
+    assert service.load_error is None
+    assert len(service.sessions) == 1
+    assert service.judge_settings['memory_max_items'] == 1000, 'migration douce du plafond'
 
 
 def test_source_disparue_ne_fait_pas_tomber_les_autres(tmp_path):

@@ -1438,8 +1438,8 @@ def test_two_active_coordination_sessions_raise_one_finding(tmp_path, monkeypatc
         fake['enabled'] = False
         svc._detect_coordination_conflicts()
         assert len(fake['alerts']) == 1, 'une session en pause ne declenche plus le conflit'
-        assert supervisor_service.is_coordination_session(fake) is True
-        assert supervisor_service.is_coordination_session(dict(alias='T429-CC01', task_id='T429')) is False
+        assert supervisor_service.is_orchestrator_session(fake) is True
+        assert supervisor_service.is_orchestrator_session(dict(alias='T429-CC01', task_id='T429')) is False
     finally:
         svc.close()
 
@@ -1491,7 +1491,7 @@ def test_mission_cadrage_partiel_complete_par_le_socle(tmp_path, monkeypatch):
         fiche = s1['mission_structure']
         assert fiche['primary_goal'] == 'Cadrer la session', 'le champ fourni est conserve'
         assert 'Criteres de gestion' in str(fiche.get('criteria')), 'les criteres sont completes'
-        assert str(fiche.get('scope_permissions')).startswith('Coordination'), 'perimetre complete'
+        assert str(fiche.get('scope_permissions')).startswith('Orchestration'), 'perimetre complete'
         assert not [a for a in s1['alerts'] if a['category'] == 'mission_non_cadree'], 'aucun constat redondant'
     finally:
         svc.close()
