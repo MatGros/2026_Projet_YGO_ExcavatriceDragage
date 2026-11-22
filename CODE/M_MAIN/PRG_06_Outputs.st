@@ -102,6 +102,7 @@ VAR
     PowerCutOffReq                   : BOOL; // . [LOC] Demande agregative coupure puissance
     MaintenanceN2BrakeForceM1        : BOOL; // . [SAFE] Forçage frein M1 autorisé et protégé
     MaintenanceN2BrakeForceM2        : BOOL; // . [SAFE] Forçage frein M2 autorisé et protégé
+    MaintenanceN2BrakeForceM3        : BOOL; // . [SAFE] Forçage frein M3 autorisé et protégé
 
     // === 🔒 CONCORDANCE SORTIES TREUILS M1/M2 (§2ter) ===
     WinchOutputCoupled               : BOOL; // . [LOC] Treuils couples (synchro OU both) : arme instSyncContactorFinal
@@ -520,8 +521,13 @@ instTranslationOutputInterlockM3(
 TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
 // Pas de garde anti-chatter sur le frein M3 : re-desserrage immédiat requis (cf. §2quater).
 
+MaintenanceN2BrakeForceM3 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+    AND PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI
+    AND PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
+    AND GVL_IHM.MaintenanceN2.Cmd.BtnM3BrakeRelease;
+
 // ── Sorties physiques M3 ──
-M3_BrakeRelease_RQ           := TranslationBrakeCmd;
+M3_BrakeRelease_RQ           := TranslationBrakeCmd OR MaintenanceN2BrakeForceM3;
 M3_CommandWord               := instTranslationOutputInterlockM3.DriveControlWord;
 M3_SetpointFrequencyHz       := instTranslationOutputInterlockM3.DriveFreqCmdWord;
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://www.plcopen.org/xml/tc6_0200">
-  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T15:54:33.703489" />
-  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T15:54:33.703489">
+  <fileHeader companyName="" productName="CODESYS" productVersion="CODESYS V3.5 SP19 Patch 1" creationDateTime="2026-11-18T18:52:23.228929" />
+  <contentHeader name="Generated.project" modificationDateTime="2026-11-18T18:52:23.228929">
     <coordinateInfo>
       <fbd>
         <scaling x="1" y="1" />
@@ -1596,6 +1596,14 @@ Remplace le zeroage binaire instantane de l'ex-§2ter.
                 <xhtml xmlns="http://www.w3.org/1999/xhtml">. [SAFE] Forçage frein M2 autorisé et protégé</xhtml>
               </documentation>
             </variable>
+            <variable name="MaintenanceN2BrakeForceM3">
+              <type>
+                <BOOL />
+              </type>
+              <documentation>
+                <xhtml xmlns="http://www.w3.org/1999/xhtml">. [SAFE] Forçage frein M3 autorisé et protégé</xhtml>
+              </documentation>
+            </variable>
             <variable name="WinchOutputCoupled">
               <type>
                 <BOOL />
@@ -2118,8 +2126,13 @@ instTranslationOutputInterlockM3(
 TranslationBrakeCmd := instTranslationOutputInterlockM3.BrakeCmd;
 // Pas de garde anti-chatter sur le frein M3 : re-desserrage immédiat requis (cf. §2quater).
 
+MaintenanceN2BrakeForceM3 := (PRG_03_Modes_Cycle.Data.Auth.Mode = E_Mode.MAINT_N2)
+    AND PRG_02_Acquisition.HwIn.Machine.EmergencyChainClosed_DI
+    AND PRG_02_Acquisition.HwIn.Machine.PowerContactorEngaged_DI
+    AND GVL_IHM.MaintenanceN2.Cmd.BtnM3BrakeRelease;
+
 // ── Sorties physiques M3 ──
-M3_BrakeRelease_RQ           := TranslationBrakeCmd;
+M3_BrakeRelease_RQ           := TranslationBrakeCmd OR MaintenanceN2BrakeForceM3;
 M3_CommandWord               := instTranslationOutputInterlockM3.DriveControlWord;
 M3_SetpointFrequencyHz       := instTranslationOutputInterlockM3.DriveFreqCmdWord;
 
