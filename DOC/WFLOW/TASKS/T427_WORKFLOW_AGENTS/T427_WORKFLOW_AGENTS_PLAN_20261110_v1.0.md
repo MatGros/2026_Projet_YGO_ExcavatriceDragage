@@ -762,3 +762,26 @@ Correctifs demandés à T429 :
 Côté T427 : l'orchestrateur est un agent à part, il délègue, suit et revoit ; sa surveillance ne peut pas être
 celle d'un agent d'exécution. Critères à écrire une fois la forme d'alerte tranchée par l'exploitant
 (constat Superviseur, notification, ou les deux).
+
+## 30. Correctif du garde de perimetre (2026-11-17 / 18) — trace
+
+Le correctif du garde et la nouvelle regle de derogation sont bien dans l'historique, mais **noyes**
+dans un commit d'une autre session : `381021be` « wip(checkpoint): point de sauvegarde avant refonte
+grafcet homing T377 » (28 fichiers). Ce message ne parle pas du garde : chercher par message ne le
+retrouvera pas.
+
+Fichiers concernes par ce correctif :
+- `TOOLS/AGENT_WORKFLOW/scripts/task_scope.py` : comparaison par composants entiers, noms courts 8.3,
+  octet nul, cache des deny-lists, derogation possible sur chemin protege.
+- `TOOLS/AGENT_WORKFLOW/scripts/hook_scope_guard.py` : `is_hard_denied` appele, refus qui donne la
+  phrase exacte a demander, derogation qui ouvre le chemin precis.
+- `TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py` : auto-entree sans effet de bord (validation avant
+  ecriture, mode conserve, une seule ecriture).
+- Tests : `test_task_scope_composants.py` (nouveau), `test_scope_guard_p1.py`, `test_scope_guard_hook.py`,
+  `test_role_commands.py`, `test_workflow_state.py`.
+
+Resultat : 115 tests passes, 12 xfailed, code 0.
+
+Faille connue, non corrigee : la derogation accepte n'importe quelle citation humaine presente dans le
+transcript. Une phrase courte (« GO ») sert donc de cle pour n'importe quel chemin. Durcissement propose :
+exiger que le motif contienne le chemin normalise.

@@ -54,9 +54,10 @@ en tête de réponse. Réponses en texte simple (tirets, numéros). L'étape res
 de statut, pas dans les réponses.
 Hors tâche : `T000` (provisoire, sans contrat ni critère évaluable ; un seul coordinateur T000 à la fois).
 
-**Pied de réponse — où on peut aller :** chaque réponse de travail finit par une ligne
-`Choix : …` listant 2 à 4 suites possibles (étape suivante, autre voie, retour, aide).
-L'utilisateur n'est jamais laissé sans savoir ce qu'il peut faire ensuite.
+**Décider plutôt que proposer un menu :** l'agent agit quand il sait quoi faire, et rend le
+résultat. Il ne termine pas chaque réponse par une liste d'options. Il pose une question, une
+seule, uniquement s'il est réellement bloqué ou si plusieurs voies changent le résultat.
+Aucun emoji de structure dans les réponses.
 
 **Aide :** le message « aide workflow » (ou « où en est-on ? ») affiche la carte en ≤ 15 lignes :
 position actuelle (tâche · étape · voie), étapes et voies disponibles, transitions possibles depuis

@@ -40,7 +40,7 @@ Le script écrit l'état hors dépôt et imprime le bloc de sortie. **Ce bloc fa
 Le bloc est complet : rien à compléter.
 - 📍 **Ce chat** : la tâche en cours, ou « aucune », avec le dernier point en une phrase ;
 - ⏸️ **En attente** : ce qui attend l'utilisateur, ou « rien » ;
-- ➡️ **Choix** : 2 à 4 suites possibles.
+- **Choix** : 2 à 4 suites possibles, sans emoji de structure.
 
 Pour `resume` : résumer le fil du chat en 5 lignes au maximum dans 📍 (il reprend le **fil de ce chat**,
 pas une tâche du catalogue).
@@ -48,7 +48,7 @@ pas une tâche du catalogue).
 ## 3. 🔀 Cas du script
 
 - **`ACTIF`** : appliquer le § Démarrage de `AGENTS.md` (pied de réponse).
-- **`OFF`** : répondre en simple assistant. Pas de ligne d'étape ni de pied `➡️`.
+- **`OFF`** : répondre en simple assistant. Pas de ligne d'étape ni de pied de réponse.
 - **`INDÉTERMINÉ`** : dire que l'état n'est pas connu, sans rien supposer. Demander de relancer
   avec `/workflow-project-orchestrator` ou `/workflow-project-coordinator`.
 - **Résumé `PÉRIMÉ` ou `ABSENT`** : le signaler dans 📊, sans lire `TASKS.yaml` entier.

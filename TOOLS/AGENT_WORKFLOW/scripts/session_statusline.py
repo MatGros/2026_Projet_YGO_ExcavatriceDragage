@@ -390,6 +390,30 @@ def get_supervisor_status(conv_id, summary=_NOT_FETCHED, summary_error=None):
         # Réponse reçue mais structure inattendue : état inconnu, pas "Offline".
         return f"{yellow}🛡️ Supervisor : État inconnu{reset}"
 
+def build_status_snapshot(conv_id, cli_name, summary, summary_error=None, stale=False):
+    """Contrat de données partagé par le rendu natif et les autres surfaces CLI."""
+    matches = [s for s in (summary or {}).get("sessions", []) if s.get("native_id") == conv_id]
+    if len(matches) > 1:
+        raise ValueError("Plusieurs affectations pour cette session : statut ambigu")
+    session = matches[0] if matches else {}
+    title, _actor = get_session_info(conv_id, cli_name, summary=summary)
+    return {
+        "schema_version": 1,
+        "session_id": conv_id,
+        "title": title,
+        "alias": session.get("alias"),
+        "supervisor": {
+            "state": session.get("state"),
+            "counts": session.get("counts", {}),
+            "error": summary_error,
+            "stale": stale,
+            "text": get_supervisor_status(conv_id, summary=summary, summary_error=summary_error),
+        },
+        "workflow": get_workflow_badge(conv_id),
+        "git": get_git_badge(),
+    }
+
+
 def main():
     try:
         # Lire stdin s'il est alimenté (ex: Claude Code envoie du JSON contenant session_id)
@@ -420,7 +444,8 @@ def main():
         summary, summary_error = fetch_supervisor_summary() if conv_id else (None, None)
         # Anti-clignotement : sur lenteur, dernière valeur connue au lieu du titre IA.
         summary, summary_error, summary_stale = resolve_summary(conv_id, summary, summary_error)
-        raw_title, actor = get_session_info(conv_id, parent_name, summary=summary)
+        snapshot = build_status_snapshot(conv_id, parent_name, summary, summary_error, summary_stale)
+        raw_title = snapshot["title"]
         boot_name = get_boot_terminal_name(parent_name)
 
         # Extraire le repère canonique de tâche (TXXX ou TXXX-ACTEUR ex: T423 ou T423-AGY01 ou T000-AGY00)
@@ -502,12 +527,12 @@ def main():
             else:
                 colored_label = f"{pastel_purple}{status_text.upper()}{reset}"
 
-            sup_badge = get_supervisor_status(conv_id, summary=summary, summary_error=summary_error)
+            sup_badge = snapshot["supervisor"]["text"]
             if summary_stale:
                 sup_badge += f" {dim}(dernier connu, Superviseur lent){reset}"
             print(f"{colored_label} {dim}│{reset} {sup_badge}")
             # 2026-11-14 : deuxième ligne épurée et uniforme (AGY / Claude / Codex) — workflow + git uniquement.
-            print(f"{STATUSLINE_INDENT}{get_workflow_badge(conv_id)} │ {get_git_badge()}")
+            print(f"{STATUSLINE_INDENT}{snapshot['workflow']} │ {snapshot['git']}")
     except Exception:
         # Filet de sécurité absolu : ne JAMAIS crasher en code 1
         print("🚀 AGY Antigravity")

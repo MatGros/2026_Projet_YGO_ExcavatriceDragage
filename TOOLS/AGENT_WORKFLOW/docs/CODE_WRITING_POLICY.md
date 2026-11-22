@@ -75,7 +75,7 @@ Interface minimale autorisée uniquement si son rôle est documenté dans la spe
 
 ## 5. Programmation orientée objet et encapsulation
 
-➡️ **Propriétaire unique de ces règles : [`DOC/STDS/CODE_QUALITY_STANDARDS.md`](../../../DOC/STDS/CODE_QUALITY_STANDARDS.md) §5.**
+**Propriétaire unique de ces règles : [`DOC/STDS/CODE_QUALITY_STANDARDS.md`](../../../DOC/STDS/CODE_QUALITY_STANDARDS.md) §5.**
 
 Responsabilité unique, producteur unique, composition sans héritage, internes privés,
 commandes arbitrées avant l'appel, GVL = frontière et jamais canal caché, structure `ST_*`
@@ -117,7 +117,7 @@ Exemple :
 
 ## 8. Organisation d'un fichier
 
-➡️ **Voir [`DOC/STDS/CODE_QUALITY_STANDARDS.md`](../../../DOC/STDS/CODE_QUALITY_STANDARDS.md) §7**
+**Voir [`DOC/STDS/CODE_QUALITY_STANDARDS.md`](../../../DOC/STDS/CODE_QUALITY_STANDARDS.md) §7**
 (ordre des sections d'un POU + en-tête minimal obligatoire).
 
 ## 9. Traçabilité

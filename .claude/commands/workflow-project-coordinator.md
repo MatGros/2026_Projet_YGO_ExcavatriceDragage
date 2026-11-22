@@ -1,12 +1,10 @@
 ---
 description: Voie Tâche (coordinateur) — entre dans le workflow puis sélectionne la voie 2.
 argument-hint: (aucun argument)
-allowed-tools: Bash(python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py:*)
+allowed-tools: Bash(python TOOLS/AGENT_WORKFLOW/scripts/workflow_role.py:*)
 ---
-!`python TOOLS/AGENT_WORKFLOW/scripts/workflow_state.py cmd 2 --source slash`
+!`python TOOLS/AGENT_WORKFLOW/scripts/workflow_role.py coordinator`
 
-RÈGLES (figées, non négociables) :
-- Reproduire le bloc ci-dessus EXACTEMENT, sans rien ajouter, retirer ni reformuler.
-- Ne rien commenter ni reformuler. Ne prendre aucune tâche.
-- Rôle attendu ensuite : `TOOLS/AGENT_WORKFLOW/skills/task-planner/COORDINATOR.md`.
-- Ne rien faire d'autre dans ce tour.
+Restituer la sortie réelle ci-dessus, puis lire
+`TOOLS/AGENT_WORKFLOW/skills/workflow-project/ROLE_COMMANDS.md` et appliquer la suite
+de l'entrée coordinateur sans réexécuter le lanceur. Aucune prise de tâche automatique.
