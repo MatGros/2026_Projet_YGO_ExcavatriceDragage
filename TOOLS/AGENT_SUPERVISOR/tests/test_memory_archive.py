@@ -77,6 +77,19 @@ def test_recyclage_cree_un_resume_dans_la_memoire():
     assert any(event.get('kind') == 'window_recycled' for event in session['events'])
 
 
+def test_flap_poll_amorti_avant_source_error():
+    """R29 : 1-2 incidents transitoires ne crient pas 'source_error' ; le 3e oui.
+    Constat exploitant 2026-11-22 : statusline 'EN ERREUR (source_error)' d'une seconde."""
+    session = dict(id='S-FLAP', state='active', events=[])
+    m._record_poll_failure(session, PermissionError('fichier en ecriture'))
+    m._record_poll_failure(session, PermissionError('fichier en ecriture'))
+    assert session['state'] == 'active', 'deux incidents consecutifs : etat conserve (flap amorti)'
+    m._record_poll_failure(session, PermissionError('fichier en ecriture'))
+    assert session['state'] == 'source_error', 'trois incidents consecutifs : source_error annonce'
+    m._reset_poll_failures(session)
+    assert session['_poll_failures'] == 0
+
+
 def test_migration_idempotente_et_sans_perte(tmp_path, monkeypatch):
     monkeypatch.setattr(memory_archive, 'ROOT', tmp_path)
     monkeypatch.setattr(memory_archive, 'MEMORY_DIR', tmp_path / 'agent-memory')

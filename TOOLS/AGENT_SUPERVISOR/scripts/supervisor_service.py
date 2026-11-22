@@ -953,6 +953,25 @@ _PERSONA_ENTRIES_CACHE = {'at': 0.0, 'entries': None}  # un SEUL scan du journal
 
 
 MEMORY_SUMMARY_MAX_CHARS = 3000
+POLL_FAILURES_BEFORE_ERROR = 3  # R29 : amortissement des flaps (statusline, IHM)
+
+
+def _record_poll_failure(session, exc) -> None:
+    """Amortit les incidents de poll transitoires : `source_error` n'est annonce
+    qu'apres POLL_FAILURES_BEFORE_ERROR echecs CONSECUTIFS (un transcript de 69 Mo
+    en ecriture concurrente produit sinon des flaps d'une seconde, visibles en
+    'EN ERREUR (source_error)' sur la statusline — constat exploitant 2026-11-22)."""
+    failures = int(session.get("_poll_failures") or 0) + 1
+    session["_poll_failures"] = failures
+    _trace(event="poll_failure", session=str(session.get("id") or "?"),
+           erreur=type(exc).__name__, consecutifs=failures)
+    if failures >= POLL_FAILURES_BEFORE_ERROR or session.get("state") not in ("active", "waiting"):
+        session.update(state="source_error", error=type(exc).__name__)
+
+
+def _reset_poll_failures(session) -> None:
+    if session.get("_poll_failures"):
+        session["_poll_failures"] = 0
 
 
 def build_window_summary(items) -> str:
@@ -3374,9 +3393,13 @@ class Supervisor:
                                             and not session.get("_rejudge_after_poll")):
                                         continue
                                 self._poll_session(session)
+                                _reset_poll_failures(session)
                                 session["_last_stamp"] = before_stamp if session["state"] == "active" else None
                             except Exception as exc:
-                                session.update(state="source_error", error=type(exc).__name__)
+                                # R29 (2026-11-22) : un incident de lecture transitoire sur un
+                                # gros transcript (ecriture concurrente) ne doit pas crier
+                                # "EN ERREUR" : source_error seulement apres N echecs consecutifs.
+                                _record_poll_failure(session, exc)
                     after_messages = sum(s.get("messages_observed", 0) for s in self.sessions.values())
                     self.collector_stats.update(last_cycle_at=timestamp(), sessions_enabled=len(enabled),
                                                 messages_seen=after_messages-before_messages,
