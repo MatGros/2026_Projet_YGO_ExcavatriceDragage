@@ -1,0 +1,387 @@
+{
+  "model": "deepseek-v4.1-flash:cloud",
+  "allow_cloud": false,
+  "judge_settings": {
+    "temperature": 0,
+    "output_tokens": 1600,
+    "timeout_seconds": 30,
+    "context_messages": 12,
+    "context_chars": 12000,
+    "model_context_tokens": 32768,
+    "memory_max_items": 20,
+    "max_visible_closed_findings": 5,
+    "audit_interval": 8
+  },
+  "sessions": [
+    {
+      "id": "62f81a73-8c89-41de-8ddd-e2ac3d9af6ec",
+      "platform": "claude",
+      "native_id": "d9739b30-d0bb-46e9-87c5-243ffc255f90",
+      "alias": "TORC-CC10",
+      "display_title": "TORC-CC10 Orchestrateur TORC",
+      "task_id": "TORC",
+      "task_title": "Orchestrateur TORC (hors catalogue)",
+      "mission": "TORC-CC10 Orchestrateur TORC\nT\u00e2che / sujet : TORC Orchestrateur TORC (hors catalogue)\nEssai fiche incomplete sans contrat.",
+      "initial_mission": "TORC-CC10 Orchestrateur TORC\nT\u00e2che / sujet : TORC Orchestrateur TORC (hors catalogue)\nEssai fiche incomplete sans contrat.",
+      "mission_updated_at": "2026-11-16T23:36:28.445232+00:00",
+      "mission_structure": {
+        "subject": "TORC Orchestrateur TORC (hors catalogue)",
+        "task_ref": "TORC",
+        "primary_goal": "",
+        "current_goal": "",
+        "milestone": "Contrat introuvable pour TORC",
+        "scope_permissions": "",
+        "constraints": "",
+        "criteria": "",
+        "evidence": "",
+        "unknowns": "Fiche incomplete : contrat absent ou alias hors catalogue (ex. TORC) \u2014 a completer par l'exploitant (T000/TORC : sans contrat par conception)",
+        "next_step": "A cadrer avec l'exploitant si la tache est formelle",
+        "extra": "Fiche generee depuis connect_session sans contrat"
+      },
+      "mission_structure_origin": null,
+      "mission_structure_updated_at": "2026-11-16T23:38:21.171074+00:00",
+      "alerts": [
+        {
+          "id": "aa39158e7fb7141e5252e088",
+          "fingerprint": "aa39158e7fb7141e5252e088d70276f6a7fd53b8efb6073a9c33a06bfc2cb42a",
+          "model": "service",
+          "severity": "warning",
+          "reason": "Session de coordination travaillant sans objectif ni crit\u00e8res d\u00e9clar\u00e9s \u2014 manquants : Objectif initial, Crit\u00e8res d'acceptation, P\u00e9rim\u00e8tre et permissions. Un objectif et des crit\u00e8res d'acceptation sont obligatoires pour juger et cl\u00f4turer un travail ; remplir la fiche (IHM : \u00ab Pr\u00e9-remplir depuis la mission texte \u00bb) ou renseigner les champs.",
+          "evidence": "Session de coordination travaillant sans objectif ni crit\u00e8res d\u00e9clar\u00e9s \u2014 manquants : Objectif initial, Crit\u00e8res d'acceptation, P\u00e9rim\u00e8tre et permissions. Un objectif et des crit\u00e8res d'acceptation sont obligatoires pour juger et cl\u00f4turer un travail ; remplir la fiche (IHM : \u00ab Pr\u00e9-remplir depuis la mission texte \u00bb) ou renseigner les champs.",
+          "category": "mission_non_cadree",
+          "title": "Session de coordination sans cadrage",
+          "created_at": "2026-11-16T23:36:29.030341+00:00",
+          "last_occurrence": "2026-11-16T23:36:29.030344+00:00",
+          "occurrences": 1,
+          "disposition": "new",
+          "acknowledged_at": null,
+          "workflow": {
+            "status": "informational",
+            "delivery_status": "not_sent",
+            "choice": null,
+            "rationale": "",
+            "chosen_at": null,
+            "response": ""
+          },
+          "evidence_provenance": {
+            "source": "introuvable",
+            "in_window": false,
+            "event_id": null
+          },
+          "memory_usage": {
+            "fenetre": 0,
+            "memoire_longue": 0,
+            "journal": 0,
+            "preuves_acquises": 0,
+            "cadrage": 0,
+            "fenetre_tronquee": true,
+            "regle_juge": 12,
+            "at": "2026-11-16T23:36:29.030366+00:00"
+          },
+          "reference": "A-aa39158e7fb7",
+          "version": 1,
+          "comments": [],
+          "history": [],
+          "assessment": {
+            "status": "active",
+            "reason": "Session de coordination travaillant sans objectif ni crit\u00e8res d\u00e9clar\u00e9s \u2014 manquants : Objectif initial, Crit\u00e8res d'acceptation, P\u00e9rim\u00e8tre et permissions. Un objectif et des crit\u00e8res d'acceptation sont obligatoires pour juger et cl\u00f4turer un travail ; remplir la fiche (IHM : \u00ab Pr\u00e9-remplir depuis la mission texte \u00bb) ou renseigner les champs.",
+            "evidence": "Session de coordination travaillant sans objectif ni crit\u00e8res d\u00e9clar\u00e9s \u2014 manquants : Objectif initial, Crit\u00e8res d'acceptation, P\u00e9rim\u00e8tre et permissions. Un objectif et des crit\u00e8res d'acceptation sont obligatoires pour juger et cl\u00f4turer un travail ; remplir la fiche (IHM : \u00ab Pr\u00e9-remplir depuis la mission texte \u00bb) ou renseigner les champs.",
+            "updated_at": "2026-11-16T23:36:29.030344+00:00"
+          },
+          "business_state": "open"
+        }
+      ],
+      "source_checkpoint": {
+        "version": 1,
+        "kind": "jsonl",
+        "path": "C:\\Users\\ZEDVICTUS\\.claude\\projects\\c---MGS-DEV-2026-Projet-YGO-ExcavatriceDragage\\d9739b30-d0bb-46e9-87c5-243ffc255f90.jsonl",
+        "offset": 63394804,
+        "identity": [
+          12552331911014853083,
+          11540474048627651
+        ],
+        "digest": "385d7829c79c5435869caf559b2cb04523279f7c37cff164e8b89888102687a0",
+        "pending": ""
+      },
+      "source_event_index": 105,
+      "context_revision": 16,
+      "analyzed_revision": 0,
+      "context": [
+        {
+          "role": "tool",
+          "source_generation": "9bd8daa4-4ed4-45b4-b944-e3acd9743f53",
+          "text": "[tool result \u00b7 call_io3mtxrn \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\n205\t            continue\n206\t        label, value = match.group(1).strip().lower(), match.group(2).strip()\n207\t        for pattern, field in _MISSION_LABELS:\n208\t            if field == \"task_ref\" and not re.match(r\"T\\d{3,}\\b\", value, re.IGNORECASE):\n209\t                continue  # a \"R\u00e9f\u00e9rence\" line is a task reference only when it names T###\n210\t            if re.fullmatch(pattern, label):\n211\t                proposal.setdefault(field, value[:4000])\n212\t                break\n213\t    ref = re.match(r\"\\s*(T\\d{3,})\\b\", proposal.get(\"subject\", \"\"), re.IGNORECASE)\n214\t    if ref and \"task_ref\" not in proposal:\n215\t        proposal[\"task_ref\"] = ref.group(1).upper()\n216\t    return proposal\n217\t\n218\t\n219\tdef validate_mission_structure(value):\n220\t    if not isinstance(value, dict) or set(value) - MISSION_FIELDS:\n221\t        raise ValueError('Structure de mission invalide')\n222\t    if any(not isinstance(v, str) or len(v) > 4000 for v in value.values()) or sum(len(v) for v in value.values()) > 20000:\n223\t        raise ValueError('Structure de mission trop longue')\n224\t    return dict(value)\n225\t\n226\t\n227\tdef service_log(message: str) -> str:\n228\t    \"\"\"R29 : journal du service, meme fichier que le serveur (trace qui doit survivre).\"\"\"\n229\t    try:\n230\t        from datetime import datetime\n231\t        base = Path(os.environ.get('LOCALAPPDATA', 'C:/')) / 'ExcavatriceDragage'\n232\t        with open(base / 'agent-supervisor-server.log', 'a', encoding='utf-8') as handle:\n233\t            handle.write(f\"{datetime.now().isoformat(timespec='seconds')} pid={os.getpid()} {message}\\n\")\n234\t        return 'ok'",
+          "event_id": "d6c030fc385db7d4c52e0fc8c5840a22",
+          "observed_at": "2026-11-16T23:37:05.253Z",
+          "event_index": 31
+        },
+        {
+          "role": "tool",
+          "source_generation": "9bd8daa4-4ed4-45b4-b944-e3acd9743f53",
+          "text": "[tool result \u00b7 call_z1yn596e \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\nLineNumber Line\r\n---------- ----\r\n       309     is_provisional = task_ref in (\"T000\", \"TORC\")\r\n       313     if is_provisional:\r\n       333     if resolved_title and not is_provisional:  # T000 : pas de doublon\r\n       366     if task_ref and not is_provisional:\r\n       391                 if task_ref and not is_provisional and snapshot.get(\"token\"):\r\n       423     if task_ref and not is_provisional and snapshot.get(\"token\"):",
+          "event_id": "29b3afad4b7015014dfed2a2a8daf58e",
+          "observed_at": "2026-11-16T23:37:13.502Z",
+          "event_index": 36
+        },
+        {
+          "role": "assistant",
+          "source_generation": "9bd8daa4-4ed4-45b4-b944-e3acd9743f53",
+          "text": "Cause du silence trouv\u00e9e en plus : `is_provisional = task_ref in (\"T000\", \"TORC\")` (l.309) fait **sauter** l'appel populate pour TORC \u2192 fiche jamais \u00e9crite. Correction : la fiche explicite s'\u00e9crit **aussi** dans ce cas :",
+          "event_id": "82c5cb87a1cb2d7282f1969e823d112f",
+          "observed_at": "2026-11-16T23:37:21.488Z",
+          "event_index": 40
+        },
+        {
+          "role": "tool",
+          "source_generation": "9bd8daa4-4ed4-45b4-b944-e3acd9743f53",
+          "text": "[tool result \u00b7 call_7aqnzona \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\nThe file C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\AGENT_SUPERVISOR\\scripts\\connect_session.py has been updated successfully.",
+          "event_id": "4174be0289541fca7953986bf074589c",
+          "observed_at": "2026-11-16T23:37:22.463Z",
+          "event_index": 42
+        },
+        {
+          "role": "tool",
+          "source_generation": "9bd8daa4-4ed4-45b4-b944-e3acd9743f53",
+          "text": "[tool result \u00b7 call_o242bsok \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\n420\t    attached = next((item for item in result.get(\"sessions\", [])\n421\t                     if item.get(\"platform\") == platform and item.get(\"native_id\") == session_id), None)\n422\t    if not attached or not attached.get(\"source\"):\n423\t        raise RuntimeError(\"Le service n\u2019a pas confirm\u00e9 une source unique pour cet ID\")\n424\t    structure_loaded = False\n425\t    if task_ref and not is_provisional and snapshot.get(\"token\"):\n426\t        structure_loaded = populate_mission_from_contract(\n427\t            base_url, snapshot.get(\"token\"), attached[\"id\"], task_ref, task_label, mission\n428\t        )\n429\t    return dict(status=\"attached\", assignment_id=attached[\"id\"], state=attached[\"state\"],",
+          "event_id": "8848ff9621502bc22918d33a8875b408",
+          "observed_at": "2026-11-16T23:37:28.774Z",
+          "event_index": 48
+        },
+        {
+          "role": "tool",
+          "source_generation": "9bd8daa4-4ed4-45b4-b944-e3acd9743f53",
+          "text": "[tool result \u00b7 call_z5sik26l \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\nThe file C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\AGENT_SUPERVISOR\\scripts\\connect_session.py has been updated successfully.",
+          "event_id": "cbafab93a815f8265f305680c4154a5e",
+          "observed_at": "2026-11-16T23:37:35.329Z",
+          "event_index": 63
+        },
+        {
+          "role": "tool",
+          "source_generation": "9bd8daa4-4ed4-45b4-b944-e3acd9743f53",
+          "text": "[tool result \u00b7 call_m0ymd0ne \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\nsynt OK\r\nmission_structure_loaded = None None\r\nfiche: TORC-CC10\r\n   milestone = None\r\n   unknowns = None\r\n   extra = None",
+          "event_id": "b689553553dceb575003fab0a9335617",
+          "observed_at": "2026-11-16T23:37:45.019Z",
+          "event_index": 69
+        },
+        {
+          "role": "tool",
+          "source_generation": "9bd8daa4-4ed4-45b4-b944-e3acd9743f53",
+          "text": "[tool result \u00b7 call_hn3756qu \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\n{\"status\": \"already_assigned\", \"assignment_id\": \"62f81a73-8c89-41de-8ddd-e2ac3d9af6ec\", \"state\": \"active\", \"alias\": \"TORC-CC10\", \"platform\": \"claude\", \"native_id\": \"d9739b30-d0bb-46e9-87c5-243ffc255f90\", \"task_id\": \"TORC\", \"task_title\": \"Orchestrateur TORC (hors catalogue)\", \"agent_id\": \"CC10\", \"task\": \"TORC Orchestrateur TORC (hors catalogue)\", \"source\": \"C:\\\\Users\\\\ZEDVICTUS\\\\.claude\\\\projects\\\\c---MGS-DEV-2026-Projet-YGO-ExcavatriceDragage\\\\d9739b30-d0bb-46e9-87c5-243ffc255f90.jsonl\", \"error\": null}\r\n2026-11-17T00:35:56 pid=44752 serveur PRET port=8093 build=26f6ad424154 ui=41b74d0fcad5 python=3.14.6\r\n2026-11-17T00:36:28 pid=44752 commande action=add id=-\r\n2026-11-17T00:36:29 pid=44752 commande action=add -> ok\r\n2026-11-17T00:36:29 pid=44752 HTTP POST /api/supervision -> 200 (15405 o)",
+          "event_id": "f5a98c6e824823afb3b20cdcb723f753",
+          "observed_at": "2026-11-16T23:37:54.645Z",
+          "event_index": 74
+        },
+        {
+          "role": "assistant",
+          "source_generation": "9bd8daa4-4ed4-45b4-b944-e3acd9743f53",
+          "text": "La sessait-session existait d\u00e9j\u00e0 \u2192 chemin `already_assigned` ne comble jamais la fiche vide. J'ajoute le backfill :",
+          "event_id": "aa1a69e482d837d95445946b157ea929",
+          "observed_at": "2026-11-16T23:38:03.611Z",
+          "event_index": 78
+        },
+        {
+          "role": "tool",
+          "source_generation": "9bd8daa4-4ed4-45b4-b944-e3acd9743f53",
+          "text": "[tool result \u00b7 call_qs7lgxmi \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\n350\t        current_task = task_reference(current_mission, anywhere=True)\n351\t        same_task = bool(current_task) and current_task.upper() == task_ref.upper()\n352\t        if existing.get(\"alias\") != alias or not same_task:\n353\t            raise ValueError(\n354\t                f\"Session d\u00e9j\u00e0 reli\u00e9e avec alias/t\u00e2che diff\u00e9rents ({existing.get('alias')}, \"\n355\t                f\"t\u00e2che {current_task or 'inconnue'} vs {task_ref}); aucun changement appliqu\u00e9. \"\n356\t                \"Pour transf\u00e9rer le suivi vers cette t\u00e2che, relancez avec --reassign :\\n\"\n357\t                f\"  py -3.13 TOOLS/AGENT_SUPERVISOR/scripts/connect_session.py --platform {platform} \"\n358\t                f\"--session-id {session_id} --alias \\\"{alias}\\\" --task \\\"{task_ref}\\\" \"\n359\t                f\"--mission \\\"{mission.strip()[:80]}\\\" --reassign\"\n360\t            )\n361\t        status = \"already_assigned\" if existing.get(\"source\") and existing.get(\"state\") in (\"active\", \"paused\", \"waiting\") else \"source_unavailable\"\n362\t        return dict(status=status, assignment_id=existing[\"id\"], state=existing[\"state\"],\n363\t                    alias=existing.get(\"alias\"), platform=platform, native_id=session_id,\n364\t                    task_id=task_ref, task_title=resolved_title, agent_id=agent_id,\n365\t                    task=task_label, source=existing.get(\"source\"), error=existing.get(\"error\"))\n366\t    if task_ref and not is_provisional:\n367\t        for item in snapshot.get(\"sessions\", []):\n368\t            current_ref = task_reference(item.get(\"mission\", \"\"), anywhere=True)\n369\t            if (current_ref == task_ref and\n370\t                    (item.get(\"platform\") != platform or item.get(\"native_id\") != session_id)):\n371\t                if not reassign:\n372\t                    raise ValueError(\n373\t                        f\"{task_ref} est d\u00e9j\u00e0 suivie par '{item.get('alias') or item.get('native_id')}'; \"\n374\t                        \"pour transf\u00e9rer le suivi de cette t\u00e2che vers ce nouveau runtime, relancez avec --reassign\"\n375\t                    )\n376\t                result = api_json(base_url + \"/api/supervision\", token=snapshot.get(\"token\"), payload={\n377\t                    \"action\": \"reassign\", \"id\": item[\"id\"], \"platform\": platform, \"native_id\": session_id,\n378\t                    \"alias\": alias.strip(), \"mission\": attached_mission, \"handover\": True})\n379\t                attached = next((s for s in result.get(\"sessions\", []) if s[\"id\"] == item[\"id\"]), None)",
+          "event_id": "b7a34367353547c3d039e237e61d89fb",
+          "observed_at": "2026-11-16T23:38:04.551Z",
+          "event_index": 80
+        },
+        {
+          "role": "tool",
+          "source_generation": "9bd8daa4-4ed4-45b4-b944-e3acd9743f53",
+          "text": "[tool result \u00b7 call_56gir9hx \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\nThe file C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\AGENT_SUPERVISOR\\scripts\\connect_session.py has been updated successfully.",
+          "event_id": "000ad2282f6e532506fff4391a532cab",
+          "observed_at": "2026-11-16T23:38:12.862Z",
+          "event_index": 95
+        },
+        {
+          "role": "tool",
+          "source_generation": "9bd8daa4-4ed4-45b4-b944-e3acd9743f53",
+          "text": "[tool result \u00b7 call_e749jdgu \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\nsynt OK\r\nstatus= already_assigned | fiche_completee = True\r\nfiche: TORC-CC10\r\n   milestone = Contrat introuvable pour TORC\r\n   unknowns = Fiche incomplete : contrat absent ou alias hors catalogue (ex. TORC) \u2014 a completer par l'exploitant (T000/TORC : sans contrat par \r\n   extra = Fiche generee depuis connect_session sans contrat",
+          "event_id": "de2c4baf282349bcdf8a36db5494ca64",
+          "observed_at": "2026-11-16T23:38:22.906Z",
+          "event_index": 101
+        }
+      ],
+      "context_truncated": true,
+      "messages_observed": 16,
+      "memory": [],
+      "recovery": {
+        "status": "none"
+      },
+      "enabled": true,
+      "events": [
+        {
+          "id": "3dece680fe17a481f1c4212ad5d2debb",
+          "ref": "E-3dece680fe17",
+          "kind": "finding_created",
+          "text": "Session de coordination travaillant sans objectif ni crit\u00e8res d\u00e9clar\u00e9s \u2014 manquants : Objectif initial, Crit\u00e8res d'acceptation, P\u00e9rim\u00e8tre et permissions. Un objectif et des crit\u00e8res d'acceptation sont obligatoires pour juger et cl\u00f4turer un travail ; remplir la fiche (IHM : \u00ab Pr\u00e9-remplir depuis la mission texte \u00bb) ou renseigner les champs.",
+          "created_at": "2026-11-16T23:36:29.030382+00:00",
+          "alert_id": "aa39158e7fb7141e5252e088",
+          "version": 1
+        },
+        {
+          "id": "cb81245ef3baadb364aad2293344e58b",
+          "ref": "E-cb81245ef3ba",
+          "kind": "source_tool",
+          "text": "[tool result \u00b7 call_zouv9yf1 \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\n{\"status\": \"attached\", \"assignment_id\": \"62f81a73-8c89-41de-8ddd-e2ac3d9af6ec\", \"state\": \"active\", \"alias\": \"TORC-CC10\", \"platform\": \"claude\", \"native_id\": \"d9739b30-d0bb-46e9-87c5-243ffc255f90\", \"task_id\": \"TORC\", \"task_title\": \"Orchestrateur TORC (hors catalogue)\", \"agent_id\": \"CC10\", \"task\": \"TORC Orchestrateur TORC (hors catalogue)\", \"source\": \"C:\\\\Users\\\\ZEDVICTUS\\\\.claude\\\\projects\\\\c---MGS-DEV-2026-Projet-YGO-ExcavatriceDragage\\\\d9739b30-d0bb-46e9-87c5-243ffc255f90.jsonl\", \"display_title\": \"TORC-CC10 Orchestrateur TORC\", \"mission_structure_loaded\": false}",
+          "created_at": "2026-11-16T23:36:30.015Z",
+          "event_index": 0,
+          "source_id": "7a978e6ab967c5028f7ea80d70f9349f"
+        },
+        {
+          "id": "cbe53a62733b0869a0baf8911267c98e",
+          "ref": "E-cbe53a62733b",
+          "kind": "source_tool",
+          "text": "[tool result \u00b7 call_qpw01qkl \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\nTORC-CC10 | mission_structure = {}\r\n2026-11-16T12:28:47 fin",
+          "created_at": "2026-11-16T23:36:39.375Z",
+          "event_index": 5,
+          "source_id": "230b40c4e743a7fa12d148b5904d96b9"
+        },
+        {
+          "id": "ce26a38572bc29d4e644f661732fa505",
+          "ref": "E-ce26a38572bc",
+          "kind": "source_tool",
+          "text": "[tool result \u00b7 call_vbk682xg \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\n2026-11-17T00:35:56 pid=44752 port 8093 : rien a purger (deja libre)\r\n2026-11-17T00:35:56 pid=44752 etat persiste : C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\.tmpsandbox\\t429_essai\\state_torc.json\r\n2026-11-17T00:35:56 pid=44752 serveur PRET port=8093 build=26f6ad424154 ui=41b74d0fcad5 python=3.14.6\r\n2026-11-17T00:36:28 pid=44752 commande action=add id=-\r\n2026-11-17T00:36:29 pid=44752 commande action=add -> ok\r\n2026-11-17T00:36:29 pid=44752 HTTP POST /api/supervision -> 200 (15405 o)",
+          "created_at": "2026-11-16T23:36:51.778Z",
+          "event_index": 10,
+          "source_id": "d76c0da9c5892939110df04d3da3f270"
+        },
+        {
+          "id": "52edec963f52e92e23ec742d538ffdee",
+          "ref": "E-52edec963f52",
+          "kind": "source_tool",
+          "text": "[tool result \u00b7 call_470ql1i9 \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\n2255\t                    platform = command.get(\"platform\", session[\"platform\"])\n2256\t                    alias = command.get(\"alias\")\n2257\t                    mission = command.get(\"mission\")\n2258\t                    handover = bool(command.get(\"handover\"))\n2259\t                    if platform not in (\"claude\", \"codex\", \"agy\", \"dsh\"):\n2260\t                        raise ValueError(\"Plateforme invalide : \" + str(platform))\n2261\t                    if platform == 'claude' and isinstance(native_id, str) and native_id.startswith('session_'):\n2262\t                        raise ValueError('ID claude.ai session_ : utiliser l\u2019UUID du transcript local Claude Code (.jsonl)')\n2263\t                    if (session[\"alerts\"] or self._chat_histories.get(sid)) and not handover:\n2264\t                        raise ValueError(\"Cette affectation contient des alertes ou un chat : creer une nouvelle affectation pour eviter de les attribuer a une autre conversation\")\n2265\t                    source = self._validate_assignment(platform, native_id)\n2266\t                    if source is None:\n2267\t                        raise ValueError(\"Conversation introuvable ou ambigue : verifier plateforme et ID\")\n2268\t                    if any(other[\"id\"] != sid and other[\"platform\"] == platform and other[\"native_id\"] == native_id for other in self.sessions.values()):\n2269\t                        raise ValueError(\"Session deja affectee\")\n2270\t                    session[\"platform\"] = platform\n2271\t                    session[\"native_id\"] = native_id\n2272\t                    if alias and isinstance(alias, str):\n2273\t                        session[\"alias\"] = alias[:100]\n2274\t                    if mission and isinstance(mission, str):\n2275\t                        session[\"mission\"] = self._mission(mission)\n2276\t                        session[\"mission_updated_at\"] = timestamp()\n2277\t                session[\"generation\"] += 1\n2278\t                if action != \"set_mission\":\n2279\t                    if session.get(\"watcher\") is not None and action == \"pause\":\n2280\t                        session[\"source_checkpoint\"] = session[\"watcher\"].checkpoint()\n2281\t                    if action == \"reassign\":\n2282\t                        session.update(watcher=None, source_checkpoint=None, context=[], memory=[], context_truncated=True, analysis_state=\"waiting\", analysis_error=None)\n2283\t                    else:\n2284\t                        session.update(analysis_state=\"waiting\", analysis_error=None)\n2285\t                self._queued.discard(sid)\n2286\t                self._queue = deque(x for x in self._queue if x != sid)\n2287\t                if action == \"set_mission\":\n2288\t                    session[\"mission\"] = self._mission(command.get(\"mission\"))\n2289\t                    session[\"mission_updated_at\"] = timestamp()",
+          "created_at": "2026-11-16T23:36:59.092Z",
+          "event_index": 15,
+          "source_id": "eb1271810965694695f63cf0fef4e422"
+        },
+        {
+          "id": "a088f8d9e69bbdcb3c23a308b84129d5",
+          "ref": "E-a088f8d9e69b",
+          "kind": "source_tool",
+          "text": "[tool result \u00b7 call_io3mtxrn \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\n205\t            continue\n206\t        label, value = match.group(1).strip().lower(), match.group(2).strip()\n207\t        for pattern, field in _MISSION_LABELS:\n208\t            if field == \"task_ref\" and not re.match(r\"T\\d{3,}\\b\", value, re.IGNORECASE):\n209\t                continue  # a \"R\u00e9f\u00e9rence\" line is a task reference only when it names T###\n210\t            if re.fullmatch(pattern, label):\n211\t                proposal.setdefault(field, value[:4000])\n212\t                break\n213\t    ref = re.match(r\"\\s*(T\\d{3,})\\b\", proposal.get(\"subject\", \"\"), re.IGNORECASE)\n214\t    if ref and \"task_ref\" not in proposal:\n215\t        proposal[\"task_ref\"] = ref.group(1).upper()\n216\t    return proposal\n217\t\n218\t\n219\tdef validate_mission_structure(value):\n220\t    if not isinstance(value, dict) or set(value) - MISSION_FIELDS:\n221\t        raise ValueError('Structure de mission invalide')\n222\t    if any(not isinstance(v, str) or len(v) > 4000 for v in value.values()) or sum(len(v) for v in value.values()) > 20000:\n223\t        raise ValueError('Structure de mission trop longue')\n224\t    return dict(value)\n225\t\n226\t\n227\tdef service_log(message: str) -> str:\n228\t    \"\"\"R29 : journal du service, meme fichier que le serveur (trace qui doit survivre).\"\"\"\n229\t    try:\n230\t        from datetime import datetime\n231\t        base = Path(os.environ.get('LOCALAPPDATA', 'C:/')) / 'ExcavatriceDragage'\n232\t        with open(base / 'agent-supervisor-server.log', 'a', encoding='utf-8') as handle:\n233\t            handle.write(f\"{datetime.now().isoformat(timespec='seconds')} pid={os.getpid()} {message}\\n\")\n234\t        return 'ok'",
+          "created_at": "2026-11-16T23:37:05.253Z",
+          "event_index": 31,
+          "source_id": "d6c030fc385db7d4c52e0fc8c5840a22"
+        },
+        {
+          "id": "29ccc57cb93bdf4c7a4ef09eef5dbae1",
+          "ref": "E-29ccc57cb93b",
+          "kind": "source_tool",
+          "text": "[tool result \u00b7 call_z1yn596e \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\nLineNumber Line\r\n---------- ----\r\n       309     is_provisional = task_ref in (\"T000\", \"TORC\")\r\n       313     if is_provisional:\r\n       333     if resolved_title and not is_provisional:  # T000 : pas de doublon\r\n       366     if task_ref and not is_provisional:\r\n       391                 if task_ref and not is_provisional and snapshot.get(\"token\"):\r\n       423     if task_ref and not is_provisional and snapshot.get(\"token\"):",
+          "created_at": "2026-11-16T23:37:13.502Z",
+          "event_index": 36,
+          "source_id": "29b3afad4b7015014dfed2a2a8daf58e"
+        },
+        {
+          "id": "877a1e55caab96a6ba038e89da399a65",
+          "ref": "E-877a1e55caab",
+          "kind": "source_assistant",
+          "text": "Cause du silence trouv\u00e9e en plus : `is_provisional = task_ref in (\"T000\", \"TORC\")` (l.309) fait **sauter** l'appel populate pour TORC \u2192 fiche jamais \u00e9crite. Correction : la fiche explicite s'\u00e9crit **aussi** dans ce cas :",
+          "created_at": "2026-11-16T23:37:21.488Z",
+          "event_index": 40,
+          "source_id": "82c5cb87a1cb2d7282f1969e823d112f"
+        },
+        {
+          "id": "98e0fffe87c025497243e159aee91949",
+          "ref": "E-98e0fffe87c0",
+          "kind": "source_tool",
+          "text": "[tool result \u00b7 call_7aqnzona \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\nThe file C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\AGENT_SUPERVISOR\\scripts\\connect_session.py has been updated successfully.",
+          "created_at": "2026-11-16T23:37:22.463Z",
+          "event_index": 42,
+          "source_id": "4174be0289541fca7953986bf074589c"
+        },
+        {
+          "id": "9929520d31e3dc78e64cf186d288d561",
+          "ref": "E-9929520d31e3",
+          "kind": "source_tool",
+          "text": "[tool result \u00b7 call_o242bsok \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\n420\t    attached = next((item for item in result.get(\"sessions\", [])\n421\t                     if item.get(\"platform\") == platform and item.get(\"native_id\") == session_id), None)\n422\t    if not attached or not attached.get(\"source\"):\n423\t        raise RuntimeError(\"Le service n\u2019a pas confirm\u00e9 une source unique pour cet ID\")\n424\t    structure_loaded = False\n425\t    if task_ref and not is_provisional and snapshot.get(\"token\"):\n426\t        structure_loaded = populate_mission_from_contract(\n427\t            base_url, snapshot.get(\"token\"), attached[\"id\"], task_ref, task_label, mission\n428\t        )\n429\t    return dict(status=\"attached\", assignment_id=attached[\"id\"], state=attached[\"state\"],",
+          "created_at": "2026-11-16T23:37:28.774Z",
+          "event_index": 48,
+          "source_id": "8848ff9621502bc22918d33a8875b408"
+        },
+        {
+          "id": "8a398805b01930952fb07abb23f8d70b",
+          "ref": "E-8a398805b019",
+          "kind": "source_tool",
+          "text": "[tool result \u00b7 call_z5sik26l \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\nThe file C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\AGENT_SUPERVISOR\\scripts\\connect_session.py has been updated successfully.",
+          "created_at": "2026-11-16T23:37:35.329Z",
+          "event_index": 63,
+          "source_id": "cbafab93a815f8265f305680c4154a5e"
+        },
+        {
+          "id": "242d0dfd34c88859fa9e16f2f3dbe7f0",
+          "ref": "E-242d0dfd34c8",
+          "kind": "source_tool",
+          "text": "[tool result \u00b7 call_m0ymd0ne \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\nsynt OK\r\nmission_structure_loaded = None None\r\nfiche: TORC-CC10\r\n   milestone = None\r\n   unknowns = None\r\n   extra = None",
+          "created_at": "2026-11-16T23:37:45.019Z",
+          "event_index": 69,
+          "source_id": "b689553553dceb575003fab0a9335617"
+        },
+        {
+          "id": "e15f0142eb484011b05c77e8b99fc365",
+          "ref": "E-e15f0142eb48",
+          "kind": "source_tool",
+          "text": "[tool result \u00b7 call_hn3756qu \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\n{\"status\": \"already_assigned\", \"assignment_id\": \"62f81a73-8c89-41de-8ddd-e2ac3d9af6ec\", \"state\": \"active\", \"alias\": \"TORC-CC10\", \"platform\": \"claude\", \"native_id\": \"d9739b30-d0bb-46e9-87c5-243ffc255f90\", \"task_id\": \"TORC\", \"task_title\": \"Orchestrateur TORC (hors catalogue)\", \"agent_id\": \"CC10\", \"task\": \"TORC Orchestrateur TORC (hors catalogue)\", \"source\": \"C:\\\\Users\\\\ZEDVICTUS\\\\.claude\\\\projects\\\\c---MGS-DEV-2026-Projet-YGO-ExcavatriceDragage\\\\d9739b30-d0bb-46e9-87c5-243ffc255f90.jsonl\", \"error\": null}\r\n2026-11-17T00:35:56 pid=44752 serveur PRET port=8093 build=26f6ad424154 ui=41b74d0fcad5 python=3.14.6\r\n2026-11-17T00:36:28 pid=44752 commande action=add id=-\r\n2026-11-17T00:36:29 pid=44752 commande action=add -> ok\r\n2026-11-17T00:36:29 pid=44752 HTTP POST /api/supervision -> 200 (15405 o)",
+          "created_at": "2026-11-16T23:37:54.645Z",
+          "event_index": 74,
+          "source_id": "f5a98c6e824823afb3b20cdcb723f753"
+        },
+        {
+          "id": "179e48456cc62a2c37f44d235504540a",
+          "ref": "E-179e48456cc6",
+          "kind": "source_assistant",
+          "text": "La sessait-session existait d\u00e9j\u00e0 \u2192 chemin `already_assigned` ne comble jamais la fiche vide. J'ajoute le backfill :",
+          "created_at": "2026-11-16T23:38:03.611Z",
+          "event_index": 78,
+          "source_id": "aa1a69e482d837d95445946b157ea929"
+        },
+        {
+          "id": "d089a2381fd84db8a7af5ae188912191",
+          "ref": "E-d089a2381fd8",
+          "kind": "source_tool",
+          "text": "[tool result \u00b7 call_qs7lgxmi \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\n350\t        current_task = task_reference(current_mission, anywhere=True)\n351\t        same_task = bool(current_task) and current_task.upper() == task_ref.upper()\n352\t        if existing.get(\"alias\") != alias or not same_task:\n353\t            raise ValueError(\n354\t                f\"Session d\u00e9j\u00e0 reli\u00e9e avec alias/t\u00e2che diff\u00e9rents ({existing.get('alias')}, \"\n355\t                f\"t\u00e2che {current_task or 'inconnue'} vs {task_ref}); aucun changement appliqu\u00e9. \"\n356\t                \"Pour transf\u00e9rer le suivi vers cette t\u00e2che, relancez avec --reassign :\\n\"\n357\t                f\"  py -3.13 TOOLS/AGENT_SUPERVISOR/scripts/connect_session.py --platform {platform} \"\n358\t                f\"--session-id {session_id} --alias \\\"{alias}\\\" --task \\\"{task_ref}\\\" \"\n359\t                f\"--mission \\\"{mission.strip()[:80]}\\\" --reassign\"\n360\t            )\n361\t        status = \"already_assigned\" if existing.get(\"source\") and existing.get(\"state\") in (\"active\", \"paused\", \"waiting\") else \"source_unavailable\"\n362\t        return dict(status=status, assignment_id=existing[\"id\"], state=existing[\"state\"],\n363\t                    alias=existing.get(\"alias\"), platform=platform, native_id=session_id,\n364\t                    task_id=task_ref, task_title=resolved_title, agent_id=agent_id,\n365\t                    task=task_label, source=existing.get(\"source\"), error=existing.get(\"error\"))\n366\t    if task_ref and not is_provisional:\n367\t        for item in snapshot.get(\"sessions\", []):\n368\t            current_ref = task_reference(item.get(\"mission\", \"\"), anywhere=True)\n369\t            if (current_ref == task_ref and\n370\t                    (item.get(\"platform\") != platform or item.get(\"native_id\") != session_id)):\n371\t                if not reassign:\n372\t                    raise ValueError(\n373\t                        f\"{task_ref} est d\u00e9j\u00e0 suivie par '{item.get('alias') or item.get('native_id')}'; \"\n374\t                        \"pour transf\u00e9rer le suivi de cette t\u00e2che vers ce nouveau runtime, relancez avec --reassign\"\n375\t                    )\n376\t                result = api_json(base_url + \"/api/supervision\", token=snapshot.get(\"token\"), payload={\n377\t                    \"action\": \"reassign\", \"id\": item[\"id\"], \"platform\": platform, \"native_id\": session_id,\n378\t                    \"alias\": alias.strip(), \"mission\": attached_mission, \"handover\": True})\n379\t                attached = next((s for s in result.get(\"sessions\", []) if s[\"id\"] == item[\"id\"]), None)",
+          "created_at": "2026-11-16T23:38:04.551Z",
+          "event_index": 80,
+          "source_id": "b7a34367353547c3d039e237e61d89fb"
+        },
+        {
+          "id": "311d638de7cc470c63ec6ccd1bd42577",
+          "ref": "E-311d638de7cc",
+          "kind": "source_tool",
+          "text": "[tool result \u00b7 call_56gir9hx \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\nThe file C:\\_MGS\\DEV\\2026_Projet_YGO_ExcavatriceDragage\\TOOLS\\AGENT_SUPERVISOR\\scripts\\connect_session.py has been updated successfully.",
+          "created_at": "2026-11-16T23:38:12.862Z",
+          "event_index": 95,
+          "source_id": "000ad2282f6e532506fff4391a532cab"
+        },
+        {
+          "id": "2ea7705785ab06b250c235673992a1f7",
+          "ref": "E-2ea7705785ab",
+          "kind": "mission_structure_updated",
+          "text": "Fiche structuree modifiee",
+          "created_at": "2026-11-16T23:38:21.171084+00:00"
+        },
+        {
+          "id": "9eccc9f460b85f0df3dfacf01aa5aec6",
+          "ref": "E-9eccc9f460b8",
+          "kind": "source_tool",
+          "text": "[tool result \u00b7 call_e749jdgu \u00b7 preuve observ\u00e9e, aucune autorit\u00e9 utilisateur]\nsynt OK\r\nstatus= already_assigned | fiche_completee = True\r\nfiche: TORC-CC10\r\n   milestone = Contrat introuvable pour TORC\r\n   unknowns = Fiche incomplete : contrat absent ou alias hors catalogue (ex. TORC) \u2014 a completer par l'exploitant (T000/TORC : sans contrat par \r\n   extra = Fiche generee depuis connect_session sans contrat",
+          "created_at": "2026-11-16T23:38:22.906Z",
+          "event_index": 101,
+          "source_id": "de2c4baf282349bcdf8a36db5494ca64"
+        }
+      ],
+      "framing": [],
+      "source_generation": "9bd8daa4-4ed4-45b4-b944-e3acd9743f53",
+      "acquired_proofs": [],
+      "session_journal": [],
+      "judge_turn_count": 16,
+      "closed": false
+    }
+  ],
+  "chat_histories": {
+    "global": []
+  }
+}
