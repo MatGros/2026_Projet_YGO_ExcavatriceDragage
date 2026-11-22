@@ -1,0 +1,746 @@
+ ▐▛███▛█   Claude Code v2.1.318
+▝▜██████▀  Opus 5.5 · Claude Pro
+ ▝▝   ▝▝   C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees…
+
+
+● Les mesures à 20 Hz concordent très bien avec CODESYS R7 (dépassements de 126
+  et 220 mm, positions à 1 mm près), tandis que le trajet P1→Trémie à 10 Hz n'a
+  pas démarré, ce qui invalide aussi son retour. Je vais maintenant
+  diagnostiquer ce démarrage manqué.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+› Message from Explore
+  ## FB_CycleSemiAuto : chemin repos → AX14 → AX15 → AX18 → AX2
+
+  J'ai tout lu en lecture seule, aucune modification. Tous les chemins sont
+  relatifs à `C:\_MGS\DEV\2026_Projet_YGO_ExcavatriceDragage\.claude\worktrees\t
+  417-cd\CODE\`. Fichier principal : `G_CYCLE\FB_CycleSemiAuto.st` (noté FB). C
+  = CONSTATÉ dans le code, H = HYPOTHÈSE.
+
+  **Réponse courte :**
+  - **Démarrer en AX14 :** impossible par une transition normale. Le seul chemin
+  passe par le forçage d'étape (`GVL_IHM.CycleSemiAuto.Cmd.SetForceStepTgt :=
+  14`).
+  - **Chemin naturel :** toutes les étapes AX2 à AX13 sont obligatoires, mais un
+  réglage minimal en réduit fortement la durée.
+  - **Continuité joystick impossible de bout en bout :** AX15A exige au moins un
+  scan au neutre.
+
+  ### Correspondance joystick simulé → entrées du cycle (C)
+  - **Sens des axes :** `D_JOYSTICK\FB_AxisScale.st:26-44` donne OutPct > 0 si
+  Raw > 5000.
+    - `JoystickLeft` (vers la trémie) = `AxisX.DirectionPositive`, donc **RawX >
+  5000** (`M_MAIN\PRG_03_Modes_Cycle.st:220`).
+    - `JoystickRight` (vers P1) = `AxisX.DirectionNegative`, donc **RawX <
+  5000** (PRG_03:218).
+    - `JoystickPush` (descendre / ouvrir) = Y négatif, donc **RawY < 5000**.
+  `JoystickPull` = **RawY > 5000** (PRG_03:214-215).
+    - `JoystickDeflected` = `NOT AtNeutralXY` (PRG_03:213).
+  - **Incohérence à signaler :** `L_SIMULATION\FB_Sim_Joystick.st:175-176`, le
+  bouton `BtnLeft_Rev_TREMIE` envoie X à 0, donc X négatif. Le cycle
+  l'interprète comme « vers P1 », pas « vers la trémie ». En maintenance aussi,
+  `ReqTremie := AxisX.DirectionPositive`
+  (`I_TRANSLATION\FB_TranslationCmdArbitrationM3.st:94`). Utilisez donc RawX
+  directement.
+  - **Armement homme-mort** (`D_JOYSTICK\FB_Joystick.st:225-249`, temps dans
+  `ST_fbJoystick_Cfg.st:15-17`) :
+    - `DeadmanArmed` passe à TRUE après un front de `RawButton` maintenu 100 ms,
+  avec `ArmingPermit` présent.
+    - Il **reste armé si on relâche le bouton**.
+    - Il se désarme si le joystick reste au neutre 100 ms (après une grâce de 3
+  s), si `ArmingPermit` tombe, ou sur une inversion directe.
+      - Inversion X+ ↔ X− : désarme toujours.
+      - Inversion Y : désarme sauf en AX8 à AX12 et en AX15B
+  (`DirectInversionPermit`, `M_MAIN\PRG_02_Acquisition.st:507-516`).
+  - **Conséquence pour le banc :** écrivez RawX et RawY dans le même scan quand
+  vous changez d'axe. Sinon un passage au neutre ou une inversion peut désarmer.
+
+  ### (1) Étapes ordonnées
+
+  | Étape | Transition exacte (FB:ligne) | Geste opérateur | Entrées procédé |
+  |---|---|---|---|
+  | AX0 → AX1 | `(StartEdge.Q OR DeadmanArmedEdge.Q) AND NOT Fault.Latched`
+  (909) | BtnStart, ou front d'armement (bouton ≥ 100 ms) | Enable = mode
+  SEMI_AUTO, puissance OK, pas de défaut codeur (garde 666) |
+  | AX1 → AX2 | `HomedM1 AND HomedM2 AND NOT Fault.Latched AND InitPositionOk`
+  (925-933) | aucun | `CycleInitPositionOk` (PRG_03:172-179) |
+  | AX2, hors P1 | ReqStart = `TranslationTremiePermit OR TranslationP1Permit`
+  (1004). L'arbitrage avec cible 3 envoie X− vers Maintenance/P1
+  (FB_TranslationCmdArbitrationM3:68-80) | X seul, Y neutre |
+  `HeightInterlockOk` (`M_MAIN\PRG_05_Translation.st:137-141`) |
+  | AX2 → AX3 | `Translation_At_P1` et `TranslationStopTimer.Q AND DeadmanArmed
+  AND JoystickPushOnly` (980, 992) | Y− seul (X neutre) | `M3_AtP1Stable`, plus
+  M3 arrêté (fréquence ≤ 0,5 Hz) pendant 500 ms (365-369) |
+  | AX3 → AX3_WAIT | `Benne_IsOpen AND NOT Benne_Busy` (1034) | Y− (ouverture
+  benne) | benne ouverte (immédiat si déjà ouverte) |
+  | AX3_WAIT → AX4 | `DiveStartStopTimer.Q AND DeadmanArmed AND JoystickPush`
+  (1059) | Y− maintenu | `DiveStartStopped` pendant 300 ms (310-316) : vitesses
+  valides et < 0,02 m/s, contacteurs retombés, freins serrés |
+  | AX4 → AX5 | `Push AND M1_CablePosM <= DiveStartMinEff` (1090) | Y− | M1 sous
+  `DiveStartMin_M` (repli 4,0 m, 332-336) |
+  | AX5 → AX6 | `KoboldInitTimer.Q` (500 ms) (1121) | Y− | aucune |
+  | AX6 → AX7 | `KoboldStabTimer.Q` (Kobold DI = 1 pendant 500 ms), OU mode ≠
+  KOBOLD_ONLY et consigne atteinte (1147-1149) | Y− |
+  `M1_M2_KoboldBottomTouch_DI`, ou M1 et M2 ≤ `SetDepthM` (< 0) |
+  | AX7 → AX8 | KOBOLD : immersion qualifiée et DI à 0 pendant 100 ms ; SETPOINT
+  : `DepthStopBySetpoint` (1178-1183) | Y− | idem |
+  | AX8 → AX10 ou AX9 | `BottomTouchStabTimer.Q AND DiveStartStopped AND
+  StopPositionCaptured` ; AX10 si `RaiseOffBottom ≤ 0` (1234-1239) | aucun
+  (inversion Y− → Y+ permise) | treuils arrêtés 500 ms |
+  | AX9 → AX10 | `Pull AND ExtractionStepDelayTimer.Q (1 s) AND M1/M2 >=
+  RaiseTarget` (1293) | Y+ | positions |
+  | AX10 → AX10B | `Pull AND Benne_CloseReached AND (IsClosed OR
+  IsRoughlyClosed)` (1323). ReqClose seulement après 1 s (1318) | Y+ | benne
+  fermée |
+  | AX10B → AX11 ou AX12 | `M2_SpeedStepApplied=1 AND M1FinalAscentStartReady
+  AND Pull` ; repli après 2 s puis arrêt 500 ms. AX12 si
+  `ExtractionControlDistance_M ≤ 0` (1349-1376) | Y+ |
+  `PRG_06_Outputs.Data.M1AscentStartReady` |
+  | AX11 → AX12 | distance ≥ `CtrlAscentDistEffM` sur M1 et M2, et `NOT
+  WinchSyncError` (1399-1401) | Y+ (transition sans condition joystick) |
+  positions |
+  | AX12 → AX13 | `M1TopLimitReached` (= `WinchM1Safety.CableLimitAscent`,
+  PRG_03:249 ; M2 forcé à FALSE, PRG_03:253) (1432) | Y+ jusqu'en haut | limite
+  haute M1 |
+  | AX13 → AX14 | `DrainingTimer.Q OR SkipDrainEdge.Q` (1471). Durée bornée 1 à
+  3600 s (PRG_03:66) | aucun, ou `BtnSkipDrain` | aucune |
+  | **AX14 → AX15A** | ReqStart = `TranslationTremiePermit` (1488) ; puis
+  `Translation_At_Tremie` et `TranslationStopTimer.Q` (1490-1499) | **X+ (RawX >
+  5000) seul, Y neutre**, homme-mort armé. Le joystick peut rester défléchi à
+  l'arrivée | `M3_AtTremieStable` (mot capteurs 11111), puis fréquence M3 ≤ 0,5
+  Hz pendant 500 ms |
+  | AX15A → AX15B | 1 scan `NOT JoystickDeflected`, puis au scan suivant
+  `DeadmanArmed AND JoystickPush` (1524-1532) | **neutre XY**, puis Y−. Moins de
+  100 ms au neutre pour garder l'armement, sinon ré-armer au bouton | aucune |
+  | AX15B → AX15C / AX18 | `RepositionRequest` → AX15C ; sinon `Push AND
+  Benne_Done AND Benne_IsOpen` → AX18 (1559-1563) | Y− (ouverture benne).
+  `BtnReposition` maintenu pour AX15C | benne ouverte, `BucketDone` |
+  | AX15C → AX15B | `NOT RepositionRequest` (1593). Descente couplée palier 1
+  (1580-1585) | défléchi + homme-mort | aucune |
+  | AX18 → AX2 | `StartEdge.Q OR (DeadmanArmed AND JoystickRight)` (1627) | **X−
+  (RawX < 5000)** ou BtnStart | aucune ; compteurs incrémentés (1615-1621) |
+  | AX2 (retour) | comme ci-dessus : X− donne ReqMaintenance vers P1 ; arrêt sur
+  P1 par PRG_05/FB_Translation (H, d'après le commentaire 970-973) | X− seul, Y
+  neutre | `M3_AtP1Stable`, cause 7 surveillée |
+
+  Note C : le commentaire 1625 annonce « front joystick », mais le code 1627
+  teste un niveau. `JoyDeflectedEdge` n'est pas utilisé dans la transition.
+
+  ### (2) Chemin le plus court vers AX14
+  - **C — pas de raccourci naturel :** la seule affectation `State := AX14` est
+  à la ligne 1472, depuis AX13. AX2 à AX13 sont donc tous obligatoires.
+  - **C — forçage :** écrire `GVL_IHM.CycleSemiAuto.Cmd.SetForceStepTgt := 14`.
+    - Gardes : seulement la porte 666 (mode SEMI_AUTO, puissance, pas de défaut
+  codeur) et la plage 0 à 22 (746-800).
+    - Aucune garde de position, de joystick ni de défaut latché.
+    - AX14 s'exécute au scan suivant ; PRG_03:310-313 remet la consigne à −1.
+    - Variante : forcer 12. AX13 suit au scan suivant si `CableLimitAscent` est
+  déjà vrai, puis AX14 après au moins 1 s ou `BtnSkipDrain`.
+    - En AX14, M3 n'a pas besoin d'être à P1. Il faut seulement
+  `HeightInterlockOk` et X+ / Y neutre (FB_TranslationCmdArbitrationM3:68-72).
+  - **C/H — chemin naturel minimal, réglages IHM :**
+    - `Cfg.DepthStopMode = SETPOINT_ONLY`.
+    - `Cfg.SetDepth_M` légèrement négatif. Il doit être < 0 (438) et est borné
+  par les limites (PRG_03:62-65).
+    - `Cfg.RaiseOffBottom_M = 0`, ce qui saute AX9.
+    - `Cfg.ExtractionControlDistance_M = 0`, ce qui saute AX11.
+    - `Cfg.DrainTime_S = 1`, ou `BtnSkipDrain`.
+    - Séquence obtenue : AX0, 1, 2, 3, 3W, 4, 5, 6, 7, 8, 10, 10B, 12, 13, 14.
+    - H : il reste quand même une descente sous 0 m, puis une remontée jusqu'à
+  la limite haute M1.
+
+  ### (3) Causes d'arrêt ou de défaut
+  Toutes les causes latchées passent par `ErrorEdge`, qui envoie en AX_STAB
+  (850-856) :
+  - `instCauses[0]` (457) : limite légale atteinte en AX4 à AX7.
+  - `instCauses[1]` (469) : `WinchSyncError` hors AX0, AX_STAB et AX8 à AX11.
+  **Elle reste active en AX2, AX14 et AX15.**
+  - `instCauses[2]` (479) et `[5]` (493) : écart de vitesse. Inactives, car
+  seuil et timeout sont à 0 (PRG_03:246-247).
+  - `instCauses[3]` (483) : `HeartbeatIhmOk` à FALSE pendant le cycle. **À
+  maintenir TRUE au banc.**
+  - `instCauses[4]` (487) : timeout d'étape. Inactive (`StepMaxTimer IN :=
+  FALSE`, 387).
+  - `instCauses[7]` (508) : en AX2, treuils hors de la fenêtre haute, ou benne
+  ni ouverte ni fermée (PRG_03:172-176). Inhibable par `TglCycleChecksInhibit`.
+  - `instCauses[8]` (517) : palier > 4 (M2 : > 5 en essai) en AX4 à AX7.
+  - `instCauses[9]` (528) : palier 4 non confirmé pendant 2 s en AX6/AX7.
+  - `instCauses[11]` (538) : consigne de profondeur invalide en AX7, si mode ≠
+  KOBOLD_ONLY.
+  - Causes 6 et 10 : toujours FALSE.
+
+  Arrêts sans défaut :
+  - **Porte 666 :** mode ≠ SEMI_AUTO, perte de puissance ou défaut codeur. Les
+  sorties tombent à 0 et le cycle se met en pause (`WaitingResume`). La reprise
+  se fait par front Start ou homme-mort (820-846).
+  - **Abort (624) :** retour en AX0.
+  - **Reset (637) :** depuis AX_STAB, retour en AX0.
+  - **Perte du permis (§4, 1675) :** si `Lifecycle.Busy AND NOT (Deflected AND
+  DeadmanArmed)`, toutes les demandes tombent. Pas de changement d'étape.
+  - **Plongée :** `DivingRetryTrig` vaut toujours FALSE (432), donc
+  AX_DIVING_RETRY n'est atteignable que par forçage. Un relâchement en AX4 à AX7
+  fige l'étape.
+
+  ### (4) Variables à observer pour AX14 et AX2
+  - **Séquenceur :**
+    - `PRG_03_Modes_Cycle.instCycleSemiAuto.CycleStep`, ou
+  `Data.SequenceState.Step`, `.StepStr`, `.WaitingForOperator`,
+  `.WaitingForProcess`.
+    - `instCycleSemiAuto.TranslationCmd.ReqStart` et `.PositionTgt` (1 = trémie,
+  3 = P1).
+    - `instCycleSemiAuto.TranslationStopTimer.ET` et `.Q`.
+  - **Arbitrage M3 :** `PRG_05_Translation.instArbM3.RunRequest`, `.ReqTremie`,
+  `.ReqMaintenance`, `.SelTarget`.
+  - **Arrivée :**
+    - `PRG_05_Translation.Data.M3_AtTremieStable` et `.M3_AtP1Stable`.
+    - `.TranslationBusy` (fréquence > 0,5 Hz, PRG_05:885).
+    - `Data.TranslationState.LimitSwitchTremie` et `.HeightInterlockBlocking`.
+    - `PRG_05_Translation.instPosDecoderM3.SensorsWord` (11111 = trémie, 00011 =
+  P1).
+    - `PRG_02_Acquisition.Data.M3.ActualFrequencyHz` et
+  `HwIn.Translation.M3_PosP1_DI`.
+  - **Joystick :** `PRG_02_Acquisition.Data.Joystick.AxisX.DirectionPositive` /
+  `.DirectionNegative`, `.AxisY.AtNeutral`, `.AtNeutralXY`, `.DeadmanArmed`.
+  - **Durée :** `CurrentCycleElapsed_Min` / `_S` et `LastCycleDuration_*`. H :
+  il n'existe pas de chronomètre dédié à la translation. Il faut chronométrer
+  entre l'entrée en AX14 (ou le front de `TranslationBusy`) et
+  `M3_AtTremieStable`, et de même en AX2 jusqu'à `M3_AtP1Stable`.
+
+● Agent "Analyse cycle SEMI_AUTO AX14-AX18" finished · 3m 18s
+  ⎿  Read TOOLS\TEST_AUTO_CI\POC_PRG\tests\test_p7_m3_manuel_10_20hz.st.in (103 
+     lines)
+  ⎿  Read TOOLS\TEST_AUTO_CI\POC_PRG\expand_st_macros.py (156 lines)
+  ⎿  Read DOC\WFLOW\ETUDES\ANALYSES_T417\T417C_P7_MANUEL_PREDICTIONS_20261102T10
+     1213.md (27 lines)
+  ⎿  Referenced file TOOLS\TEST_AUTO_CI\POC_PRG\poc_prg.py
+  ⎿  Read ..\..\..\..\..\..\Users\ZEDVIC~1\AppData\Local\Temp\claude\C---MGS-DEV
+     -2026-Projet-YGO-ExcavatriceDragage\a4693006-108f-47b0-a79d-750283ee1d4d\ta
+     sks\b8qvw6ngc.output (6 lines)
+  ⎿  Skills restored (task-planner)
+
+● Après SIM_SETUP et SIM_ARM, DeadmanArmed reste à FALSE, donc M10a ne démarre
+  jamais, alors que les trajets suivants armés après 400 cycles d'attente
+  fonctionnent. Je suppose que le permis d'armement arrive trop tard, 300 ms
+  après le Reset ; je porte donc l'attente de fin de SIM_SETUP à 400 cycles et
+  relance les 4 trajets.
+
+● Update(TOOLS\TEST_AUTO_CI\POC_PRG\expand_st_macros.py)
+  ⎿  Added 3 lines, removed 1 line
+      75      "    PRG_07_Supervision.FaultMachineReset_IHM := TRUE;",
+      76      _loop(2),
+      77      "    PRG_07_Supervision.FaultMachineReset_IHM := FALSE;",
+      78 -    _loop(30),                                                 
+      78 +    # 400 cycles (4 s) : avec 30 cycles, le 1er armement homme-
+         +mort apres setup echouait (DeadmanArmed=FALSE,                 
+      79 +    # diagnostic D8 P7 M10a) ; les trajets precedes de 400 cycl
+         +es armaient correctement.                                      
+      80 +    _loop(400),                                                
+      81  ])
+      82  
+      83  SIM_ARM = f"""    GVL_Simulation.SimJoystickRawButton := TRUE;
+
+  Ran 1 shell command (ctrl+o to expand)
+
+› Message from Explore
+  ## Homing machine en simulation : séquence pour obtenir MachineHomed = TRUE
+
+  **Résumé.** Le chemin le plus court passe par 6 actions IHM/sim et ne demande
+  ni joystick ni homme-mort. Le banc ne modélise **pas** le capteur haut en
+  fonction de la position : il ne passe à TRUE que si on force
+  `GVL_Simulation.SimTopPositionActive := TRUE`. Il n'existe aucune variable de
+  simulation qui force MachineHomed.
+
+  Chemins : `FB` = `CODE/G_CYCLE/FB_CycleMachineHoming.st`, `P02` =
+  `CODE/M_MAIN/PRG_02_Acquisition.st`.
+
+  ### (1) Étapes HX*, dans l'ordre (toutes CONSTATÉ sauf mention)
+
+  | Étape | Condition de transition exacte | Action à appliquer |
+  |---|---|---|
+  | HX0 → HX1 | `(StartEdge.Q OR BtnValidationEdge.Q) AND ModeIsMaint2` (FB:414)
+  | Front montant de `GVL_IHM.CycleMachineHoming.Cmd.BtnStart` (P02:610).<br>⚠
+  `BtnValidation = HwIn.Operator.JoyBtnRaw OR
+  GVL_IHM.CycleMachineHoming.Cmd.BtnValidate` (P02:609) : **un simple appui sur
+  `SimJoystickRawButton` en MAINT_N2 lance aussi le cycle**. |
+  | HX1 → HX1a | `HomingBucketConfirmEdge.Q AND NOT JoystickDeflected` (FB:431),
+  avec `JoystickDeflected = NOT Data.Joystick.AtNeutralXY` (P02:604) | Joystick
+  au neutre (RawX = RawY = 5000), puis front montant de
+  `GVL_IHM.M2TreuilBenne.Bucket.Cmd.BtnConfirmHomingBucket`.<br>Fermer la benne
+  n'est **pas** une condition de transition. Optionnel : homme-mort armé + Y+ →
+  `CmdBucketClose` (FB:424). |
+  | HX1a → HX2 | `JoystickWinchSelectArbitrated = 0` pendant 300 ms
+  (`CouplingSettleTimer`) `AND WinchesMechanicallyStopped` (FB:442-447) | Aucune
+  action, attendre au moins 300 ms, treuils à
+  l'arrêt.<br>WinchesMechanicallyStopped = contacteurs retombés, freins fermés,
+  \|vitesse\| < 0,02 m/s sur M1 et M2 (P02:557-560). |
+  | HX2 → HX3 | `TopPositionSensor` (FB:463), avec `TopPositionSensor = NOT
+  HwIn.Winch.M1M2_TopPositionFree_DI` (P02:593) | Mettre
+  `GVL_Simulation.SimTopPositionActive := TRUE`, car le banc fait
+  `Winch.M1M2_TopPositionFree_DI := NOT SimTopPositionActive`
+  (FB_SimBench.st:583).<br>La montée en Y+ avec homme-mort (FB:455-457) est
+  **facultative** : la position n'agit pas sur le capteur simulé. |
+  | HX3 → HX4 | Mode A : `BothAxesHomed` (FB:487). Mode B :
+  `WinchesMechanicallyStopped AND BothAxesHomed` (FB:499-509) | Garder le
+  joystick au neutre. `NOT JoystickDeflected` fait basculer en Mode B (FB:491),
+  qui ré-émet HomeReq à l'arrêt (FB:501-504). Le homing codeur se déclenche tout
+  seul (voir §2). |
+  | HX4 → HX5 | `StabilizationOk` (FB:524-527) : arrêt, neutre, `CablePosM1` et
+  `CablePosM2` dans [`CfgStabilizationMinM`..`CfgStabilizationMaxM`] =
+  **[7,50..9,50] m** (défauts de ST_fbMachineHomingCycle_Cfg.st:29-30, non
+  surchargés dans P02:583-586), et `ABS(M1-M2) <= CoherenceLimitM` (1,0 m) |
+  Rien à faire. Après preset, les deux axes valent `CfgTopSensorPos_M = 8,5`
+  (GVL_PERSISTENT.st:41/49 ; M2 recopié de M1 en PRG_07:214), donc la condition
+  passe. |
+  | HX5 → HX6 | `NOT JoystickDeflected AND WinchesMechanicallyStopped` (FB:553)
+  | Neutre, arrêt. |
+  | HX6 → HX0 | 1er scan : `CommitPublished := TRUE`, `CommitClose :=
+  PendingClose`. 2e scan : retour HX0 (FB:560-566) | Rien. |
+  | Résultat | `MachineHomed := BothAxesHomed AND (CommitPublished OR
+  BucketOffsetValid) AND SeqStep<>HX7 AND NOT MachineHomingFailed AND NOT
+  ReHomingAckRequired AND NOT Fault.Latched` (FB:602-605) | MachineHomed = TRUE.
+  |
+
+  Le commentaire d'en-tête du FB annonce une plage [8,50..8,80] m, mais le code
+  utilise 7,50..9,50.
+
+  ### (2) Prérequis et homing codeurs
+
+  **Prérequis**
+  - **Sources de simulation** (CONSTATÉ) :
+    - `SimulationModeActive` et `SimWinchActive` à TRUE : sinon les codeurs,
+  freins et capteur haut simulés ne sont pas routés vers HwIn (P02:135, 481).
+    - `SimOperatorActive` à TRUE seulement si on veut utiliser le joystick
+  simulé (P02:137, 483).
+  - **Mode** (CONSTATÉ) :
+    - `GVL_IHM.Modes.Cmd.SelMode := E_Mode.MAINT_N2`.
+    - La bascule de mode exige des treuils à l'arrêt mécanique :
+  `ModeChangeAllowed` (FB_Modes.st:226, 262-264).
+    - Un changement de page IHM peut réécrire SelMode (PRG_03:77-85), et SelMode
+  repart en SEMI_AUTO au boot (PRG_03:75).
+    - Le mode doit rester MAINT_N2 pendant tout le cycle, sinon
+  `ModeLostDuringCycle` (FB:263).
+  - **Couplage** (CONSTATÉ) : `JoystickWinchSelectArbitrated` vaut 2 si M3 est à
+  la Trémie et que `GVL_IHM.M3Translation.Cmd.TglAllowWinchMoveAtTremie` est
+  FALSE (FB_Modes.st:372-373). Le cycle reste alors bloqué en HX1a et passe en
+  HX7 en HX2 (`CouplingInterlockFault`, FB:259).
+    - Le séquencement benne couplé `TglEnableCoupledBucketSequencing` + Y+ peut
+  aussi forcer 2 si la benne n'est pas fermée (FB_Modes.st:375-392). Raison de
+  plus pour ne pas toucher Y en HX2.
+  - **AU / homme-mort** : nécessaires **uniquement** si on utilise le joystick
+  (fermeture benne, montée).
+    - CONSTATÉ : `ArmingPermit` (PRG_04:1205) exige notamment `NOT
+  ArmContactorOff` et `NOT ArmPowerCutOff`.
+    - HYPOTHÈSE : il faut donc une chaîne AU armée (SimChainOk / armement) ; pas
+  vérifié en détail.
+    - CONSTATÉ : l'entrée `BootReady` est déclarée mais n'est pas utilisée dans
+  le corps du FB.
+  - **Codeurs** (CONSTATÉ) : pas d'erreur de homing latchée avant le départ,
+  sinon `AxisHomingError` fait avorter dès HX1a. Exemple : `BootIncoherentError`
+  (FB_Encoder_Homing.st:184-186), à lever par `BtnConfirmCoherence` puis Reset.
+
+  **Déclenchement du homing codeurs M1/M2** (CONSTATÉ)
+  - À l'entrée en HX3, le FB émet une impulsion `M1Demand.HomeReq` /
+  `M2Demand.HomeReq` (FB:464-465). Elle alimente à la fois `HomingPermit` (OR,
+  P02:655/708) et `HomingAtTargetM` (P02:658/712).
+  - `M2Demand.UseDynamicTarget` n'est jamais écrit par le FB, donc reste FALSE.
+  - Dans `FB_Encoder_Homing.st:206-207`, `HomeEdge.Q AND TopPositionSensor`
+  déclenche le homing nominal avec cible `CfgTopSensorPosM` = 8,5 m (l.220). On
+  a `PresetValue := RawPos` et `PendingHomingRefRaw := RawPos - cible`
+  (l.230-231).
+  - FB_Encoder_Abs envoie `PresetTriggerCmd = 2` (l.140). Le banc applique
+  `RawPos := PresetValue` après 3 cycles de latence, mouvement gelé
+  (FB_Sim_Encoder.st:127-149).
+  - Relecture après 50 ms, tolérance 0,010 m, mode READBACK_ONLY
+  (FB_Encoder_Homing.st:241-270). Si OK : `Calib.Homed` passe à TRUE et
+  `HomedAndReliable = EncoderAvailable AND Homed AND NOT EncoderIncoherent`
+  (FB_EncoderReliability.st:34).
+  - HYPOTHÈSE : une prise au vol (treuils en mouvement) risque de dépasser les
+  10 mm de tolérance. Avec les treuils arrêtés au moment du forçage du capteur,
+  la relecture est exacte.
+
+  ### (3) Causes d'abandon et de défaut
+
+  **Abandons vers HX7** (CONSTATÉ)
+
+  | Étape | Conditions d'abandon | Référence |
+  |---|---|---|
+  | HX1 | `ModeLostDuringCycle OR MotionOutOfPhase` | FB:428 |
+  | HX1a, HX4, HX5 | `ModeLostDuringCycle OR AxisHomingError` | FB:444 / 531 /
+  550 |
+  | HX2, HX3 | `TransactionAbort` = AxisHomingError, MotionOutOfPhase,
+  ClimbTimedOut (300 s de montée commandée), HomeAxesTimedOut (60 s en HX3 sans
+  les deux axes homés), CouplingInterlockFault, ModeLostDuringCycle |
+  FB:264-267, 460, 514 |
+  | HX4 | Stabilisation hors plage → retour HX1 ; 3e échec → HX7 + cause 7 |
+  FB:536-544, 358 |
+
+  - `MotionOutOfPhase` = un treuil bouge hors HX2 alors que la grâce de 3 s est
+  écoulée (FB:244). La grâce ne court qu'en HX1a/HX4/HX5 (FB:238-240).
+  - Causes latchées 0 à 7 : FB:330-360.
+  - **Perte de datum** : si MachineHomedRaw retombe après avoir été vrai,
+  `ReHomingAckRequired` se latche (FB:275-280). Il ne se lève qu'avec un front
+  Reset **et** les treuils à l'arrêt (FB:286-289).
+  - **Sortie de HX7 et acquittement** : uniquement par un front Reset
+  (FB:294-303), avec `Reset = PRG_07_Supervision.FaultMachineReset_IHM OR
+  GVL_IHM.CycleMachineHoming.Cmd.BtnAbort` (P02:589). `FaultMachineReset_IHM`
+  vient de `GVL_IHM.Modes.Cmd.BtnFaultReset` (PRG_07:138).
+  - **Côté codeur** (FB_Encoder_Homing.st:136-150) : HomingModeError,
+  TargetOutOfRangeError, PresetFailError (relecture KO), BootIncoherentError.
+  Elles remontent par `HomingFault.Error` (P02:552/556).
+
+  ### (4) Raccourcis en simulation
+
+  - **Aucun bypass MachineHomed en simulation** (CONSTATÉ). Une recherche
+  `homed|homing|bypass` dans `CODE/L_SIMULATION` ne trouve aucune variable qui
+  force MachineHomed ou HomedAndReliable. Les seuls bypass sont dans
+  GVL_BypassRetain.st (treuils, AU, fins de course), aucun ne touche au homing.
+  - **Raccourci de stimulus légitime et documenté** (CONSTATÉ) :
+  `GVL_Simulation.SimTopPositionActive`, commenté « Stimulus explicite du
+  capteur haut commun pour qualifier le référencement benne »
+  (GVL_Simulation.st:25-27). Il remplace la montée physique. Il est remis à
+  FALSE sur front descendant de SimulationModeActive (P02:114).
+  - **Forçage de step mise en service** (CONSTATÉ, encadré dans le FB) :
+    - Avec `GVL_IHM.CycleMachineHoming.Cmd.TglCommissioning = TRUE` en MAINT_N2,
+  `GVL_IHM.CycleMachineHoming.Cfg.ForceStepTarget := 7` puis front de
+  `Cmd.BtnForceStepApply`, on saute directement en HX6 (FB:308-318). HX6 publie
+  `CommitPublished` (FB:562).
+    - **Mais** MachineHomed exige toujours `BothAxesHomed`. Il faut donc que les
+  codeurs aient été homés avant, par exemple par homing unitaire
+  `GVL_IHM.M1TreuilRetenue.Cmd.BtnHome` / `GVL_IHM.M2TreuilBenne.Cmd.BtnHome` en
+  MAINT_N1/N2 avec treuils à l'arrêt (HomingPermit P02:652-655 ; cible
+  `CfgHomingTargetM` = 8,5 si `BtnHomingAtZero` est FALSE, P02:661).
+    - Si `BucketReferenced` (persistant, P02:600) est déjà TRUE et que les deux
+  codeurs sont homés et fiables, MachineHomed est vrai sans aucun cycle, hors
+  latches et défauts.
+    - Ce chemin contourne la séquence opérateur. Ce n'est pas une preuve de bon
+  fonctionnement du cycle.
+
+  **Séquence minimale recommandée** (déduite du code ; non exécutée sur le banc)
+  1. Simulation et SimWinchActive actifs, treuils à l'arrêt, `SelMode =
+  MAINT_N2`.
+  2. Front Reset si une faute est présente.
+  3. Front `BtnStart`.
+  4. Joystick au neutre, front `BtnConfirmHomingBucket`.
+  5. Attendre au moins 300 ms (passage en HX2).
+  6. `SimTopPositionActive := TRUE`.
+  7. Attendre environ 100 ms ou plus (preset 3 cycles + relecture 50 ms), puis
+  passage HX4 → HX5 → HX6 → HX0. MachineHomed passe à TRUE.
+
+  Laisser `SimTopPositionActive` à TRUE ne gêne pas le cycle (`TopLostEdge`
+  n'est pas consommé). Le remettre à FALSE après coup pour la suite des essais.
+
+● Agent "Analyse séquence homing machine" finished · 4m 23s
+
+● P7.4 est terminé : les 4 trajets M3 passent et la CI reproduit R7 CODESYS à
+  quelques pourcents près, avec un événement « frein fermé en mouvement » sur
+  M10a à analyser. J'enchaîne maintenant sur P7.2 (homing) en repérant d'abord
+  les variables.
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● Le front montant de SimulationModeActive active déjà tous les domaines,
+  treuils compris (PRG_02_Acquisition.st:90). J'écris les prédictions avant le
+  test de homing.
+
+  Searched for 1 pattern, ran 2 shell commands (ctrl+o to expand)
+
+● P7.2 a réussi du premier coup : MachineHomed est passé à TRUE environ 1 s
+  après le capteur haut, M1 et M2 étant à 8,500 m, et l'étape est revenue à HX0.
+  Je repère maintenant l'énumération des étapes et la commande de forçage pour
+  P7.3, le cycle SEMI_AUTO AX14→AX18 → AX2.
+
+  Searched for 1 pattern, ran 5 shell commands (ctrl+o to expand)
+
+● Cycle complet AX14→AX15A→AX15B→AX18→AX2→P1 franchi sans AX_STAB. J'ajoute
+  maintenant les 3 jobs P7 à run_all.py, puis je lance la suite complète.
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Suite complète run_all.py en cours (23 jobs, dont les 3 P7). Je ferai un point
+  groupé dès la fin.
+
+✻ Sautéed for 21m 33s · done Monday 10:21 AM
+
+❯ Soit moins bavard pendant les tests ... informe de facons plus groupé         
+
+● Compris, je fais un seul point groupé quand run_all se termine.
+
+✻ Churned for 7s · done Monday 10:22 AM
+
+● Background command "Ajout des jobs P7 et suite complète" completed (exit code
+0)
+
+  Ran 1 shell command (ctrl+o to expand)
+
+● Les objectifs P7 sont atteints sur le banc CI : homing, trajets M3 et cycle
+  SEMI_AUTO AX14 → AX18 → AX2 → P1. La suite complète tourne en environ 3
+  minutes avec python TOOLS/TEST_AUTO_CI/POC_PRG/run_all.py. run_all est
+  CONFORME : 55 tests unitaires OK, 23 jobs, tous au verdict attendu, en 178 s.
+  Aucun fichier de CODE/ n'a été modifié.
+
+  📊 Résultats P7 (prédictions écrites avant chaque exécution)
+
+  ┌──────────────────┬──────────────────────────────────────────────────────┐
+  │     Objectif     │                       Résultat                       │
+  ├──────────────────┼──────────────────────────────────────────────────────┤
+  │ P7.1 SimBench    │ ✅                                                   │
+  │ actif            │                                                      │
+  ├──────────────────┼──────────────────────────────────────────────────────┤
+  │ P7.2 Homing      │ ✅ MachineHomed = TRUE environ 1 s après le capteur  │
+  │                  │ haut ; M1 et M2 à 8,500 m                            │
+  ├──────────────────┼──────────────────────────────────────────────────────┤
+  │ P7.3 Cycle       │ ✅ AX14 → AX15A → AX15B → AX18 → AX2 → P1, sans      │
+  │                  │ passage en AX_STAB ni choc en butée                  │
+  ├──────────────────┼──────────────────────────────────────────────────────┤
+  │ P7.4 Trajets M3  │ ✅ Durées à 7 % près de R7 CODESYS, dépassements à   │
+  │ 10/20 Hz         │ quelques mm près (tableau ci-dessous)                │
+  └──────────────────┴──────────────────────────────────────────────────────┘
+
+  Trajets M3 : CI (vraies PRG + SimBench) comparée à R7 CODESYS
+
+  ┌──────────────────┬──────────────────────────────┬───────────────────────┐
+  │      Trajet      │              CI              │          R7           │
+  ├──────────────────┼──────────────────────────────┼───────────────────────┤
+  │ 10 Hz, P1 →      │ 25,5 s · 25 mm               │ 26,3 s · 24 mm        │
+  │ Trémie           │                              │                       │
+  ├──────────────────┼──────────────────────────────┼───────────────────────┤
+  │ 10 Hz, Trémie →  │ 25,4 s · 69 mm · arrêt à     │ 26,6 s · 69 mm ·      │
+  │ P1               │ 4,997 m                      │ 5,001 m               │
+  ├──────────────────┼──────────────────────────────┼───────────────────────┤
+  │ 20 Hz, P1 →      │ 13,2 s · 128 mm              │ 14,1 s · 130 mm       │
+  │ Trémie           │                              │                       │
+  ├──────────────────┼──────────────────────────────┼───────────────────────┤
+  │ 20 Hz, Trémie →  │ 13,3 s · 220 mm · arrêt à    │ 14,3 s · 220 mm ·     │
+  │ P1               │ 5,145 m                      │ 5,151 m               │
+  └──────────────────┴──────────────────────────────┴───────────────────────┘
+
+  Cycle AX14 → P1 :
+  - AX14 (P1 → Trémie) : 9,5 s.
+  - AX15A → AX15B → AX18 → AX2 : enchaînés en 30 ms.
+  - Retour en P1 : 7,7 s.
+
+  H1/H2 : l'écart entre position vraie et position estimée reste entre −36 et
+  +18 mm sur les 4 trajets. Je n'ai pas vu de dérive cumulée, mais la mesure ne
+  porte que sur 4 trajets.
+
+  ⚠️ Points à arbitrer
+
+  1. Arrêt au retour en P1 du cycle : 5,308 m, soit 0,31 m au-delà de P1. Ma
+     prédiction (≤ 5,3 m) est donc manquée. C'est la seule assertion en échec :
+     le job est classé CARACTERISATION avec un verdict OBSTACLE attendu. À
+     comparer au dépassement du trajet manuel à 20 Hz (0,22 m).
+  2. AX15B → AX18 en 20 ms. Hypothèse non vérifiée : la benne simulée était déjà
+     vue ouverte, donc l'ouverture réelle n'a pas été testée.
+  3. frein_ferme_en_mvt = 1 sur le trajet 10 Hz P1 → Trémie (un événement frein
+     fermé en mouvement). Pas encore analysé.
+  4. Raccourci de test : l'entrée en AX14 se fait par forçage d'étape
+     (SetForceStepTgt). Les étapes AX2 à AX13 ne sont pas parcourues.
+
+  🔧 Modifications du banc
+
+  - T9 : les cycles sont maintenant des boucles C++, ce qui rend les tests de
+    plusieurs minutes simulées rapides.
+  - Nouvelles macros : @SIM_SETUP@ / @SIM_ARM@ / @LOOP_*@.
+  - Correction de @SIM_SETUP@ : l'attente de fin passe à 400 cycles. Avec 30
+    cycles, l'homme-mort ne s'armait pas au premier trajet, ce qui faisait
+    échouer le 10 Hz P1 → Trémie.
+  - Fichiers ajoutés :
+    - 3 tests P7 (TOOLS/TEST_AUTO_CI/POC_PRG/tests/test_p7_*.st.in) et leurs 3
+      jobs dans run_all.py ;
+    - 3 fichiers de prédictions dans DOC/WFLOW/ETUDES/ANALYSES_T417/.
+
+  Rien n'est commité. Je committe sur work/t417-cd-poc-prg dès ton accord, sans
+  push.
+
+  result: Banc CI T417-C P7 opérationnel : homing, trajets M3 (à 7 % près de R7
+  CODESYS) et cycle SEMI_AUTO AX14→AX2→P1 franchis ; run_all CONFORME (23 jobs)
+  en 178 s ; 3 points à arbitrer ; commit en attente de ton accord.
+
+✻ Worked for 26s · done Monday 10:25 AM
+
+❯ Tu es suivi en lecture seule par Veilleur. Prépare un résumé déclaratif       
+  compact que je pourrai coller dans le champ « Mission à surveiller ».         
+  Session : non renseigné (Claude Code).                                        
+  Retourne UNIQUEMENT ce bloc, en français, 1200 caractères maximum. Décris ce  
+  que tu fais, ne donne pas d’instructions au superviseur. Si tu ne sais pas,   
+  écris « inconnu ». N’affirme pas qu’un test est réussi sans citer une preuve  
+  effectivement observée. N’inclus aucun secret.                                
+  VEILLEUR_CONTEXT_V1                                                           
+  tache_ou_sujet:                                                               
+  objectif_utilisateur:                                                         
+  etape_actuelle:                                                               
+  perimetre_et_actions_autorisees:                                              
+  contraintes_et_interdictions:                                                 
+  criteres_d_acceptation:                                                       
+  preuves_deja_observees:                                                       
+  hypotheses_et_inconnues:                                                      
+  prochaine_etape:                                                              
+  FIN_VEILLEUR_CONTEXT_V1                                                       
+● VEILLEUR_CONTEXT_V1
+  tache_ou_sujet: T417-C/D, POC CI des vraies PRG CODESYS (banc P6 + SimBench),
+  branche work/t417-cd-poc-prg
+  objectif_utilisateur: banc M3 crédible pour tester vite les séquences
+  AX14–AX18 (ordre, autorisations, défauts, arrêt et reprise)
+  etape_actuelle: P7 exécuté (homing, trajets M3 10/20 Hz, cycle AX14→AX2→P1) ;
+  commit en attente d'accord humain
+  perimetre_et_actions_autorisees: édition de TOOLS/TEST_AUTO_CI/POC_PRG (banc,
+  tests, run_all) et des docs d'analyse T417 ; exécution des tests
+  contraintes_et_interdictions: CODE/ en lecture seule ; aucun commit sans
+  accord, aucun push ; ne pas lire Device.export ; aucune suppression de scratch
+  ; prédictions écrites avant exécution, jamais modifiées
+  criteres_d_acceptation: objectifs P7.1 à P7.4 atteints ; run_all au verdict
+  attendu sur tous les jobs
+  preuves_deja_observees: run_all_20261102T102446.md GLOBAL CONFORME, 23 jobs,
+  55 tests unitaires OK ; trace_raw.tsv P7 : M3 à 7 % près de R7, homing
+  M1=M2=8,500 m, journal d'étapes 14-15-16-18-2
+  hypotheses_et_inconnues: benne simulée déjà ouverte en AX15B (non vérifié) ;
+  arrêt retour P1 à 5,308 m (prédiction ≤ 5,3 manquée) ; événement frein fermé
+  en mouvement non analysé ; AX2–AX13 non parcourus (forçage AX14)
+  prochaine_etape: commit après accord ; arbitrage des 3 écarts par
+  l'orchestrateur
+  FIN_VEILLEUR_CONTEXT_V1
+
+✻ Worked for 20s · done Monday 11:31 AM
+
+❯ je me souviens plus de l'avance de T417-C ... lance un workflow breifing      
+  ⎿  2 skills available
+
+  Ran 2 shell commands (ctrl+o to expand)
+
+● ============================================================
+  🎬 BRIEFING SESSION WORKFLOW PROJET / AGENTS.MD ACTIF
+  ============================================================
+  Briefing session Excavatrice de Dragage, reprise par CC01.
+
+  📍 Où en est T417-C
+
+  Le banc CI est opérationnel jusqu'à P7, mais tout le travail P7 est non 
+  commité. Le dernier run date du 02/11 : run_all CONFORME, 23 jobs au verdict
+  attendu, 55 tests unitaires OK, 178 s.
+
+  ┌────────┬───────────────────────────────────────────┬────────────────────┐
+  │ Palier │                  Contenu                  │        État        │
+  ├────────┼───────────────────────────────────────────┼────────────────────┤
+  │ P1–P5  │ FB réel → PRG_02/03/05/06 réelles         │ ✅ commité         │
+  ├────────┼───────────────────────────────────────────┼────────────────────┤
+  │ P6     │ PRG_02 à 06 réelles, PRG_07 en coquille,  │ ✅ commité         │
+  │        │ H-LOCK treuils                            │ (a4ad2cf7)         │
+  ├────────┼───────────────────────────────────────────┼────────────────────┤
+  │ P7.1   │ SimBench actif                            │ ✅ atteint, 🟡 non │
+  │        │                                           │  commité           │
+  ├────────┼───────────────────────────────────────────┼────────────────────┤
+  │ P7.2   │ Homing jusqu'à MachineHomed (M1=M2=8,500  │ ✅ atteint, 🟡 non │
+  │        │ m)                                        │  commité           │
+  ├────────┼───────────────────────────────────────────┼────────────────────┤
+  │ P7.3   │ Cycle AX14 → AX15A → AX15B → AX18 → AX2 → │ ✅ franchi, 🟡 non │
+  │        │  P1, sans AX_STAB                         │  commité           │
+  ├────────┼───────────────────────────────────────────┼────────────────────┤
+  │ P7.4   │ Trajets M3 10/20 Hz : durées à 7 % de R7, │ ✅ atteint, 🟡 non │
+  │        │  dépassements à quelques mm               │  commité           │
+  └────────┴───────────────────────────────────────────┴────────────────────┘
+
+  Toujours non validé :
+  - l'équivalence avec CODESYS, car l'identité binaire de R7 n'est pas établie
+    (T417-E) ;
+  - l'intégration de PRG_07, encore en coquille ;
+  - les étapes AX2 à AX13, non parcourues : AX14 est atteint par forçage.
+
+  ⚠️ En attente de toi
+
+  ┌─────┬──────────────────────┬────────────────────────────────────────────┐
+  │  #  │       Décision       │                   Détail                   │
+  ├─────┼──────────────────────┼────────────────────────────────────────────┤
+  │     │                      │ Tests P7, macros, run_all.py, prédictions  │
+  │ 1   │ GO commit            │ et rapport de run sur                      │
+  │     │                      │ work/t417-cd-poc-prg, sans push            │
+  ├─────┼──────────────────────┼────────────────────────────────────────────┤
+  │     │ Arrêt au retour P1 à │ 0,31 m au-delà de P1 ; ma prédiction ≤ 5,3 │
+  │ 2   │  5,308 m             │  m est manquée, le job est classé          │
+  │     │                      │ CARACTERISATION                            │
+  ├─────┼──────────────────────┼────────────────────────────────────────────┤
+  │ 3   │ AX15B → AX18 en 20   │ Hypothèse non vérifiée : benne simulée     │
+  │     │ ms                   │ déjà ouverte, donc ouverture non testée    │
+  ├─────┼──────────────────────┼────────────────────────────────────────────┤
+  │ 4   │ frein_ferme_en_mvt = │ Sur le trajet 10 Hz P1 → Trémie, pas       │
+  │     │  1                   │ analysé                                    │
+  └─────┴──────────────────────┴────────────────────────────────────────────┘
+
+  À mettre à jour : dans cette branche, la fiche T417-C de TASKS.yaml s'arrête à
+  P5 (mise à jour le 01/11). Le rapport T417C_POC_CI_PRG_20261101.md n'a pas
+  non plus reçu P7.
+
+  🛠️ Skills actives
+
+  ┌─────────────────┬────────────────────────────┬──────────────────────────┐
+  │      Skill      │            Rôle            │       Déclencheur        │
+  ├─────────────────┼────────────────────────────┼──────────────────────────┤
+  │ task-planner    │ Catalogue TASKS.yaml et    │ « tasks », « état des    │
+  │                 │ contrats                   │ tâches »                 │
+  ├─────────────────┼────────────────────────────┼──────────────────────────┤
+  │ troubleshooting │ Diagnostic, arbre de       │ « diagnostic », « panne  │
+  │                 │ causes                     │ »                        │
+  └─────────────────┴────────────────────────────┴──────────────────────────┘
+
+  📊 Snapshot TASKS.yaml (copie de cette branche)
+
+  ⏳ 3 en cours (T417, T417-C, T417-D) · ⬜ 143 à faire · ✅ 71 · ⏸️ 2 · ❌ 7.
+  La copie est à l'état de cette branche, et aucun statut 🔒 n'y est compté.
+
+  🧭 Repères
+
+  - 📐 Standards : DOC/STDS/ (CODE_QUALITY_STANDARDS, NAMING_CONVENTION,
+    guides).
+  - 🏗️ Architecture : DOC/AF/ et CODE/, 7 POU de PRG_02 à PRG_07, 3 tâches.
+  - 🔧 Outillage : generate_codesys_bundle.py, G200_check_linkage.py,
+    run_all_gates.py.
+  - 🧪 Banc T417-C : TOOLS/TEST_AUTO_CI/POC_PRG/run_all.py.
+
+  Workflow : Cadrage → Contrat → Plan validé → Code ST → Gates → Restitution.
+
+  ▶️ Options
+
+  - 🔹 1. Tâche du catalogue : commit P7, puis mise à jour de T417-C dans
+    TASKS.yaml et du rapport (recommandé, pour ne pas perdre le travail).
+  - 🔹 2. Diagnostic : analyser les écarts 2 à 4 (je commencerais par la benne
+    en AX15B, car elle touche directement le cycle).
+  - 🔹 3. Nouveau besoin : parcours AX2→AX13 sans forçage, ou tests de défauts
+    et de reprise.
+  - 🔹 4. Gates : relancer run_all.py ou les 21 gates.
+
+  result: Briefing T417-C : P1–P6 commités, P7 (homing, trajets M3, cycle
+  AX14→P1) atteint mais non commité ; dernier run CONFORME le 02/11 ; 4
+  décisions attendent ton retour, dont le GO commit.
+
+✻ Cooked for 33s · done 1:17 AM
+
+❯ Alors la priorité nest pas comit ou pas ...                                   
+  Ce qui est urgent cest l'analyse qui doit proposer une nouvelle solution de   
+  simulation M3                                                                 
+
+● Je cherche dans le dossier T417 où en est cette analyse et ce qu'elle doit
+  trancher.
+
+  Searched for 1 pattern, read 6 files, listed 1 directory, ran 4 shell commands (ctrl+o to expand)
+
+● Je viens de repérer des traces de MES réelles (AX14 du 22/09, M3 du 23/09) que
+  les études T417 n'ont pas exploitées ; je les extrais, car ce sont les seules
+  mesures machine disponibles pour la nouvelle solution.
+
+  Ran 6 shell commands (ctrl+o to expand)
+
+● Write(~\.claude\jobs\a4693006\tmp\ev.py)
+  ⎿  Wrote 30 lines to ~\.claude\jobs\a4693006\tmp\ev.py
+       1 import sys
+       2 from pathlib import Path
+       3 sys.path.insert(0, "TOOLS/PLC_CSV_SNAPSHOT/external_python")
+       4 import trace_to_csv as t
+       5 sys.stdout.reconfigure(encoding="utf-8")
+       6 base = Path("TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace")
+       7 for fn in sys.argv[1:]:
+       8     v, m = t.read_trace(base / fn)
+       9     d = {}
+      10     for x in v:
+     … +20 lines (ctrl+o to expand)
+
+  Ran 1 shell command (ctrl+o to expand)
