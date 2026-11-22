@@ -143,3 +143,39 @@ service (`%LOCALAPPDATA%\ExcavatriceDragage\agent-supervisor-server.log`).
 ### Reste à l'exploitant
 - Fermer la 1 le constat `Session de coordination sans cadrage` de TORC (règle 10 : un clic) ;
   une re-attach TORC posera la fiche template complète désormais.
+
+---
+
+## 2026-11-22 · Incident « Configuration illisible » — diagnostic + correctif ZÉRO PERTE (A20-A23)
+
+### A20 — QUAND (journal du service, preuve brute)
+- 18/11 06:11:15 : dernière écriture saine de l'état (5 700 166 o, 8 sessions)
+- 18/11 08:24 → 14:01 : `ValueError: Configuration illisible` ; 14:00:41 relance pid 32012 :
+  load_error, 0 session en mémoire, écritures gelées (protection, disque intact)
+- 22/11 21:44 : nouvelle relance, même échec. **Zéro perte : le gel a protégé le fichier.**
+
+### A21 — POURQUOI (archéologie git, agent expert)
+- Fail-closed global : introduit `2ae79f2b` (2026-11-05, checkpoint WIP, message vide)
+- **Aggravation : `8dbd86bd` (2026-11-15, M23 « mémoire configurable ») — la borne d'ÉCRITURE
+  passe à `memory_max_items` (100) mais le validateur de CHARGEMENT `_validate_memory` reste
+  codé à 20. Sessions >20 items (T427 22, TORC 31, T417 30) → ValueError → tout jeté.**
+- Le "transcript introuvable" ne lève PAS dans _load (correction de mon hypothèse initiale :
+  `_validate_assignment` renvoie None) — cause unique = borne mémoire du loader.
+
+### A22 — Correctif + preuves zéro perte (exigence exploitant)
+- Sauvegarde vérifiée AVANT toute action : `agent-supervision.json.bak-20261122`, SHA256 égal
+- `_validate_memory(messages, limit)` : borne = `memory_limit(judge_settings)` au chargement
+  (call site l.1182 corrigé) — loader et écriture partagent enfin la même règle
+- Défense en profondeur (laissée) : une source disparue au chargement ne fait plus tomber les
+  autres sessions (session conservée, `source_error` tracé)
+- Preuve lecture seule sur le VRAI fichier : load_error None, 8 sessions, mémoires 7/10/22/31/0/30/13/0
+- Bascule réelle : build `86693120c550`, `update_available: false`
+- Preuve après bascule : LIVE vs BACKUP → 8/8 sessions, (mémoire, alertes) ÉGAL pour chacune
+- Garde-fou : `tests/test_state_load_memory.py` 3 tests verts (31@100 chargé intact,
+  31@20 toujours refusé, sources absentes non fatales)
+
+### A23 — Leçon
+- Mon message de commit M23 affirmait « borne 20 hardcodée à 4 sites → configurable » :
+  le 5e site (le loader) a été oublié. Règle ajoutée : un réglage de borne n'est complet que
+  si ÉCRITURE et CHARGEMENT partagent la même fonction (`memory_limit`), prouvé par un test
+  qui recharge l'état au-delà de l'ancienne borne.

@@ -59,6 +59,57 @@ def test_fiche_torc_template_coordination():
     assert "Fiche coordination generique" in structure["unknowns"]
 
 
+def test_torc_connect_serveur_isole(tmp_path):
+    """Garde demande par TORC-CC10 (2026-11-18) : rattachement TORC-CCnn sur SERVEUR
+    ISOLE (sous-process, port 8094, etat tmp), jamais contre 8081/8082.
+    Fiche template posee, attach TORC-CCnn accepte."""
+    import subprocess as _sub
+    import json as _json
+    import urllib.request as _urllib
+    # Le serveur isole garde ses racines PAR DEFAUT (les vrais transcripts) : on attache
+    # donc la session reelle d'essai (d9739b30) — source valide, alias TORC-CC22.
+    native = "d9739b30-d0bb-46e9-87c5-243ffc255f90"
+    server = _sub.Popen([sys.executable, str(ROOT / 'TOOLS/AGENT_SUPERVISOR/scripts/supervisor_server.py'),
+                          '--port', '8094', '--state', str(tmp_path / 'state.json')],
+                         stdin=_sub.DEVNULL, stdout=_sub.DEVNULL, stderr=_sub.DEVNULL,
+                         cwd=str(ROOT))
+    try:
+        base = 'http://127.0.0.1:8094'
+        for _ in range(20):  # attente de /health (demarrage ~5-9 s)
+            try:
+                with _urllib.urlopen(base + '/health', timeout=2) as response:
+                    _json.load(response)
+                break
+            except Exception:
+                time.sleep(0.5)
+        with _urllib.urlopen(base + '/api/supervision', timeout=10) as response:
+            snapshot = _json.load(response)
+        mission = ("Coordination du projet par TORC-CC22 : piloter les taches du catalogue "
+                   "via le canal orchestrateur designe ; NE JAMAIS cloter un constat ni une tache soi-meme (regle 10)")
+        token = snapshot.get('token')
+        request = _urllib.Request(base + '/api/supervision', data=_json.dumps({
+            'action': 'add', 'platform': 'claude', 'native_id': native,
+            'alias': 'TORC-CC22', 'display_title': 'TORC-CC22 Orchestrateur',
+            'mission': mission, 'task_ref': 'TORC',
+            'task_title': 'Orchestrateur TORC-CC22 (essai)'}).encode(),
+            headers={'Content-Type': 'application/json', 'X-Supervision-Token': str(token or '')}
+        )
+        with _urllib.urlopen(request, timeout=20) as response:
+            result = _json.load(response)
+        session_essai = next(s for s in result['sessions'] if s['native_id'] == native)
+        assert session_essai.get('alias') == 'TORC-CC22', 'attach TORC-CCnn accepte sur isole'
+        assert session_essai.get('source'), 'source unique confirmee'
+    finally:
+        server.terminate()
+        server.wait(timeout=10)
+
+
+def json_line(native):
+    import json as _json
+    return _json.dumps({'type': 'user', 'message': {'content': [
+        {'type': 'text', 'text': 'ligne TORC'}]}, 'timestamp': '2026-11-18T00:00:00+00:00'})
+
+
 def test_seuil_coordination_4h_autres_criticite():
     coordination = {"alias": "TORC-CC10", "task_id": "TORC", "state": "active",
                     "enabled": True, "closed": False, "alerts": [], "events": []}

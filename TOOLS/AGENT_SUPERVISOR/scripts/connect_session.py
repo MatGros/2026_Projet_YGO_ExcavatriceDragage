@@ -490,7 +490,18 @@ def main():
                          display_title=args.display_title)
         print(json.dumps(result, ensure_ascii=False))
     except (ValueError, RuntimeError, HTTPError, URLError, TimeoutError) as exc:
-        print(json.dumps({"status": "error", "message": str(exc)[:240]}, ensure_ascii=False))
+        # R29/T427 (demande TORC-CC10, 2026-11-18) : un 400 sans son corps est un trou de
+        # diagnostic — le client affiche desormais le motif du service, verbatim.
+        message = str(exc)
+        if isinstance(exc, HTTPError):
+            try:
+                body = json.loads(exc.read().decode("utf-8", errors="replace"))
+                detail = str(body.get("error") or "").strip()
+                if detail:
+                    message = f"{message} — motif du service : {detail}"
+            except (ValueError, UnicodeDecodeError, OSError):
+                pass
+        print(json.dumps({"status": "error", "message": message[:400]}, ensure_ascii=False))
         raise SystemExit(2)
 
 

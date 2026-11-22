@@ -932,22 +932,42 @@ def actor_of_alias(alias) -> str:
     return actor if actor else ""
 
 
+_PERSONA_USAGE_CACHE = {}  # session_id -> (instant monotonic, payload) — R29 stabilite
+PERSONA_USAGE_TTL_SECONDS = 120
+_PERSONA_ENTRIES_CACHE = {'at': 0.0, 'entries': None}  # un SEUL scan du journal, partage
+
+
 def persona_usage(session_id: str) -> list:
-    """Invocations de personas tracees pour cette session (R15) : usage reel, pas une impression."""
+    """Invocations de personas tracees pour cette session (R15) : usage reel, pas une impression.
+    R29 (incident stabilite 2026-11-22) : trace_log.query relisait 780 k lignes a CHAQUE
+    snapshot (toutes les 2 s) -> 7 s/poll, IHM en timeout. Cache memoire TTL 30 s."""
+    cached = _PERSONA_USAGE_CACHE.get(session_id)
+    now = time.monotonic()
+    if cached is not None and (now - cached[0]) < PERSONA_USAGE_TTL_SECONDS:
+        return cached[1]
     try:
         import sys
         scripts_dir = Path(__file__).resolve().parents[2] / "AGENT_WORKFLOW" / "scripts"
         if str(scripts_dir) not in sys.path:
             sys.path.insert(0, str(scripts_dir))
         import trace_log
-        entries = trace_log.query(kind="persona", session=session_id, limit=0)
+        # Un SEUL scan du journal partage par toutes les sessions (TTL identique) :
+        # 8 × 780k lignes a chaque poll -> 1 scan toutes les 2 min.
+        if (_PERSONA_ENTRIES_CACHE['entries'] is None
+                or now - _PERSONA_ENTRIES_CACHE['at'] >= PERSONA_USAGE_TTL_SECONDS):
+            _PERSONA_ENTRIES_CACHE['entries'] = trace_log.query(kind="persona", limit=0)
+            _PERSONA_ENTRIES_CACHE['at'] = now
+        entries = [entry for entry in _PERSONA_ENTRIES_CACHE['entries']
+                   if str(entry.get('session') or '') == str(session_id)]
     except Exception:
         return []
     usage = {}
     for entry in entries:
         role = str(entry.get("role") or "?")
         usage[role] = usage.get(role, 0) + 1
-    return [{"role": role, "count": count} for role, count in sorted(usage.items())]
+    result = [{"role": role, "count": count} for role, count in sorted(usage.items())]
+    _PERSONA_USAGE_CACHE[session_id] = (time.monotonic(), result)
+    return result
 
 
 def _experience_read(session, poste: str, pattern: str, refs=None) -> None:
@@ -1165,10 +1185,22 @@ class Supervisor:
             for value in data.get("sessions", []):
                 if not isinstance(value, dict):
                     raise ValueError("Affectation persistante invalide")
-                self._validate_assignment(value["platform"], value["native_id"])
+                # R29 (perte zero exigee) : une source introuvable ne fait plus tomber
+                # TOUT le chargement — la session est conservee et signalee source_error.
+                source_disparue = False
+                try:
+                    self._validate_assignment(value["platform"], value["native_id"])
+                except ValueError:
+                    source_disparue = True
                 sid = str(uuid.UUID(value["id"]))
                 self.sessions[sid] = self._new_session(sid, value["platform"], value["native_id"], value.get("alias", ""), False, self._mission(value.get("mission", "")))
                 session = self.sessions[sid]
+                if source_disparue:
+                    session["state"] = "source_error"
+                    session["error"] = "source_introuvable_au_chargement"
+                    record_event(session, "source_missing_on_load",
+                                 "Transcript introuvable au chargement : session conservee, source a rattacher",
+                                 timestamp())
                 session["display_title"] = str(value.get("display_title") or session_display_title(session)).strip()[:200]
                 session["closed"] = bool(value.get("closed", False))
                 if session["closed"]:
@@ -1179,7 +1211,7 @@ class Supervisor:
                 session["source_generation"] = value.get("source_generation")
                 session["source_event_index"] = self._nonnegative_int(value.get("source_event_index", 0), "source_event_index")
                 session["context"] = self._validate_observed_messages(value.get("context", []), "context", self.judge_settings["context_messages"], self.judge_settings["context_chars"])
-                session["memory"] = self._validate_memory(value.get("memory", []))
+                session["memory"] = self._validate_memory(value.get("memory", []), memory_limit(self.judge_settings))
                 if session["source_checkpoint"] is None:
                     session["recovery"] = dict(status="unverified", reason="checkpoint_absent")
                 session["context_truncated"] = bool(value.get("context_truncated", False))
@@ -1281,8 +1313,13 @@ class Supervisor:
         return result
 
     @staticmethod
-    def _validate_memory(messages):
-        if not isinstance(messages, list) or len(messages) > 20:
+    def _validate_memory(messages, limit=None):
+        # R29 (incident 2026-11-18 -> 22, perte zero exigee) : la borne du CHARGEMENT
+        # etait figee a 20 alors que l ECRITURE suit le reglage memory_max_items (100).
+        # Les sessions depassant 20 faisaient tomber TOUT le chargement ("Configuration
+        # illisible", 0 session). Le loader partage desormais la meme borne que l ecriture.
+        bound = memory_limit() if limit is None else int(limit)
+        if not isinstance(messages, list) or len(messages) > bound:
             raise ValueError("memory invalide")
         result=[]
         for item in messages:
