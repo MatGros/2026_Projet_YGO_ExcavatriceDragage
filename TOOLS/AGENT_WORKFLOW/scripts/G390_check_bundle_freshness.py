@@ -39,8 +39,18 @@ def main() -> int:
         print("ERROR: bundle timestamp missing", file=sys.stderr)
         return 2
 
-    # Scratch sous l'outillage, jamais a la racine et jamais supprime automatiquement.
-    scratch = root / "TOOLS" / "AGENT_WORKFLOW" / ".tmp" / f"g390_freshness_{uuid4().hex[:12]}"
+    # Scratch sous l'outillage. R29 (decision exploitant 2026-11-23) : retention 3 max —
+    # les bacs plus anciens sont retires (bundle courant dans CODE_XML/, regenerable),
+    # chaque retrait etant AFFICHE. Les logs de compilation, eux, sont gardes ailleurs.
+    G390_KEEP_FULL = 3
+    tmp_root = root / "TOOLS" / "AGENT_WORKFLOW" / ".tmp"
+    previous = sorted((item for item in tmp_root.iterdir()
+                       if item.is_dir() and item.name.startswith("g390_freshness_")),
+                      key=lambda item: item.stat().st_mtime, reverse=True) if tmp_root.is_dir() else []
+    for old in previous[G390_KEEP_FULL:]:
+        shutil.rmtree(old)
+        print(f"INFO: retention — bac g390 retire : {old.name}")
+    scratch = tmp_root / f"g390_freshness_{uuid4().hex[:12]}"
     scratch.mkdir(parents=True, exist_ok=True)
     print(f"INFO: scratch G390 conserve : {scratch.relative_to(root)}")
     try:

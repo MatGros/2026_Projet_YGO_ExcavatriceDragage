@@ -244,6 +244,43 @@ def create_retained_scratch(object_name: str) -> Path:
     return Path(tempfile.mkdtemp(prefix=f"codesys_compile_{safe_name}_", dir=scratch_root))
 
 
+RETENTION_KEEP_FULL = 3   # decision exploitant 2026-11-23 : 3 max (pas 5), logs gardes toujours
+
+
+def apply_scratch_retention(keep_full: int = RETENTION_KEEP_FULL) -> list[str]:
+    """Politique de retention (decision exploitant 2026-11-23) :
+    - les LOGS (build_result.log + .trace) sont conserves POUR TOUJOURS dans
+      .tmp/logs_compile/<run>/ (quelques Ko, aucune pression disque) ;
+    - seuls les `keep_full` derniers dossiers COMPLETS restent (inspection apres incident) ;
+    - au-dela, les artefacts lourds (copie .project, compileinfo/bootinfo 28,9 Mo x2)
+      sont retires — AUCUNE valeur de recuperation (source = CODE/*.st + PRJ_CODESYS/
+      CODE_BACKUP, deja archives ; ces binaires sont regeneres a chaque compile).
+    Rien d'autre n'est touche. Chaque retrait est AFFICHE. Retourne la liste des retraits."""
+    import shutil
+    scratch_root = PROJECT_ROOT / "TOOLS" / "AGENT_WORKFLOW" / ".tmp"
+    if not scratch_root.is_dir():
+        return []
+    logs_root = scratch_root / "logs_compile"
+    runs = sorted((item for item in scratch_root.iterdir()
+                   if item.is_dir() and item.name.startswith("codesys_compile_")),
+                  key=lambda item: item.stat().st_mtime, reverse=True)
+    removed = []
+    for old in runs[keep_full:]:
+        destination = logs_root / old.name
+        kept_logs = []
+        for name in ("build_result.log", "build_result.log.trace"):
+            source = old / name
+            if source.exists():
+                destination.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(source, destination / name)
+                kept_logs.append(name)
+        shutil.rmtree(old)
+        removed.append(old.name)
+        print(f"INFO: retention — dossier complet retire : {old.name}"
+              + (f" (logs conserves : {logs_root.relative_to(PROJECT_ROOT)}/{old.name})" if kept_logs else ""))
+    return removed
+
+
 def find_codesys_profile(codesys_exe: Path) -> str | None:
     """Find installed CODESYS profile name from the installation directory."""
     profiles_dir = codesys_exe.parent.parent / "Profiles"
@@ -291,7 +328,9 @@ def main() -> int:
 
     # 4. Create temp workspace
     retained_scratch = create_retained_scratch(args.object_name)
-    print(f"[INFO] Scratch conservé (nettoyage manuel requis) : {retained_scratch}")
+    print(f"[INFO] Scratch conservé (rétention : 3 dossiers complets, logs gardés) : {retained_scratch}")
+    # Apres creation (jamais avant : un test unitaire qui mocke mkdtemp ne doit rien purger).
+    apply_scratch_retention()
     with nullcontext(str(retained_scratch)) as tmp_dir_str:
         tmp_dir = Path(tmp_dir_str)
         print(f"[INFO] Temp Workspace: {tmp_dir}")
