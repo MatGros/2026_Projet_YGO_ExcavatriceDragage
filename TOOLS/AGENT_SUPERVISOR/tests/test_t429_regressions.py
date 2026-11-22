@@ -1444,11 +1444,12 @@ def test_two_active_coordination_sessions_raise_one_finding(tmp_path, monkeypatc
         svc.close()
 
 
-def test_mission_cadrage_finding_targets_coordination_only(tmp_path, monkeypatch):
+def test_mission_cadrage_socle_defaut_coordination_jamais_sans_objectif(tmp_path, monkeypatch):
     monkeypatch.setenv("WORKFLOW_TRACE_DIR", str(tmp_path / "trace"))   # hygiène : jamais le journal réel
-    """R18/M16 (ecart exploitant 2026-11-15 : une session travaille sans objectif ni criteres
-    et rien ne le dit) : le constat mécanique cible les sessions de COORDINATION ; toute autre
-    session active recoit un etat lisible (cadrage_state) sans envahir les constats."""
+    """R29 (decision exploitant 2026-11-22 : "un orchestrateur a forcement un objectif de base,
+    affinable — aucun objectif n'est pas normal") : la fiche d'une session de COORDINATION
+    incomplete est COMPLETEE par le socle par defaut (objectif, criteres, perimetre), sans
+    constat "sans cadrage" ; les autres sessions restent seulement signalees."""
     svc, _source, sid = service(tmp_path)
     try:
         s1 = svc.sessions[sid]
@@ -1457,42 +1458,40 @@ def test_mission_cadrage_finding_targets_coordination_only(tmp_path, monkeypatch
                   native_id='native-cdx', alerts=[], events=[], version=0, mission_structure={})
         svc.sessions['sid-coord'] = s2
         svc._detect_mission_cadrage()
-        finding = next(a for a in s2['alerts'] if a['category'] == 'mission_non_cadree')
-        assert 'Objectif initial' in finding['reason'] and "Critères d'acceptation" in finding['reason']
-        assert 'Périmètre et permissions' in finding['reason']
-        assert 'coordination' in finding['reason'], 'le constat nomme le cas : coordination sans cadrage'
+        assert not [a for a in s2['alerts'] if a['category'] == 'mission_non_cadree'], \
+            'coordination : socle par defaut, jamais "sans objectif"'
+        fiche = s2['mission_structure']
+        assert fiche.get('primary_goal'), 'objectif de base pose'
+        assert 'Criteres de gestion' in str(fiche.get('criteria')), 'criteres de gouvernance poses'
+        assert fiche.get('scope_permissions'), 'perimetre pose'
+        assert 'affinable' in str(fiche.get('unknowns')), 'le socle est annonce affinable'
+        assert any(e.get('kind') == 'cadrage_default_applied' for e in s2['events']), 'application tracee'
         assert s1['alerts'] == [], 'une session non coordination ne recoit pas de constat'
-        assert s1['cadrage_state']['manquants'] == ['Objectif initial', "Critères d'acceptation", 'Périmètre et permissions'], 'etat lisible pose'
         svc._detect_mission_cadrage()
-        assert sum(1 for a in s2['alerts'] if a['category'] == 'mission_non_cadree') == 1, 'idempotent'
-        s2['mission_structure'] = dict(primary_goal='Coordonner le catalogue', criteria='Résumé à jour',
-                                       scope_permissions='TASKS.yaml via API TM')
+        assert len([e for e in s2['events'] if e.get('kind') == 'cadrage_default_applied']) == 1, 'idempotent'
+        # L'exploitant affine : sa valeur prime et n'est pas ecrasee par le socle.
+        s2['mission_structure']['primary_goal'] = 'Objectif affine par l exploitant'
         svc._detect_mission_cadrage()
-        assert 'resolved_observed_at' in finding, 'corrigé observé quand le cadrage est rempli'
-        assert finding['disposition'] != 'closed' and not finding.get('acknowledged_at'), 'la clôture reste humaine'
+        assert s2['mission_structure']['primary_goal'] == 'Objectif affine par l exploitant'
         assert s1['cadrage_state']['manquants'] == ['Objectif initial', "Critères d'acceptation", 'Périmètre et permissions'], 'l etat de s1 reste fidele a sa fiche'
-        s2['state'] = 'paused'; s2['mission_structure'] = {}
-        svc._detect_mission_cadrage()
-        assert len(s2['alerts']) == 1, 'session en pause ne declenche plus'
     finally:
         svc.close()
 
 
-def test_mission_cadrage_finding_text_tracks_partial_fill(tmp_path, monkeypatch):
+def test_mission_cadrage_partiel_complete_par_le_socle(tmp_path, monkeypatch):
     monkeypatch.setenv("WORKFLOW_TRACE_DIR", str(tmp_path / "trace"))   # hygiène : jamais le journal réel
-    """R18 : quand un champ se remplit, le constat est revisé avec la liste réduite des
-    manquants (meme constat, pas un doublon)."""
+    """R29 (2026-11-22) : fiche de coordination PARTIELLE — les champs fournis sont conserves,
+    les manquants sont completes par le socle ; la valeur de l'exploitant n'est jamais ecrasee."""
     svc, _source, sid = service(tmp_path)
     try:
         s1 = svc.sessions[sid]
         s1.update(enabled=True, state='active', alias='T000-CC10', task_id='T000',
-                  alerts=[], mission_structure={})
+                  alerts=[], mission_structure={'primary_goal': 'Cadrer la session'})
         svc._detect_mission_cadrage()
-        finding = next(a for a in s1['alerts'] if a['category'] == 'mission_non_cadree')
-        s1['mission_structure'] = dict(primary_goal='Cadrer la session')
-        svc._detect_mission_cadrage()
-        assert 'Objectif initial' not in finding['reason'], 'le champ rempli sort de la liste'
-        assert "Critères d'acceptation" in finding['reason'] and 'Périmètre et permissions' in finding['reason']
-        assert finding['occurrences'] == 2, 'le constat est revisé, pas dupliqué'
+        fiche = s1['mission_structure']
+        assert fiche['primary_goal'] == 'Cadrer la session', 'le champ fourni est conserve'
+        assert 'Criteres de gestion' in str(fiche.get('criteria')), 'les criteres sont completes'
+        assert str(fiche.get('scope_permissions')).startswith('Coordination'), 'perimetre complete'
+        assert not [a for a in s1['alerts'] if a['category'] == 'mission_non_cadree'], 'aucun constat redondant'
     finally:
         svc.close()

@@ -830,6 +830,22 @@ MEMORY_SEARCH_NOTICE = (
     "remplace pas la preuve : retrouvez le message d'origine par recherche quand vous citez."
 )
 
+# R29 (decision exploitant 2026-11-22) : un ORCHESTRATEUR a TOUJOURS un objectif de base
+# (affinable, jamais absent). Une fiche de coordination incomplete est donc COMPLETEE par
+# ce socle par defaut — on n'alerte pas "sans cadrage" sur une absence qui n'existe pas.
+COORDINATION_DEFAULT_CADRAGE = {
+    "primary_goal": ("Coordination du projet : piloter les taches du catalogue via le canal "
+                     "orchestrateur designe ; NE JAMAIS cloturer un constat ni une tache "
+                     "soi-meme (regle 10). Objectif de base — affinable par l'exploitant."),
+    "criteria": ("Criteres de gestion : (1) clotures par l'exploitant ou un juge code ; "
+                 "(2) fiches modifiees via l'API Task Manager, jamais en direct ; "
+                 "(3) ne jamais contourner un verrou d'un autre acteur ; "
+                 "(4) preuve = git diff reel, pas un rapport d'agent ; "
+                 "(5) aucun commit ni push sans accord humain explicite."),
+    "scope_permissions": ("Coordination : DOC/WFLOW/TASKS via API Task Manager, chat agent, "
+                          "journal ; lecture seule partout ailleurs"),
+}
+
 COORDINATION_JUDGE_NOTICE = (
     "## SESSION DE COORDINATION (role orchestrateur/coordinateur, alias T000-*/TORC-*) : le juge applique "
     "les criteres de gestion specifiques — (1) la session ne cloture ni un constat ni une tache "
@@ -3289,7 +3305,33 @@ class Supervisor:
                     fiche_declaree_incomplete=declared_incomplete)
                 if not is_coordination_session(session):
                     continue
-                if declared_incomplete:
+                # R29 (decision exploitant 2026-11-22) : une fiche marquee "Fiche incomplete"
+                # (pas de contrat, ex. TORC) n'est PAS une fiche sans objectif — le socle
+                # par defaut s'applique aussi, puis l'exploitant affine.
+                if missing:
+                    structure = dict(session.get("mission_structure") or {})
+                    filled = []
+                    for champ, valeur in COORDINATION_DEFAULT_CADRAGE.items():
+                        if not str(structure.get(champ) or "").strip():
+                            structure[champ] = valeur
+                            filled.append(champ)
+                    if filled:
+                        structure.setdefault("milestone", "Coordination (socle par defaut)")
+                        structure["unknowns"] = (
+                            "Fiche completee par le socle coordination par defaut — affinable "
+                            "par l'exploitant")
+                        session["mission_structure"] = structure
+                        session["mission_structure_origin"] = "mission"
+                        session["mission_structure_updated_at"] = timestamp()
+                        record_event(session, "cadrage_default_applied",
+                                     "Socle coordination applique (objectif/criteres/perimetre "
+                                     "par defaut, affinables) : " + ", ".join(filled), timestamp())
+                        _trace(event="cadrage_default_applied", session=str(session["id"]),
+                               champs=",".join(filled))
+                        self._persist_background()
+                        missing = mission_cadrage_missing(session)
+                        session["cadrage_state"] = dict(manquants=missing, at=timestamp())
+                if not missing:
                     continue
                 existing = next((a for a in (session.get("alerts") or []) if a.get("category") == "mission_non_cadree"), None)
             except Exception as detect_exc:   # la detection ne doit jamais tuer le cycle de collecte (M1)
