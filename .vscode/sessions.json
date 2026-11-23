@@ -120,6 +120,18 @@
                 ]
             },
             {
+                "name": "🧪 CC OmniRte AGY (Gemini 4 hydrogen-medium)",
+                "env": {
+                    "TK_HIST": "cc-omniroute-gemini"
+                },
+                "autoExecuteCommands": true,
+                "icon": "code",
+                "color": "terminal.ansiBlue",
+                "commands": [
+                    "cmd /c \"set ANTHROPIC_BASE_URL=http://127.0.0.1:20128&& set ANTHROPIC_AUTH_TOKEN=local-dev&& set ANTHROPIC_API_KEY=&& set ANTHROPIC_MODEL=agy/gemini-4-hydrogen-medium&& claude --model agy/gemini-4-hydrogen-medium\""
+                ]
+            },            
+            {
                 "name": "⚡ CC Ollama (glm-5.3)",
                 "env": {
                     "TK_HIST": "cc-ollama-glm"
