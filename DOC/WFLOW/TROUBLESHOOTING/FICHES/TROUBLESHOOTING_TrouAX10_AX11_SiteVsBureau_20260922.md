@@ -21,7 +21,7 @@ Trou / saut dans les commandes treuils entre les étapes **AX10** (fermeture ben
 
 ## 3. 🧩 Indices / historique
 
-- Base saine du matin : commit `8ec1fa28` (variante `AX11_A_MATIN`) ; variante `AX11_B_MECA_B_APRES_MIDI` puis `AX11_C_HOMING_INHIBE`.
+- Base saine du matin : commit `80f60bc2` (variante `AX11_A_MATIN`) ; variante `AX11_B_MECA_B_APRES_MIDI` puis `AX11_C_HOMING_INHIBE`.
 - Fiche antérieure : `TROUBLESHOOTING_AX10_AX11_AX12_TRACE62_20260919.md` (banc) — hypothèse **H2 (barrière d'atomicité)** très probable, non tranchée faute de variables tracées.
 - Déjà essayé : à confirmer par l'utilisateur.
 - Conditions d'apparition : à confirmer.

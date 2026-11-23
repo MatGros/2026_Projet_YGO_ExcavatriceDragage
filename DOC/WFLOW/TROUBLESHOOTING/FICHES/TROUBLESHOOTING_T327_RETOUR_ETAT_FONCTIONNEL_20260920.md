@@ -10,7 +10,7 @@ présente et doit être diagnostiquée séparément.
 
 ## Régression constatée
 
-Le commit `73949276` avait élargi `ManualBucketLimitsActive` au-delà du JOG M2 unitaire en
+Le commit `8e4b8b8d` avait élargi `ManualBucketLimitsActive` au-delà du JOG M2 unitaire en
 remplaçant le verrou historique `JoystickWinchSelectArbitrated = 2` par une condition fondée
 sur `NOT instBucket.Lifecycle.Busy`.
 

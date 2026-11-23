@@ -1,6 +1,6 @@
 # 🧑‍🔬 Synthèse — Experts A et B (simulation M3), 2026-10-28
 
-> Deux sous-agents indépendants, lecture seule, branche `work/base-machine-simu` (HEAD a6b45c92).
+> Deux sous-agents indépendants, lecture seule, branche `work/base-machine-simu` (HEAD 667767fd).
 > Rapports d'origine écrits dans le scratchpad de session, **perdus** au redémarrage : cette synthèse les reconstitue depuis la conversation.
 > ✅ fait prouvé (fichier:ligne) · ❓ hypothèse.
 
@@ -20,7 +20,7 @@
 ## 2. 🕰️ Historique « inertie »
 
 - Aucune inertie massique M3 jamais codée.
-- `fd12dc08` (T300-C3) : **mémoire de sens** pendant la décélération variateur — dans HEAD, à garder.
+- `4ff6d2dd` (T300-C3) : **mémoire de sens** pendant la décélération variateur — dans HEAD, à garder.
 - T417 L2 « roue libre » : planifiée puis **abandonnée** (V2), la trace montre une rampe ~25 Hz/s (`PLAN_T417_SIMBENCH_M3_ROUE_LIBRE.md:3`).
 - `SimWinchCoast_M` = roulis **treuils**, pas M3.
 - Modelica `M3_POC.mo` : même garde 0,5 Hz, pas de masse.

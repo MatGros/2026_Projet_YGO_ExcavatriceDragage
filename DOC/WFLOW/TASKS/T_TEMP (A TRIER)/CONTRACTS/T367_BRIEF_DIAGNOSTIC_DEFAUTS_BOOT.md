@@ -53,7 +53,7 @@ nombre d'appuis — d'où l'impression de "faux positif qui bloque".
 
 - Ne pas se limiter aux 2 messages déjà cités par l'utilisateur — il a dit explicitement que
   "la plupart du temps" ce sont des faux positifs, ce qui suggère plusieurs sources.
-- Vérifier si `FB_CycleMachineHoming.st` (boot bug déjà corrigé ce soir, commit `bb9436e1`,
+- Vérifier si `FB_CycleMachineHoming.st` (boot bug déjà corrigé ce soir, commit `0a9733c3`,
   voir aussi commit du fix auto-arm antérieur) a un lien avec ce sujet ou si c'est indépendant.
 - Croiser avec le diagnostic T369 existant s'il est accessible
   (`DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T369_DEADLOCK_REARMEMENT_SIMU_20260921.md`

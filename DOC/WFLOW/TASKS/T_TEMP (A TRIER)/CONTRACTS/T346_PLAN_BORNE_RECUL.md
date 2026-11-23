@@ -7,7 +7,7 @@
 | **Agent** | DSH13 |
 | **Statut** | ✅ **APPLIQUÉ — variante (b) + Q2 option A**, arbitrage humain du 2026-09-20 (lot livré, non commité) |
 | **Diagnostic source** | `DOC/WFLOW/AUDITS/DESIGN/DIAGNOSTIC_T346_BORNE_RECUL_2026-09-20.md` |
-| **Base** | HEAD `f4ca3fee`, `FB_Bucket.st` **propre** |
+| **Base** | HEAD `7d3cc328`, `FB_Bucket.st` **propre** |
 
 > 🎯 **Objectif de ce document** : rendre l'arbitrage humain **immédiat** en montrant le code
 > exact des 2 variantes. Aucune ligne de `CODE/` n'est écrite.

@@ -4,7 +4,7 @@
 |---|---|
 | **Date** | 2026-11-02 10:1x (session DSH) |
 | **Tâche** | T213 — `⬜` à faire · **C2** · OUTILLAGE · contrat `PENDING` / validation `PENDING` |
-| **HEAD** | `540a8a86` |
+| **HEAD** | `f1aa2f85` |
 | **Verrou** | aucun (T213 non verrouillée ; `TASK_LOCKS.json` = T426/CDX01 seulement) |
 | **Mode** | **READ-ONLY strict** — aucun fichier `CODE/` touché, aucun bundle, aucun gate |
 | **Méthode** | workflow `briefing-t213` : 4 audits parallèles (diagnostic existant · chaîne homing M2 · outillage CI · traçabilité doc) + vérification directe par l'orchestrateur |
@@ -19,7 +19,7 @@
 | Constat | Effet |
 |---|---|
 | 🔴 **La prémisse de T213 est fausse** : la chaîne `M2Demand.UseDynamicTarget → instEncoderM2.UseDynamicTarget → CfgTopHomingTarget_M + CfgOffsetClose_M` **n'existe pas dans le code** | AC7 (critère d'acceptation central) est **structurellement inatteignable** ; le lot serait rejeté après avoir consommé bundle + gates |
-| 🔴 **Le REX qui explique pourquoi elle n'existe pas a été supprimé du code** (T364, `42fe45c8`) | Réactiver la cible dynamique réintroduit l'incident machine documenté : écart M1/M2 ~15 m → `FB_WinchSync` SafeStop → `Fault.Latched` |
+| 🔴 **Le REX qui explique pourquoi elle n'existe pas a été supprimé du code** (T364, `2eb45254`) | Réactiver la cible dynamique réintroduit l'incident machine documenté : écart M1/M2 ~15 m → `FB_WinchSync` SafeStop → `Fault.Latched` |
 | 🟠 **0 / 10** des champs T213 ne sont dans `F_HomingM2` ; **4 / 10 existent déjà ailleurs** dans le snapshot | Une partie du besoin est déjà satisfaite hors du slot homing |
 | 🟠 **4 références de fichiers mortes** dans le contrat/plan, et **`check_task_contract.py` passe PASS quand même** | Garde-fou fantôme : « `git diff` de `FB_MachineHomingCycle.st` = vide » passerait trivialement |
 | 🟢 **L'outillage suit tout seul** : `troubleshooting_variables.txt` est **généré** depuis les `.st` | AC3 est prouvable en 2 commandes — mais **aucun gate ne verrouille** cette liste |
@@ -105,7 +105,7 @@ Traçabilité de la décision (audit documentaire) :
 |---|---|
 | Le code portait un REX : *« Cible dynamique (top + offset ~23 m) supprimée ici : elle créait un écart apparent M1/M2 de ~15 m au preset → FB_WinchSync SafeStop → Fault.Latched »* | Cité verbatim dans `TROUBLESHOOTING_T334_M3_DeuxChemins_2026-09-20.md:603` et `:745` (constat A16) |
 | Ce REX **n'existe plus** dans `FB_CycleMachineHoming.st` ; les lignes `412-420` sont aujourd'hui `HX0_REPOS` | `FB_CycleMachineHoming.st:411-418` (lecture directe) |
-| Il a été supprimé avec les deux lignes de forçage lors de la refonte T364 | `git show 42fe45c8` : suppression de `M1Demand.UseDynamicTarget := FALSE;` / `M2Demand.UseDynamicTarget := FALSE;` + du commentaire REX |
+| Il a été supprimé avec les deux lignes de forçage lors de la refonte T364 | `git show 2eb45254` : suppression de `M1Demand.UseDynamicTarget := FALSE;` / `M2Demand.UseDynamicTarget := FALSE;` + du commentaire REX |
 | Les fiches T336 / T334 / T338 citent encore `:412-420` et `:510-515` | Renvois **périmés** (T364 a réécrit la séquence HX0..HX6) |
 
 **🚨 Risque machine si on réactive sans traiter la cause :** l'incident d'origine (écart apparent ~15 m au preset) est un **défaut latché par la surveillance de synchronisme M1/M2**. Réarmer la cible dynamique sans résoudre cet incident le reproduit — sur une machine réelle.
@@ -236,7 +236,7 @@ git diff --exit-code -- TOOLS/PLC_CSV_SNAPSHOT/variable_lists/troubleshooting_va
 **Exécuté (read-only)** :
 - 4 audits parallèles (workflow `briefing-t213`) : diagnostic existant · chaîne homing M2 · outillage · traçabilité.
 - Greps exhaustifs hors `CODE_BACKUP/` : `M2Demand.*`, `CfgTop/Offset*`, `DynamicTarget_M`, `BucketReference*`, `HomedAndReliable`.
-- `git log`/`git show 42fe45c8` sur `CODE/G_CYCLE/FB_CycleMachineHoming.st`.
+- `git log`/`git show 2eb45254` sur `CODE/G_CYCLE/FB_CycleMachineHoming.st`.
 - Lectures : `PRG_02:557-577 / 710-725`, `FB_Encoder_Homing.st:200-241`, `FB_TroubleshootingView.st:338-344 / 456-480`, `AF_Partie-09_v2.4:352-454`, `AF_Partie-14_v1.4` (grep), `TROUBLESHOOTING_T334:596-617 / 738-755`.
 - `check_task_contract.py T213` → **PASS (0/0)**.
 

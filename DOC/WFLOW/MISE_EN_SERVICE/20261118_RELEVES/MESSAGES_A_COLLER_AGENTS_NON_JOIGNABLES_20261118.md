@@ -8,7 +8,7 @@
 > Réponds en 3 lignes : (1) où en est ta tâche et ce qui est commité, (2) ce qui te bloque, (3) ce que tu attends de l'exploitant. Rien à modifier ni à lancer sur la machine sans GO exploitant. Pas de redémarrage ni de purge des services 8081 / 8082. `RECU` + ta réponse suffisent, pas d'échéance fixée.
 
 ## Lignes à ajouter selon la session
-- **T417-C-AGY02** : où en sont `PRG_03` (page 8, mapping pages vers modes), le DiffBundle, le correctif de la cause 6 de `FB_Safety_Translation` (retrait de `DriveStatusWord.0`, ajout de `DriveOnline`) : écrit, commité, importé, ou en attente d'un GO ? Le commit `6956366b` (18/11 08:23, refonte homing, 20 fichiers `CODE/` dont `FB_Safety_Winch.st`, `PRG_03`, `PRG_04`) chevauche-t-il ton lot ?
+- **T417-C-AGY02** : où en sont `PRG_03` (page 8, mapping pages vers modes), le DiffBundle, le correctif de la cause 6 de `FB_Safety_Translation` (retrait de `DriveStatusWord.0`, ajout de `DriveOnline`) : écrit, commité, importé, ou en attente d'un GO ? Le commit `e75d1e08` (18/11 08:23, refonte homing, 20 fichiers `CODE/` dont `FB_Safety_Winch.st`, `PRG_03`, `PRG_04`) chevauche-t-il ton lot ?
 - **T432-CDX02** (commandes de session du Superviseur) : ne redémarre ni ne purge aucun service sans informer l'exploitant.
 - **T431-CDX05** (Superviseur, coordination du workflow T427) : T427-CC02 doit livrer un plan avant 10:00 ; dis-moi si ta coordination recoupe son périmètre.
 - **T430-CDX04** (organisation documentaire du code) : ne déplace, ne renomme ni ne supprime rien dans `DOC/WFLOW/MISE_EN_SERVICE/` ni `DOC/WFLOW/TASKS/T377_*`.

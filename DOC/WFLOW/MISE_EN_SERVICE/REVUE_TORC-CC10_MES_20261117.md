@@ -11,7 +11,7 @@
 - Correction des hooks (`$CLAUDE_PROJECT_DIR`) : faite par l'exploitant, **testée** depuis un sous-dossier.
 
 ## 2. Mes erreurs, à ne pas répéter
-1. **Hypothèse reprise sans vérifier** : « machine = v0.7.25 ≈ `e38cc09a` » (registre de réintégration). Fausse : l'automate a le **v0.7.24 du 23/09 à 16:23**. Trouvée seulement grâce au bouton Details de l'exploitant.
+1. **Hypothèse reprise sans vérifier** : « machine = v0.7.25 ≈ `da7ba246` » (registre de réintégration). Fausse : l'automate a le **v0.7.24 du 23/09 à 16:23**. Trouvée seulement grâce au bouton Details de l'exploitant.
 2. **Piège du gain odométrique mal calculé** : j'ai annoncé un remplacement silencieux à 0,02, en partant de P2 − PV = 2 m (défauts du code). Sur la machine : 10 m → gain refusé, repli conservé. J'ai affirmé avant de relever les valeurs réelles.
 3. **Commande inventée de mémoire** : « File → Open Project from PLC » n'existe pas (c'est **Source Upload**). Corrigé après recherche.
 4. **Affirmation sans preuve** : « écart v0.7.24 → code actuel plus grand que prévu ». Reformulée en hypothèse.

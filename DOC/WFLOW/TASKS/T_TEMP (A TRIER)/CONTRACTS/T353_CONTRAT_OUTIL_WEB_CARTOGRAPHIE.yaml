@@ -12,8 +12,8 @@
 #     blob 2ea84800602ea530698c4a220f88ad48e3b7fd8f — 789 l — modifie non committe
 #   DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T351_ANNEXE_M3_TrousT334_20260921.md
 #     blob 20bfada06fc56a9fa10f432cd48272f203ed3b95 — 606 l — non suivi dans Git
-# Revision figee a l'ecriture : HEAD = c9e1fbfe
-#   ⚠️ Les blocs d'ancrage de T351 et de l'annexe declarent HEAD 065591fb : HEAD
+# Revision figee a l'ecriture : HEAD = 7872086c
+#   ⚠️ Les blocs d'ancrage de T351 et de l'annexe declarent HEAD 59d461e4 : HEAD
 #   a bouge DEPUIS, ce qui n'invalide PAS leurs ancrages (ils sont par blob, pas
 #   par commit). C'est precisement le principe que l'outil doit implementer.
 # ═══════════════════════════════════════════════════════════════════════════
@@ -168,7 +168,7 @@ execution:
     4 fichiers cites passes ROUGE EN DIRECT pendant le lot (drift concurrent : comportement attendu) ;
     8/8 egalite stricte entre le SHA-1 du JS execute sous Node et `git hash-object` ;
     git status --short -- CODE/ VIDE (aucune ecriture de ce lot) et blobs des 3 sources inchanges
-    (aeaac5dd / 2ea84800 / 20bfada0) ; HEAD c9e1fbfe inchange, aucun commit.
+    (aeaac5dd / 2ea84800 / 20bfada0) ; HEAD 7872086c inchange, aucun commit.
   evidence_submitted:
     - parsing_rate_report
     - reference_resolution_report

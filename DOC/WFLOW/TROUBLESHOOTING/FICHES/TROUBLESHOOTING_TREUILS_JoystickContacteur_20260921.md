@@ -49,7 +49,7 @@
 ### 🔐 Bloc d'ancrage de révision (AC2)
 
 ```
-HEAD              = 065591fb2633af098a39596e35de24e00e9916e2  (court : 065591fb)
+HEAD              = 065591fb2633af098a39596e35de24e00e9916e2  (court : 59d461e4)
                     « fix(benne): T262 phase B - seuil d'ouverture benne cable
                       (branche additive, borne 20%) [NON TESTE MACHINE] » — 2026-09-21 01:32:32 +0200
 Horodatage final  = 2026-09-21T01:33:25+02:00
@@ -57,7 +57,7 @@ Horodatage final  = 2026-09-21T01:33:25+02:00
 
 | Fichier cité | blob SHA (`git hash-object`) — **état de référence pour tous les numéros de ce document** | État vs HEAD |
 |---|---|---|
-| `CODE/M_MAIN/PRG_04_Treuils_Benne.st` | `31760d59b4e09b03a8e91b2358f8804a6b1985ad` (1982 l) | ✅ **PROPRE** — committé par `065591fb` (T262 phase B) après avoir été sale pendant le lot |
+| `CODE/M_MAIN/PRG_04_Treuils_Benne.st` | `31760d59b4e09b03a8e91b2358f8804a6b1985ad` (1982 l) | ✅ **PROPRE** — committé par `59d461e4` (T262 phase B) après avoir été sale pendant le lot |
 | `CODE/M_MAIN/PRG_02_Acquisition.st` | `5b8baa9ba8ea0e9e0204ac8a5cc0a9a6b1bd2bb7` (719 l) | ⚠️ **SALE** — non committé (+11/−6). 🔴 **FICHIER CHAUD : 3 blobs en 8 min** (`fabb8f764dd8` → `892de7b784f5` → `5b8baa9ba8ea`) |
 | `CODE/M_MAIN/PRG_07_Supervision.st` | `c10f004151f80e099eb04537c9a87cc8a3d4c986` (920 l) | ✅ **PROPRE** (était sale pendant le lot ; committé depuis) |
 | `CODE/H_TREUILS_BENNE/BENNE/FB_Bucket.st` | `9c493a5f0d5726b3d276c455bc3efca83fe29ebd` (838 l) | ✅ **PROPRE** (était sale pendant le lot) |
@@ -90,7 +90,7 @@ Horodatage final  = 2026-09-21T01:33:25+02:00
 1. `PRG_04_Treuils_Benne.st` était **modifié non committé** par un lot concurrent pendant tout le lot
    (le diff disque portait des lignes **« T262 phase B »** : `instCloseThreshold : FB_BucketCloseThreshold;`
    `:27`, `ThresholdMeasureValid` `:28`, bloc de branchement `:1811-1826`).
-   ✅ **Résolu à `01:32:32`** : ce lot a été **committé** sous `065591fb`
+   ✅ **Résolu à `01:32:32`** : ce lot a été **committé** sous `59d461e4`
    (« fix(benne): T262 phase B - seuil d'ouverture benne cable (branche additive, borne 20%) [NON TESTE MACHINE] »)
    → le fichier est désormais **PROPRE** et son blob est **devenu le blob de HEAD**. Le document continue
    de s'ancrer sur ce blob, qui n'a pas changé.
@@ -106,7 +106,7 @@ Horodatage final  = 2026-09-21T01:33:25+02:00
    **Les deux chaînes §3/§4 ont donc été entièrement re-dérivées et re-vérifiées deux fois** sur l'état
    disque (133 + 42 ancres de contrôle, §14), puis **une troisième fois en contrôle exhaustif** : les
    **211 références `fichier:ligne` explicites du document ont été relues une par une contre le disque**
-   (`01:33:25`, HEAD `065591fb`) → **211/211 conformes**. C'est la démonstration exacte du risque annoncé
+   (`01:33:25`, HEAD `59d461e4`) → **211/211 conformes**. C'est la démonstration exacte du risque annoncé
    par le contrat (§`alert_duty`, 2ᵉ point) — et la preuve qu'**un lot documentaire seul ne peut pas
    garantir AC10** tant qu'un lot de code tourne en parallèle (§10-9).
 4. ⚠️ **Les mesures d'ancrage de l'orchestrateur (01:30) sont elles-mêmes périmées sur 1 fichier** :
@@ -116,7 +116,7 @@ Horodatage final  = 2026-09-21T01:33:25+02:00
    vieillit en minutes — elle doit être reprise juste avant écriture, par l'auteur du document.**
 
 > 📌 **Règle d'usage :** les numéros `PRG_04:…` de ce document sont valides **pour
-> `31760d59b4e09b03a8e91b2358f8804a6b1985ad` uniquement** (= blob de HEAD `065591fb`), et les `PRG_02:…`
+> `31760d59b4e09b03a8e91b2358f8804a6b1985ad` uniquement** (= blob de HEAD `59d461e4`), et les `PRG_02:…`
 > pour `5b8baa9ba8ea0e9e0204ac8a5cc0a9a6b1bd2bb7` uniquement (**⚠️ fichier chaud, encore SALE —
 > re-vérifier en priorité**). **Avant d'utiliser une ligne, comparer le blob**
 > (`git hash-object <fichier>`). Si le blob diffère → re-grep, ne pas extrapoler.
@@ -390,9 +390,9 @@ Ni un écart ouvert, ni le comportement d'origine.
 
 | Commit | Date | Message |
 |---|---|---|
-| `6f708b22` | 2026-09-20 00:53:22 | « credit du temps d'arret reel dans FB_WinchDirectionInterlock (D18) [NON TESTE] » |
-| `657be973` | 2026-09-20 02:03:53 | « purge DeadTimeArmed atteignable des que le delai est ecoule (D18, T325 phase 1) [NON TESTE] » |
-| `e638308f` | 2026-09-20 02:52:52 | « corrige debordement TIME D18 + deborne affichage ouverture benne [NON TESTE] » |
+| `a4d1a3fe` | 2026-09-20 00:53:22 | « credit du temps d'arret reel dans FB_WinchDirectionInterlock (D18) [NON TESTE] » |
+| `b013aa3c` | 2026-09-20 02:03:53 | « purge DeadTimeArmed atteignable des que le delai est ecoule (D18, T325 phase 1) [NON TESTE] » |
+| `1db5456a` | 2026-09-20 02:52:52 | « corrige debordement TIME D18 + deborne affichage ouverture benne [NON TESTE] » |
 
 **Ce que fait le mécanisme (fait vérifié, état disque, blob `5fa9e0405ac3`) :**
 
@@ -401,9 +401,9 @@ Ni un écart ouvert, ni le comportement d'origine.
 | Armement du temps mort au front `Enable` avec demande maintenue | `FB_WinchDirectionInterlock.st:106-108` | `DeadTimeArmed := TRUE` → pas de ré-adoption immédiate du sens (pas d'inrush) |
 | **Crédit du temps d'arrêt RÉEL** accumulé pendant tout le neutre | `:110-114` (`StoppedTimer(IN := Enable AND NOT RequestActive, PT := MaxDirectionDelay)`) | Le temps de contacteurs retombés est **capitalisé** |
 | Capture au front de la nouvelle demande | `:76-79` (`RequestActiveRising` puis `CapturedStoppedTime := StoppedTimer.ET`) | Capture **avant** que `StoppedTimer` ne retombe à 0 |
-| Reliquat = délai plein − crédit, sans sous-flow TIME | `:93-96` (`IF CapturedStoppedTime >= EffectiveDelay THEN 0 ELSE EffectiveDelay - CapturedStoppedTime`) | **Anti-débordement DWORD** (commit `e638308f`) |
+| Reliquat = délai plein − crédit, sans sous-flow TIME | `:93-96` (`IF CapturedStoppedTime >= EffectiveDelay THEN 0 ELSE EffectiveDelay - CapturedStoppedTime`) | **Anti-débordement DWORD** (commit `1db5456a`) |
 | Comptage du reliquat | `:118-121` (`DirectionChangeDelay`) | Temporisation effective |
-| Purge atteignable dès le délai écoulé | `:132-139` → `DeadTimeArmed := FALSE` | **T325 phase 1** (commit `657be973`) |
+| Purge atteignable dès le délai écoulé | `:132-139` → `DeadTimeArmed := FALSE` | **T325 phase 1** (commit `b013aa3c`) |
 | Consommation du crédit | `:174-176` | Un crédit périmé n'est **jamais** réutilisé |
 | Limite résiduelle connue | `:13-19` (bandeau) | T325 **phase 2**, NON couverte : si la demande redevient le **même** sens que le dernier commandé au moment où `DeadTimeArmed` vient d'être armé, `DirectionChanged` reste FALSE → le temps mort ne peut jamais être mesuré ; seule issue = retour au neutre ou `Reset`. **Déclaré, pas caché.** |
 
@@ -590,7 +590,7 @@ Ligne d'écriture logique : `CODE/M_MAIN/PRG_06_Outputs.st` (blob `3b7534a3acd4`
 
 | # | Constat | Preuve | Impact |
 |---|---|---|---|
-| **1** | **`DOC/WFLOW/TASKS.yaml` est périmé sur T325** : il décrit encore T325 comme « ANALYSE et CADRAGE uniquement — aucune modification de code », alors que le correctif D18 est **committé** (3 commits `6f708b22`, `657be973`, `e638308f`) | `git log` + §6.1 | 🟠 Doc/pilotage — à corriger par l'orchestrateur (registres hors de mon périmètre) |
+| **1** | **`DOC/WFLOW/TASKS.yaml` est périmé sur T325** : il décrit encore T325 comme « ANALYSE et CADRAGE uniquement — aucune modification de code », alors que le correctif D18 est **committé** (3 commits `a4d1a3fe`, `b013aa3c`, `1db5456a`) | `git log` + §6.1 | 🟠 Doc/pilotage — à corriger par l'orchestrateur (registres hors de mon périmètre) |
 | **2** | **Les bypass de sécurité position sont effectifs dans TOUS les modes, y compris SEMI_AUTO**, par dérogation assumée | `PRG_04_Treuils_Benne.st:841-844`, `:865`, `:970-971` ; consommation `FB_Safety_Winch.st:577`, `:581` ; `PRG_04:867`, `:872` | 🔴 **Sécurité** : un bypass `TopLimitSoftware` resté armé lève la butée logicielle **aussi en automatique**. La barrière dure (`%IX0.7` → `FB_Safety_Winch.st:576`) reste, elle, non bypassable par ce chemin. À tracer explicitement en AF-05 §4bis |
 | **3** | **`Data.ReqProgram.ReqWinchM1/M2` publié en MAINT_N2 (homing) n'est consommé par AUCUN arbitre dans ce mode** : `FB_WinchCmdArbitrationM1.st:56` et `M2.st:85` ne lisent `ReqWinch` que sous `Mode = SEMI_AUTO` | Producteur `PRG_03:401-405` ← `FB_CycleMachineHoming.st:589-590`, `:617-618` ; seuls consommateurs `PRG_04:534`, `:557` et (affichage) `PRG_07_Supervision.st:757`, `:793-799` | 🟠 **À confirmer** (§11-U1) : le mouvement de homing est de fait produit par le **geste joystick** exigé par `ClimbPermit := DeadmanArmed AND JoystickPull` (`FB_CycleMachineHoming.st:237`), via la branche manuelle. Si `TglJoystickMaster = FALSE` (mode Boutons), `ClimbPermit` est satisfait par le joystick mais l'arbitre est en branche **Boutons** → la montée de homing HX2 **pourrait ne pas partir**. Chemin non testé, non tranché ici |
 | **4** | **Asymétrie A2 — `NOT Context.BucketBusy` absent du gate M2** (`M2:143-151` vs `M1:117`) | §6.4-A2 | 🔴 en mode manuel couplé, M2 peut partir alors que M1 est gelé par une action benne. Le front descendant (`M2:156-158`) est le seul filet commun |
@@ -598,9 +598,9 @@ Ligne d'écriture logique : `CODE/M_MAIN/PRG_06_Outputs.st` (blob `3b7534a3acd4`
 | **6** | **`TglJoystickMaster = FALSE` neutralise le gate homme-mort de l'arbitre** | `M1:121` / `M2:147` : `(NOT TglJoystickMaster OR Joystick.DeadmanArmed)` | 🟠 en mode Boutons, l'exigence `DeadmanArmed` disparaît du gate de l'arbitre. À vérifier : est-elle reprise ailleurs ? `FB_Safety_Winch` porte `JoystickOnline/Operational` (`PRG_04:937-938`) mais pas `DeadmanArmed`. **Non tranché** (§11-U2) |
 | **7** | **Le garde-fou survitesse est désactivé dans les 2 chaînes** : `SpeedGuardEnable := FALSE` codé en dur | `PRG_04_Treuils_Benne.st:1441` (M1), `:1509` (M2) ; commentaire de dette `:1430-1440` ; consommateur `FB_Winch.st:234` | 🟠 Dette safety **déjà documentée** dans le code (FB `FB_WinchRateInterlock` inexistant). Signalé, non touché |
 | **8** | **Écart du brief T351 sur les lignes de la garde croisée** | §6.2 | 🟠 Constat documentaire — **le brief n'est pas modifié** (interdit de périmètre) |
-| **9** | 🔴 **DEUX FICHIERS CITÉS ONT ÉTÉ MODIFIÉS PAR DES LOTS CONCURRENTS PENDANT CE LOT, L'UN D'EUX DEUX FOIS.** `PRG_04_Treuils_Benne.st` : blob `e6005d533cac` (01:23) → **`31760d59b4e0`** (01:29), **+1 ligne** décalant tout le fichier à partir de ~380 (stable depuis, puis committé `065591fb`). `PRG_02_Acquisition.st` : **`fabb8f764dd8` → `892de7b784f5` (+6 lignes) → `5b8baa9ba8ea` (−1 ligne)** — **3 blobs en 8 minutes**. **Conséquence : toutes les références déjà écrites étaient devenues fausses, deux fois** ; elles ont été **entièrement re-dérivées et re-vérifiées**, puis contrôlées **exhaustivement** (211/211, §14) | `git hash-object` avant/après ; `git status --short -- CODE/` avant/après ; HEAD `d6e54377` → `065591fb` | 🔴 **Risque de méthode, pas de code** : c'est la démonstration que le critère AC10 (« `git status --short -- CODE/` identique avant/après ») **ne peut pas être tenu par un lot de documentation** tant que des lots de code tournent en parallèle. **Le gel de l'arbre, ou l'ancrage par blob re-vérifié en fin de lot, est indispensable.** Annexe M3 (DSH17) a constaté **le même phénomène** de son côté |
-| **9bis** | ✅ **Résolution du drift** : le lot concurrent a **committé** son travail à `01:32:32` sous **`065591fb`** (`fix(benne): T262 phase B …`). `PRG_04_Treuils_Benne.st`, `PRG_07_Supervision.st`, `FB_Bucket.st`, `ST_CycleCfg.st` et le fichier non suivi `FB_BucketCloseThreshold.st` sont **redevenus propres**. **Seuls** restent sales : `PRG_02_Acquisition.st` (cité) et `GVL_Simulation.st` (non cité) | `git status --short -- CODE/` à `01:33:25` ; `git log -1` | 🟢 **L'arbre est en cours de stabilisation, mais `PRG_02` reste instable** — c'est le seul fichier cité dont les références peuvent encore être invalidées |
-| **10** | **Le diff non committé de `PRG_04_Treuils_Benne.st` portait du « T262 phase B »**, pas du T291-B/AGY01 comme annoncé par l'orchestrateur. ✅ **Confirmé par le commit lui-même** : `065591fb` = « **fix(benne): T262 phase B** - seuil d'ouverture benne cable (branche additive, borne 20%) [NON TESTE MACHINE] » | `git diff` pendant le lot : `instCloseThreshold : FB_BucketCloseThreshold;` `:27`, `ThresholdMeasureValid` `:28`, branchement `:1811-1826` ; puis `git log -1` | 🟠 **Incohérence d'attribution confirmée** — l'information transmise au lot (« périmètre T291-B / AGY01 ») désignait le mauvais lot. Corrigé par les faits, non par ce document |
+| **9** | 🔴 **DEUX FICHIERS CITÉS ONT ÉTÉ MODIFIÉS PAR DES LOTS CONCURRENTS PENDANT CE LOT, L'UN D'EUX DEUX FOIS.** `PRG_04_Treuils_Benne.st` : blob `e6005d533cac` (01:23) → **`31760d59b4e0`** (01:29), **+1 ligne** décalant tout le fichier à partir de ~380 (stable depuis, puis committé `59d461e4`). `PRG_02_Acquisition.st` : **`fabb8f764dd8` → `892de7b784f5` (+6 lignes) → `5b8baa9ba8ea` (−1 ligne)** — **3 blobs en 8 minutes**. **Conséquence : toutes les références déjà écrites étaient devenues fausses, deux fois** ; elles ont été **entièrement re-dérivées et re-vérifiées**, puis contrôlées **exhaustivement** (211/211, §14) | `git hash-object` avant/après ; `git status --short -- CODE/` avant/après ; HEAD `3d1bd67e` → `59d461e4` | 🔴 **Risque de méthode, pas de code** : c'est la démonstration que le critère AC10 (« `git status --short -- CODE/` identique avant/après ») **ne peut pas être tenu par un lot de documentation** tant que des lots de code tournent en parallèle. **Le gel de l'arbre, ou l'ancrage par blob re-vérifié en fin de lot, est indispensable.** Annexe M3 (DSH17) a constaté **le même phénomène** de son côté |
+| **9bis** | ✅ **Résolution du drift** : le lot concurrent a **committé** son travail à `01:32:32` sous **`59d461e4`** (`fix(benne): T262 phase B …`). `PRG_04_Treuils_Benne.st`, `PRG_07_Supervision.st`, `FB_Bucket.st`, `ST_CycleCfg.st` et le fichier non suivi `FB_BucketCloseThreshold.st` sont **redevenus propres**. **Seuls** restent sales : `PRG_02_Acquisition.st` (cité) et `GVL_Simulation.st` (non cité) | `git status --short -- CODE/` à `01:33:25` ; `git log -1` | 🟢 **L'arbre est en cours de stabilisation, mais `PRG_02` reste instable** — c'est le seul fichier cité dont les références peuvent encore être invalidées |
+| **10** | **Le diff non committé de `PRG_04_Treuils_Benne.st` portait du « T262 phase B »**, pas du T291-B/AGY01 comme annoncé par l'orchestrateur. ✅ **Confirmé par le commit lui-même** : `59d461e4` = « **fix(benne): T262 phase B** - seuil d'ouverture benne cable (branche additive, borne 20%) [NON TESTE MACHINE] » | `git diff` pendant le lot : `instCloseThreshold : FB_BucketCloseThreshold;` `:27`, `ThresholdMeasureValid` `:28`, branchement `:1811-1826` ; puis `git log -1` | 🟠 **Incohérence d'attribution confirmée** — l'information transmise au lot (« périmètre T291-B / AGY01 ») désignait le mauvais lot. Corrigé par les faits, non par ce document |
 | **11** | **Conflit de consignes sur les registres** : le brief T351 §7 demande de mettre à jour `TASKS.yaml` et `TASK_LOCKS.json` ; **la consigne d'orchestration du lot m'interdit explicitement ces 2 fichiers** (2 lots en parallèle → risque de mise à jour perdue) | Brief §7 vs consigne du lot ; le contrat `scope.allowed` les autorise, `scope.forbidden` ne les interdit pas | 🟡 Résolu **en faveur de l'interdiction** (périmètre le plus restrictif). ⚠️ **AC12 dépend d'une écriture que je ne peux pas faire** : le catalogue doit être mis à jour **par l'orchestrateur** (chemin du livrable + horodatage ISO). Information remontée §14 |
 | **12** | **Boucle d'un scan assumée sur `ArmingPermit`** | `PRG_02_Acquisition.st:464` (consomme `PRG_04_Treuils_Benne.Data.ArmingPermit`) vs `PRG_04:1205` (producteur, rang 04 après rang 02) | 🟢 Documenté (`PRG_04:1161-1163`) — signalé pour que le diagnostic ne le prenne pas pour un bug |
 
@@ -688,7 +688,7 @@ DSH07, jamais à ce lot.**
 | Heure (2026-09-21) | Étape | État | Détail |
 |---|---|---|---|
 | 01:23:27 | `debut` | en_cours | Lecture intégrale du préambule sous-agent (203 lignes) |
-| 01:23:40 | `ancrage` | ok | `HEAD = d6e54377`. **`PRG_04_Treuils_Benne.st` blob disque `e6005d533cac`, SALE, 1982 lignes** — l'orchestrateur annonçait `e8551c3a80f6` / 1950 lignes (périmé ; 1950 = nombre de lignes du blob **HEAD**). `git status --short -- CODE/` relevé AVANT : 4 modifiés + 1 non suivi |
+| 01:23:40 | `ancrage` | ok | `HEAD = 3d1bd67e`. **`PRG_04_Treuils_Benne.st` blob disque `e6005d533cac`, SALE, 1982 lignes** — l'orchestrateur annonçait `e8551c3a80f6` / 1950 lignes (périmé ; 1950 = nombre de lignes du blob **HEAD**). `git status --short -- CODE/` relevé AVANT : 4 modifiés + 1 non suivi |
 | 01:23:40 | `verif-disque` | ok | Contrôle anti-piège REX T345 : `instCloseThreshold` (présent **uniquement** dans le diff non committé) lu aux lignes **27 / 1815 / 1826** par `Select-String` **et** par l'outil de lecture → lecture outillée = **disque**, pas HEAD |
 | 01:24:02 | `ancrage` | ok | 27 blobs `CODE/` + le CSV d'E/S mesurés. 12 valeurs identiques à celles de l'orchestrateur, **1 divergente** (`PRG_04`) |
 | 01:25:13 | `lecture-code` | ok | Lecture réelle de `PRG_04` · `FB_WinchCmdArbitrationM1/M2` (intégral) · `FB_Winch` · `FB_WinchDirectionInterlock` · `FB_WinchOutputInterlock` · `FB_Safety_Winch` · `FB_Joystick` · `PRG_02` · `PRG_03` · `PRG_06` · `FB_Modes` · `FB_CycleSemiAuto` · `FB_CycleMachineHoming` · CSV E/S. Découvertes : 2 asymétries d'arbitre (A2, A4) + piste `ReqWinch` non consommé en MAINT_N2 |
@@ -700,10 +700,10 @@ DSH07, jamais à ce lot.**
 | 01:31:00 | `mesure-apres-v2` | **fail** | 🔴 **`PRG_02_Acquisition.st` A ENCORE BOUGÉ** : `892de7b784f5` → **`5b8baa9ba8ea`** (719 lignes, −1). **Troisième blob pour ce fichier en 8 minutes** → 3 contre-vérifications de l'échantillon ont échoué (`HwIn.Operator`, `RawY`, `AxisY` décalés de −1). `PRG_04` en revanche est **stable** (`31760d59b4e0`) |
 | 01:31:00 | `verification-v3` | ok | Re-dérivation `PRG_02` : décalage **−1** pour toutes les lignes ≥ 445 (lignes 182-183 inchangées). Correction appliquée par **13 éditions ciblées en ordre anti-cascade**, + mise à jour du bloc d'ancrage, du journal et du contrôle de non-régression |
 | 01:31:00 | `verification-v4` | ok | **35 ancres de contrôle** finales tirées des **deux chaînes** (`PRG_02`, `PRG_04`, `PRG_03`, `PRG_06`, `FB_Winch`, `FB_Safety_Winch`, `FB_WinchCmdArbitrationM1/M2`) : **35/35 conformes** après correction |
-| 01:32:32 | *(événement externe)* | — | **Le lot concurrent T262 phase B COMMITE** son travail : HEAD `d6e54377` → **`065591fb`**. `PRG_04_Treuils_Benne.st`, `PRG_07_Supervision.st`, `FB_Bucket.st`, `ST_CycleCfg.st` et le fichier non suivi `FB_BucketCloseThreshold.st` **redeviennent propres** |
-| 01:33:25 | `re-ancrage-3` | ok | Re-mesure **à la demande de l'orchestrateur** (alerte drift). `HEAD = 065591fb` · 27 blobs remesurés : **tous identiques à mon ancre précédente** (`PRG_04 = 31760d59b4e0`, `PRG_02 = 5b8baa9ba8ea`) → **les 211 références du document restent valides**. `git status --short -- CODE/` : plus que **2 entrées** (`PRG_02_Acquisition.st` cité · `GVL_Simulation.st` non cité). ⚠️ Les mesures de l'orchestrateur (01:30) étaient **périmées sur `PRG_02`** (annoncé 720 l / `892de7b784f5`, disque 719 l / `5b8baa9ba8ea`) |
+| 01:32:32 | *(événement externe)* | — | **Le lot concurrent T262 phase B COMMITE** son travail : HEAD `3d1bd67e` → **`59d461e4`**. `PRG_04_Treuils_Benne.st`, `PRG_07_Supervision.st`, `FB_Bucket.st`, `ST_CycleCfg.st` et le fichier non suivi `FB_BucketCloseThreshold.st` **redeviennent propres** |
+| 01:33:25 | `re-ancrage-3` | ok | Re-mesure **à la demande de l'orchestrateur** (alerte drift). `HEAD = 59d461e4` · 27 blobs remesurés : **tous identiques à mon ancre précédente** (`PRG_04 = 31760d59b4e0`, `PRG_02 = 5b8baa9ba8ea`) → **les 211 références du document restent valides**. `git status --short -- CODE/` : plus que **2 entrées** (`PRG_02_Acquisition.st` cité · `GVL_Simulation.st` non cité). ⚠️ Les mesures de l'orchestrateur (01:30) étaient **périmées sur `PRG_02`** (annoncé 720 l / `892de7b784f5`, disque 719 l / `5b8baa9ba8ea`) |
 | 01:33:25 | `verification-exhaustive` | ok | **Contrôle EXHAUSTIF : les 211 références `fichier:ligne` explicites du document ont été relues une par une contre le disque** (regex d'extraction sur le document → résolution du chemin → lecture de la ligne réelle). **211/211 conformes**, 0 hors-borne, 0 fichier introuvable. Aucun décalage mécanique appliqué : contrôle individuel |
-| 01:33:25 | `maj-ancrage` | ok | Corrections : HEAD/bloc d'ancrage (`065591fb`, état **PROPRE/SALE re-dérivé pour chaque fichier**), règle d'usage, §10-9 + **§10-9bis (résolution du drift)**, §10-10 (**attribution T262 confirmée par le message de commit**), §11-U8 (bornes du bloc resserrées `1590-1612` au lieu de `1588-1616`), **§12 (alignement §3.10 de l'annexe + confirmation qu'aucun renommage n'est requis)**, §13, §14 |
+| 01:33:25 | `maj-ancrage` | ok | Corrections : HEAD/bloc d'ancrage (`59d461e4`, état **PROPRE/SALE re-dérivé pour chaque fichier**), règle d'usage, §10-9 + **§10-9bis (résolution du drift)**, §10-10 (**attribution T262 confirmée par le message de commit**), §11-U8 (bornes du bloc resserrées `1590-1612` au lieu de `1588-1616`), **§12 (alignement §3.10 de l'annexe + confirmation qu'aucun renommage n'est requis)**, §13, §14 |
 | 01:33:25 | `verification-annexe` | ok | Annexe DSH17 relue (§3.10 + §3.8) : **567 lignes**. Ses 2 exemples d'écart T334 recoupés indépendamment et **confirmés** (`FB_CycleSemiAuto.st:780` `CycleMotionPermit`, `:781` `TranslationP1Permit`, `PRG_06:434` `instTranslationOutputInterlockM3(`). Vérifié : **ce document ne réutilise aucune référence de ligne de T334** |
 
 ---
@@ -716,7 +716,7 @@ CODE/ : AUCUNE ÉCRITURE par ce lot. Aucun bundle, aucun gate, aucun test CI lan
 
 | Élément | AVANT (01:23:40) | APRÈS (01:33:25) | Verdict |
 |---|---|---|---|
-| `HEAD` | `d6e54377` | **`065591fb`** | ❌ **a avancé** — commit d'un **lot concurrent** (T262 phase B, `01:32:32`). Aucun commit de ce lot |
+| `HEAD` | `3d1bd67e` | **`59d461e4`** | ❌ **a avancé** — commit d'un **lot concurrent** (T262 phase B, `01:32:32`). Aucun commit de ce lot |
 | `PRG_04_Treuils_Benne.st` blob | `e6005d533cac` | `31760d59b4e09b03a8e91b2358f8804a6b1985ad` | ❌ **CHANGÉ PAR UN AUTRE LOT** (stable depuis 01:29, puis committé) ; état **PROPRE** |
 | `PRG_02_Acquisition.st` blob | `fabb8f764dd8` | `5b8baa9ba8ea0e9e0204ac8a5cc0a9a6b1bd2bb7` | ❌ **CHANGÉ DEUX FOIS PAR UN AUTRE LOT** (`892de7b784f5` puis `5b8baa9ba8ea`) — 🔴 **fichier chaud, encore SALE** |
 | 25 autres blobs cités | — | **identiques** | ✅ stables |
@@ -746,7 +746,7 @@ sont donc intégralement imputables aux lots concurrents** (T262 phase B, et un 
   été pointé sur `CODE/`) — preuve détaillée dans l'encadré « Preuve que ce lot n'a rien écrit » ci-dessus.
 - Le jeu de fichiers diffère parce que des **lots concurrents** ont modifié puis **committé**
   `PRG_04_Treuils_Benne.st`, `PRG_07_Supervision.st`, `FB_Bucket.st`, `ST_CycleCfg.st`
-  (commit `065591fb`, T262 phase B) et ont modifié, **sans les committer**, `PRG_02_Acquisition.st`
+  (commit `59d461e4`, T262 phase B) et ont modifié, **sans les committer**, `PRG_02_Acquisition.st`
   (**deux fois**, 3 blobs) et `GVL_Simulation.st` — **pendant** la fenêtre du lot (01:23 → 01:33).
 - **Aucun verrou de gel de l'arbre n'a été posé** pour ce lot documentaire, alors que le contrat
   anticipait explicitement ce risque (§`alert_duty`, 2ᵉ point) sans en tirer de mesure de gel.

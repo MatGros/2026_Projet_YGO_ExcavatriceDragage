@@ -59,9 +59,9 @@
 
 | Lot | Ce que tu vérifies pendant la passe | Signe OK |
 |---|---|---|
-| **T345-L2** *(AX14→AX15A, commit `b7b2c04b`)* | arrivée trémie **sans relâchement** exigé : 1 scan neutre puis push | arrivée **fluide**, pas de blocage |
-| **T331** *(repli AX15B, commit `31c9db0d`)* | le geste **Y+** à AX15B → ⚠️ cf. §4 | **ne pas le déclencher** en essai nominal |
-| **T295** *(timeout benne, commit `e011036b`)* | ouverture benne à AX15B **sans `[BENNE] ErrorID:03`** | pas d'erreur benne |
+| **T345-L2** *(AX14→AX15A, commit `9c5abe9e`)* | arrivée trémie **sans relâchement** exigé : 1 scan neutre puis push | arrivée **fluide**, pas de blocage |
+| **T331** *(repli AX15B, commit `c4b6b31f`)* | le geste **Y+** à AX15B → ⚠️ cf. §4 | **ne pas le déclencher** en essai nominal |
+| **T295** *(timeout benne, commit `0bb5b7ad`)* | ouverture benne à AX15B **sans `[BENNE] ErrorID:03`** | pas d'erreur benne |
 
 ---
 

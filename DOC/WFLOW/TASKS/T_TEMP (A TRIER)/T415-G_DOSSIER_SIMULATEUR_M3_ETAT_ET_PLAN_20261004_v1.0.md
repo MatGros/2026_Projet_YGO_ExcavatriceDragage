@@ -1,7 +1,7 @@
 # 🧭 Dossier simulateur M3 (TwinBench) — état, preuves, plan à challenger
 
 > Date : 2026-10-04 · Rédacteur : CC01 · Tâches : T415-B (lien), T415-G (TwinBench v2), T415-E1 (modèle)
-> Dernier checkpoint : commit `95c9ed5d` (non poussé). Aucun code modifié depuis.
+> Dernier checkpoint : commit `cb97e99b` (non poussé). Aucun code modifié depuis.
 > Partie A = dossier factuel. Partie B = brief à copier-coller pour un challenger indépendant.
 
 ---

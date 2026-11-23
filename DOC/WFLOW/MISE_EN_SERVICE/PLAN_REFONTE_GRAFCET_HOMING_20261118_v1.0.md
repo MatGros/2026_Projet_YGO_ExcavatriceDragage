@@ -1,7 +1,7 @@
 # Plan Consolidé — Refonte GRAFCET Homing (Audits 5 Agents + Avis T377)
 
 - **Date :** 2026-11-18
-- **Checkpoints Git :** `381021be` (code propre pré-refonte) · `cd67630c` (suivi constats)
+- **Checkpoints Git :** `0771dd2d` (code propre pré-refonte) · `048a0cf0` (suivi constats)
 - **Sources :** Audits lecture seule Code (`bbea8fdb`), Spec AF/T377 (`f1f08edf`), Effets de bord & CI (`1e57e6ce`), Ollama DeepSeek `safety` / `plc` / `challenger` / `T377` (`task-3023/3024/3025/3034`).
 - **Statut :** Plan prêt pour validation des décisions §5 avant lancement Phase 1. **Aucune modif `CODE/` appliquée.**
 

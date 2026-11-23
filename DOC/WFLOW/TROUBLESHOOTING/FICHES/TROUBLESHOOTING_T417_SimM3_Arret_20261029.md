@@ -136,8 +136,8 @@ Hypothèses de la réplique : pas de balancier (angle=0), pas de came/jitter cap
 ## 11. 📦 Livrable partiel (état au 2026-10-29, objectif /goal non atteint)
 
 **Fait, vérifié :**
-- Checkpoint `8669c6dd`, correction des défauts FB `0990a225`, bundle régénéré `be51ce13` (G200 PASS, 0 erreur ; G390 PASS), journal `102b1676`.
-- Gates palier C : 8 échecs sur 61, tous présents sur la base `746e3a0f`. Aucun nouvel échec.
+- Checkpoint `aff8cdd0`, correction des défauts FB `9247900c`, bundle régénéré `67ea97b2` (G200 PASS, 0 erreur ; G390 PASS), journal `9d72f3dc`.
+- Gates palier C : 8 échecs sur 61, tous présents sur la base `5f7bdaaa`. Aucun nouvel échec.
 - Suite L_SIMULATION : 6 PASS / 6 FAIL, identique à la base.
 
 **Non fait, bloquant :**
@@ -146,4 +146,4 @@ Hypothèses de la réplique : pas de balancier (angle=0), pas de came/jitter cap
 - G518 : `TC-T301-SRC-001/002` absents ; `test_fb_sim_translation.st` ne compile pas (`FullTravelTimeS`, 8 usages). Réécriture non validée.
 - Tests A/B : faits sur extraits de code fournis uniquement (runner Ollama texte seul).
 
-**Hypothèses, non vérifiées :** les trois causes du délai ; la coupure « instantanée » observée par l'exploitant (non reproduite dans le code de référence `e38cc09a`).
+**Hypothèses, non vérifiées :** les trois causes du délai ; la coupure « instantanée » observée par l'exploitant (non reproduite dans le code de référence `da7ba246`).

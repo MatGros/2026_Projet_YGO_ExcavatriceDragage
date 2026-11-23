@@ -2,7 +2,7 @@
 
 - **Date :** 2026-11-18
 - **Statut :** Cahier de suivi vivant (aucune modification `CODE/` appliquée)
-- **Point de sauvegarde Git :** `381021be` (`wip(checkpoint): point de sauvegarde avant refonte grafcet homing T377`)
+- **Point de sauvegarde Git :** `0771dd2d` (`wip(checkpoint): point de sauvegarde avant refonte grafcet homing T377`)
 - **Objectif :** Tracer les constats observés en simulation, leur cause vérifiée dans le code, les règles déjà posées (Step 0 / Step 1 / transverse) et les points à trancher avant codage puis test en simulation.
 
 ---

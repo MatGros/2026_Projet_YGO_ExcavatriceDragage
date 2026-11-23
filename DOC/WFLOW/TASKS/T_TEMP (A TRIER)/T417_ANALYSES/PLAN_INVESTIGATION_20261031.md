@@ -121,7 +121,7 @@ Sources : [témoignage MES](../../REGISTRES/REGISTRE_MES_TEMOIGNAGE_M3_20261030.
 
 ## Exécution du plan — CDX01, 31 octobre 2026
 
-Cette section remplace les décisions opérationnelles du tableau initial, conservé comme historique. Contrat : `investigation_20261031` dans [T417](../../CONTRACTS/TASK_CONTRACT_T417_SIMULATION_M3_REALISTE.yaml). Aucun changement ST de production ou simulation, aucun déploiement ni commit effectué par cette session. L'arbre partagé a évolué pendant l'étude (HEAD observé ensuite `8150ef03`) : les empreintes des preuves identifient les entrées effectivement étudiées, pas une version chargée en CODESYS.
+Cette section remplace les décisions opérationnelles du tableau initial, conservé comme historique. Contrat : `investigation_20261031` dans [T417](../../CONTRACTS/TASK_CONTRACT_T417_SIMULATION_M3_REALISTE.yaml). Aucun changement ST de production ou simulation, aucun déploiement ni commit effectué par cette session. L'arbre partagé a évolué pendant l'étude (HEAD observé ensuite `5850eca9`) : les empreintes des preuves identifient les entrées effectivement étudiées, pas une version chargée en CODESYS.
 
 ### Couverture
 

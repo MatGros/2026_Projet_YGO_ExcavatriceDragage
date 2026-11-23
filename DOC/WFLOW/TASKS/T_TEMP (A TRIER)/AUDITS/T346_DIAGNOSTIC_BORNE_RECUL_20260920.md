@@ -5,7 +5,7 @@
 | **Tâche** | T346 (C1, sécurité machine) |
 | **Date** | 2026-09-20T22:34+02:00 |
 | **Agent** | DSH (nouvelle session T346) |
-| **Base de code** | HEAD `f4ca3fee` · `FB_Bucket.st` **propre** (aucun diff non commité) |
+| **Base de code** | HEAD `7d3cc328` · `FB_Bucket.st` **propre** (aucun diff non commité) |
 | **Statut** | 🔍 Diagnostic **livré** — ⏸️ **ARRÊT AVANT CODE** (plan à valider) |
 | **Périmètre de cette fiche** | Lecture seule `CODE/` — **zéro ligne de code écrite** |
 

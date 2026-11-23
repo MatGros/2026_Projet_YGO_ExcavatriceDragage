@@ -51,7 +51,7 @@ En `SEMI_AUTO`, à l'arrivée de M3 sur **P1** (étape AX2) et sur **Trémie** (
 
 ## 3. 🧩 Indices / historique
 
-- Derniers changements : `T319` (continuité AX2→AX3, clos ✅, `TASKS.yaml:308-328`) ; `T300` (banc M3, perte capteur ~1 s, `TASKS.yaml:768-818`) ; `T287` (défaut frein M3 aux arrivées Trémie **et** P1, `TASKS.yaml:1240-1273`) ; `T327` (exclusion `CoupledBucketPhaseLocked`, commit `cbd88966`).
+- Derniers changements : `T319` (continuité AX2→AX3, clos ✅, `TASKS.yaml:308-328`) ; `T300` (banc M3, perte capteur ~1 s, `TASKS.yaml:768-818`) ; `T287` (défaut frein M3 aux arrivées Trémie **et** P1, `TASKS.yaml:1240-1273`) ; `T327` (exclusion `CoupledBucketPhaseLocked`, commit `f0fe9bcc`).
 - Déjà essayé / déjà su : `T287` documente la commutation capteur `0↔1` ≈ 1 s aux arrivées ; `DOC/WFLOW/AUDITS/DESIGN/AUDIT_T300_TRACE_20260904_v1.0.md:76` note que la perte/reprise « ~1 s » **n'est pas** dans la trace du 04/09 → à recapturer au pas fin.
 - Conditions d'apparition : arrivée **sur le point d'arrêt** (P1 en AX2, Trémie en AX14), joystick **maintenu** (c'est l'instruction IHM de l'étape : `FB_CycleSemiAuto.st:911` « Pousser gauche/droite : arrêt automatique sur P1 »).
 - Alarmes : piste `State.ErrorId=64` (cause 6, « Limite extreme translation atteinte ») observée le 04/09 (`DOC/WFLOW/AUDITS/DESIGN/AUDIT_T300_TRACE_20260904_v1.0.md:55`), portée par `TranslationM3.**State**`.ErrorId et non `Safety` (`DOC/WFLOW/AUDITS/DESIGN/AUDIT_T300_TRACE_20260904_v1.0.md:66`, écart E4) ; `T287` signale une récidive du défaut **séquence/retour frein** aux mêmes arrivées.
@@ -575,7 +575,7 @@ L'examen comparé du code de transition dans `FB_CycleSemiAuto.st` met en évide
 
 > 📅 2026-09-20 · 🏷️ Acteur : session **T334 bis**, tag **DSH10** (`TASK_LOCKS.json` vérifié : DSH07=T334, DSH08=T295, DSH09=T331 ⇒ DSH10 = premier libre). **Aucun verrou pris** : mission read-only, zéro écriture `CODE/`, zéro test, zéro gate, zéro bundle, zéro commit.
 > 🎯 Objet : vérifier **fichier:ligne** les affirmations de la phase 1 (§1-§9bis) **sans rien recopier**, chercher ce que les analyses ont manqué, et proposer des options — **sans trancher à la place de l'orchestrateur**.
-> 🔢 **Révision de travail** : `git rev-parse HEAD` = `fd12dc0` **+ arbre de travail modifié** (voir §A.0 : le fichier porteur de la preuve H2 a bougé **après** l'écriture de la fiche).
+> 🔢 **Révision de travail** : `git rev-parse HEAD` = `4ff6d2d` **+ arbre de travail modifié** (voir §A.0 : le fichier porteur de la preuve H2 a bougé **après** l'écriture de la fiche).
 
 ---
 
@@ -751,7 +751,7 @@ Le socle est **solide et non recopié** : l'axe est bien unique, la divergence p
 ### H. 📝 Journal de la session T334 bis (read-only)
 
 - 2026-09-20 18:41 : briefing chargé (`subagent_preamble.md`, skill `troubleshooting` canonique). Tag **DSH10** (après correction d'un premier log mis-taggé `DSH08`, cf. A17). **Aucun verrou pris.**
-- Relevé `git rev-parse HEAD` = `fd12dc0` **+ arbre modifié** ; détection du décalage **+4** sur `FB_CycleSemiAuto.st` (édition T331/DSH09 à **18:13:32**, postérieure à la fiche **18:07:20**).
+- Relevé `git rev-parse HEAD` = `4ff6d2d` **+ arbre modifié** ; détection du décalage **+4** sur `FB_CycleSemiAuto.st` (édition T331/DSH09 à **18:13:32**, postérieure à la fiche **18:07:20**).
 - Vérification **fichier:ligne** des 5 affirmations ; relecture directe de `FB_CycleSemiAuto.st`, `PRG_05_Translation.st`, `FB_Translation.st`, `FB_TranslationCmdArbitrationM3.st`, `FB_TranslationOutputInterlock.st`, `FB_Translation_PositionDecoder.st`, `FB_Brake.st`, `FB_Safety_Translation.st`, `FB_Safety_Winch.st`, `FB_Winch.st`, `FB_WinchStateProjection.st`, `FB_CycleMachineHoming.st`, `FB_Modes.st`, `PRG_06_Outputs.st`, `PRG_07_Supervision.st`, `ST_*` de types, `GVL_PERSISTENT.st`, `TASK_LOCKS.json`, `TASKS.yaml`, `AF_Partie-04/11`.
 - Trouvailles : 3 écarts de **fond** (§B.1, §B.2, §B.4/§B.6) + 2 configs mortes (§B.5, A13) + 4 erreurs/imprécisions de **citation** (§F) + 1 claim **hors fiche** (§A.1-5).
 - **Aucun fichier de `CODE/` écrit, aucun test, aucun gate, aucun bundle, aucune IHM, aucun commit.** Seul livrable : la présente section.

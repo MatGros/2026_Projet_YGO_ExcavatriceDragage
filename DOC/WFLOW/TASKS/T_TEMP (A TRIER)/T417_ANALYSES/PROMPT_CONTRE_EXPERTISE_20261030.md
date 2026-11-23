@@ -2,7 +2,7 @@
 SOURCE: DOC/WFLOW/ETUDES/ANALYSES_T417/REPRISE_PREUVES_20261030.md
 # T417 — Registre de reprise et expériences — 2026-10-30
 
-Référence témoignage : [registre MES](../../REGISTRES/REGISTRE_MES_TEMOIGNAGE_M3_20261030.md). GO utilisateur reçu pour poursuivre l'objectif ; production inchangée, aucun commit autorisé. Référence de lecture initiale : HEAD `14009dcf`, arbre comportant des travaux tiers conservés.
+Référence témoignage : [registre MES](../../REGISTRES/REGISTRE_MES_TEMOIGNAGE_M3_20261030.md). GO utilisateur reçu pour poursuivre l'objectif ; production inchangée, aucun commit autorisé. Référence de lecture initiale : HEAD `6038a040`, arbre comportant des travaux tiers conservés.
 
 ## Contrat d'investigation et de contre-expertise (lecture seule)
 

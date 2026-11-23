@@ -1,6 +1,6 @@
 # 🧯 Rapport — Révision des consignes agents (discipline de session)
 
-**Date** : 2026-11-03 · **Branche** : `work/consignes-discipline-session` (depuis `540a8a86`)
+**Date** : 2026-11-03 · **Branche** : `work/consignes-discipline-session` (depuis `f1aa2f85`)
 **Nature** : lot documentaire, aucun fichier `CODE/`, aucun bundle à importer.
 **Entrées** : propositions A/B/C d'un agent analyseur + résumé de 6 patterns de défaillance.
 

@@ -62,7 +62,7 @@ execution:
   executed_by: CDX01
   status: COMPLETED
   summary: >
-    Checkpoint fd32b652 puis correction locale du frottement. Avant 8/9, apres 9/9
+    Checkpoint 0bc27acb puis correction locale du frottement. Avant 8/9, apres 9/9
     scenarios ST reels. Review independante PASS et DeepSeek v4.1 PASS ; remarque
     sur frottement explicite dans les tests appliquee. G200 PASS 0 erreur ; bundles
     frais. Palier C 53/61 PASS, 8 gates deja en echec avant correction, G390 corrige.

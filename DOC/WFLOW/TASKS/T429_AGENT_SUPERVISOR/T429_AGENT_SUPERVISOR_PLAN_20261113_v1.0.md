@@ -177,13 +177,13 @@ plan_project:
       execution: DONE
       execution_by: CC01
       evidence: "CSS : titre neutre var(--text) + has-* color var(--text) + marker par état (vert/orange/rouge/gris) + .model-tag standard 5 acteurs ; JS : badge model-tag + metaRow ; test_dossier_ui.mjs 16 asserts, test_ui.mjs PASS, layout 0 fail (2026-11-14)"
-      execution_comment: "2 amendements exploitant le jour même (checkpoint 5f895090) : texte colore SEUL (badge encadre illisible supprime) + couleur portee par la FAMILLE detectee dans l alias (T429-MMX01 -> MMX jaune), la couleur suivra l acteur meme en changeant de terminal"
+      execution_comment: "2 amendements exploitant le jour même (checkpoint 3674341c) : texte colore SEUL (badge encadre illisible supprime) + couleur portee par la FAMILLE detectee dans l alias (T429-MMX01 -> MMX jaune), la couleur suivra l acteur meme en changeant de terminal"
     - id: M15
       title: "R17 — Le Superviseur reconnaît une session orchestrateur et adapte sa vigilance"
       done_when: "Détection mécanique du rôle coordination (alias/tâche T000-CCxx) ; notice dédiée au juge avec les critères de gestion (verrou, écriture hors contrat, clôture de constat par l'agent interdite) ; alerte mécanique si DEUX orchestrateurs actifs simultanés"
       execution: DONE
       execution_by: CC01
-      evidence: "commit 9ad9e447 : is_coordination_session + notice COORDINATION_JUDGE_NOTICE + _detect_coordination_conflicts idempotent ; tests 217 py verts (test_coordination_session_judge_notice_only_for_t000, test_two_active_coordination_sessions_raise_one_finding) ; handoff T427-CC02 transmis + accusé (d2878f46/b5ed67ec)"
+      evidence: "commit 3fea6f21 : is_coordination_session + notice COORDINATION_JUDGE_NOTICE + _detect_coordination_conflicts idempotent ; tests 217 py verts (test_coordination_session_judge_notice_only_for_t000, test_two_active_coordination_sessions_raise_one_finding) ; handoff T427-CC02 transmis + accusé (029083df/a9d4eab6)"
       execution_comment: "Fait prouvé 2026-11-15 : zéro notion orchestrateur dans service + vigilance (grep) — le juge l'évalue comme toute session ; demande exploitant 2026-11-14"
     - id: M16
       title: "R18 — le système dit une session qui travaille sans objectif ni critères"
@@ -239,7 +239,7 @@ plan_project:
       done_when: "memory_max_items configurable (défaut 20, config 20→500) ; plafonds de fenêtre 1M ; l'IHM stats d'état ; textes tête+queue"
       execution: DONE
       execution_by: CC01
-      evidence: "Constante MEMORY_MAX_ITEMS + memory_limit() ; 4 sites déhardcodés ; head_tail_text() aux textes de mémoire/contexte (le début du message conservé) ; plafonds de validation élargis 1M ; IHM : champ memory-max-items + stats du fold mémoire (l'élément/caractères/borne/plus ancien) ; test memory_limit 1 passed (25 gardés > 20) ; DOM 16 asserts + layout OK ; suite complète : 221 passed + 2 failed (les 2 intermittents connus en suivi, solo verts x3) [commit 8dbd86bd]"
+      evidence: "Constante MEMORY_MAX_ITEMS + memory_limit() ; 4 sites déhardcodés ; head_tail_text() aux textes de mémoire/contexte (le début du message conservé) ; plafonds de validation élargis 1M ; IHM : champ memory-max-items + stats du fold mémoire (l'élément/caractères/borne/plus ancien) ; test memory_limit 1 passed (25 gardés > 20) ; DOM 16 asserts + layout OK ; suite complète : 221 passed + 2 failed (les 2 intermittents connus en suivi, solo verts x3) [commit 9ee5cd03]"
       execution_comment: "Demande exploitant 2026-11-15 (modèle 1M contexte) — le run de suite est en cours de dernière preuve ; le restart restera nécessaire pour le service"
     - id: M24
       title: "R27 — standardiser le plan de session /plan (gabarit + lien skill)"
@@ -253,13 +253,13 @@ plan_project:
       done_when: "Le amendement du prompt posé, les suites 26/26 vertes ; la procédure V1 (copie datée du plan de session au dossier) documentée"
       execution: DONE
       execution_by: CC01
-      evidence: "judge_prompt.py l.109 amendé ; test_judge_prompt + test_judge_behavior → 26 passed ; commit 0a86fb72 ; V1 : la copie datée au dossier de tâche entre dans le dossier de lecture déclaré (zéro code), posée par l'exploitant ou dérogation"
+      evidence: "judge_prompt.py l.109 amendé ; test_judge_prompt + test_judge_behavior → 26 passed ; commit 554147b7 ; V1 : la copie datée au dossier de tâche entre dans le dossier de lecture déclaré (zéro code), posée par l'exploitant ou dérogation"
       execution_comment: "Demande exploitant 2026-11-15 (les /subtask) ; l'amendement texte exact de la fork repris"
     - id: M26
       title: "R29 — alerte mise à jour fixe au scroll, relance 1 clic, fond du menu en alerte"
       done_when: "Le bandeau fixe + bouton relance 1 clic + fond du menu de gauche en alerte, le tout testé et relu"
       execution: DONE
-      execution_by: CC01 (pose par la fork, commis ec091f00, relu CC01)
+      execution_by: CC01 (pose par la fork, commis 773a7996, relu CC01)
       evidence: "restart_service 1 passed (os.execv jamais appelé en test) · DOM 16 asserts (bandeau fix + fond + clic) · test_ui régression PASS · layout 0 fail ; NOTE : le 1er redémarrage reste manuel (le build en service est encore périmé), ensuite le bandeau prend le relais"
       execution_comment: "URGENT exploitant via /subtask ; la fork a posé le code, CC01 relu le diff et relancé les 4 vérifications"
       validation: NOT_REVIEWED
@@ -320,7 +320,7 @@ plan_project:
 | **R3** | **Famille d'acteur MMX** — l'alias `T429-MMX01` est accepté par le Superviseur (`ALIAS_PATTERN`), le champ catalogue `agent` impose `CC/AGY/CDX/DSH/OPC` | une seule règle : soit la regex catalogue accepte MMX, soit l'alias porte un acteur de la regex — décision tracée et appliquée des deux côtés | `check_task_contract` + tests `connect_session` verts | **agent T000** (lot `T000_SESSION_NAMING` en cours) |
 | **R4** | **Test rouge `test_supervisor_summary_exposes_only_rename_title`** | le test passe, soit la sémantique de `session_display_title` est confirmée, soit elle est corrigée | `pytest TOOLS/AGENT_WORKFLOW/tests/test_session_statusline.py` → 0 failed | **agent T000** (le changement vient de son lot) |
 | **R5** | **Alignement du service 8082** — l'arbre HEAD est en avance du build en service (`71e9a47c851d`, `update_available: true`) | le build servi = HEAD, sauvegarde vérifiée, 7 affectations conservées, 0 constat perdu | `GET /health` → `update_available: false` + diff de l'état avant/après | CC01 (après R4) |
-| **R6** | **Push** — 5 commits locaux non poussés (`7f487148`, `cf14f135`, `22535a09`, + à venir) | branche distante à jour, aucun commit perdu | `git rev-list --left-right --count origin/main...HEAD` → `0 0` | **exploitant** (accord explicite requis) |
+| **R6** | **Push** — 5 commits locaux non poussés (`79882d00`, `f2f0b952`, `55416b1c`, + à venir) | branche distante à jour, aucun commit perdu | `git rev-list --left-right --count origin/main...HEAD` → `0 0` | **exploitant** (accord explicite requis) |
 | **R7** | **Bruit de fond catalogue** — le résumé était figé (PÉRIMÉ) | générateur mécanique en place, résumé À JOUR, contrôle en CI | `python TOOLS/AGENT_WORKFLOW/scripts/generate_tasks_summary.py --check` → 0 | CC01 ✅ **fait le 2026-11-13** |
 | **R8** | **Prédicat de périmètre** — le périmètre d'une tâche devient une donnée (ensemble de chemins autorisés, déduit du contrat `scope.allowed`), pas une phrase dans un prompt | un prédicat booléen, testable, sans LLM : `chemin ∈ périmètre` ; T429 sert de cas d'école | tests unitaires du prédicat (inclus / exclu / chemin voisin) | CC01 (T427) |
 | **R9** | **Garde de dérive** — hook `PreToolUse` sur `Edit\|Write\|MultiEdit` : écriture hors périmètre → refus motivé + question à l'exploitant ; une dérogation confirmée est **enregistrée** (durable) | aucune écriture hors périmètre sans dérogation tracée ; le refus force la confirmation au lieu de la recommending | hook testé (chemin autorisé → passe ; hors périmètre → refus ; dérogation → passe) | CC01 (T427) |
@@ -415,7 +415,7 @@ Production : hooks (mécanique, déterministe). Consommation : revue périodique
 | **R26** | **Mémoire longue élargie et observable** (demande exploitant 2026-11-15 « 20 msgs… pas bcp » pour un modèle 1M contexte) | la borne 20 hardcodée à 4 sites devient `memory_max_items` configurable (défaut 20 inchangé, config 20→500) ; plafonds de fenêtre montés (context_messages 200→2000, context_chars 100k→1M, model_context_tokens 131k→1 048 576) ; l'IHM : champ config + **stats d'état du panneau mémoire** (éléments/caractères/borne/plus ancien) ; le textes bornés **tête+queue** (le début du message n'est plus jeté — constat 2026-11-15) | test memory_limit (25 gardés > 20 hardcode, défaut 20 inchangé, head_tail markée) · DOM stats · layout | CC01 (T429) |
 | **R27** | **Standardiser le plan de session `/plan`** (demande exploitant 2026-11-15 « le backlog est bordélique… y a pas un template ? ») | un gabarit `SESSION_PLAN_TEMPLATE.md` à 9 sections (objectif/périmètre/jalons alignés plan_project/poses/review/challenge/méthodes/critères/rules of engagement) + le lien dans la skill canonique plan-project | liste de vérification : le plan de session généré suit les 9 sections | pose humaine le gabarit + la skill (hors périmètre épinglé) — texte exact fourni par CC01 2026-11-15 |
 | **R28** | **Le juge distingue plan de tâche et plan de session** (demande exploitant 2026-11-15 `/subtask « challenger le prompt »`) | amendement du prompt du juge : deux places possibles, la PROVENANCE de chaque objectif vérifiée, l'écart signé au lieu d'ignorer un des deux, l'absence de plan dans la fenêtre ≠ défaut ; **V1** : le contenu du plan de session est copié daté au dossier de tâche (il entre dans le dossier de lecture déclaré, zéro code) | `test_judge_prompt.py` + `test_judge_behavior.py` 26 passed | CC01 (T429) |
-| **R29** | **Alerte mise à jour visible en tout scroll + relance 1 clic + fond du menu en alerte** (URGENT exploitant 2026-11-15) | bandeau `position:fixed` en haut (« Mise à jour du service disponible : redémarrage nécessaire ») ; bouton 1 clic → action `restart_service` (os.execv du même binaire, l'état persiste, affectations en pause, réponse envoyée avant remplacement) ; fond du menu de gauche en roge sombre tant que le service est périmé | test restart_service (os.execv jamais appelé en test) · DOM 16 asserts · test_ui · layout 0 fail — relelu CC01 | CC01 (T429) — pose exécutée par la fork, commis ec091f00, relue CC01 |
+| **R29** | **Alerte mise à jour visible en tout scroll + relance 1 clic + fond du menu en alerte** (URGENT exploitant 2026-11-15) | bandeau `position:fixed` en haut (« Mise à jour du service disponible : redémarrage nécessaire ») ; bouton 1 clic → action `restart_service` (os.execv du même binaire, l'état persiste, affectations en pause, réponse envoyée avant remplacement) ; fond du menu de gauche en roge sombre tant que le service est périmé | test restart_service (os.execv jamais appelé en test) · DOM 16 asserts · test_ui · layout 0 fail — relelu CC01 | CC01 (T429) — pose exécutée par la fork, commis 773a7996, relue CC01 |
 
 ### Décisions figées sur ce lot
 
@@ -428,7 +428,7 @@ Production : hooks (mécanique, déterministe). Consommation : revue périodique
 ## 3quints. 🧭 Handoff → 🐋 T427-CC02 (2026-11-15, GO exploitant)
 
 > Transmission réelle faite le 2026-11-15 par le canal inter-sessions (désignation explicite de
-> l'exploitant) ; M15/R17 livré côté service (commit `9ad9e447`, 217 tests verts). La canonique
+> l'exploitant) ; M15/R17 livré côté service (commit `3fea6f21`, 217 tests verts). La canonique
 > orchestrateur revient au lot T427. Piège M8 évité : le texte exact est consigné **ici**, dans
 > le dossier T429, et T427-CC02 a été informé de son emplacement.
 

@@ -18,7 +18,7 @@
 Le GEL figé (2026-09-03) déclare pour `AX15B_DUMP_OPEN` (16, DÉCHARGE) **deux** sorties :
 `AT15B-c` (option, `RepositionRequest` → AX15C) et `AT15B` (`JoystickDeflected AND Benne_Done AND Benne_IsOpen` → `ReqOpen := FALSE` → **AX18**). Il **ne déclare aucun** saut `AX15B → AX10`.
 
-Or le commit `31c9db0d` (T331) a introduit **sans GEL** une transition `AX15B → AX10_CLOSE_BUCKET`
+Or le commit `c4b6b31f` (T331) a introduit **sans GEL** une transition `AX15B → AX10_CLOSE_BUCKET`
 (`FB_CycleSemiAuto.st:1567-1569`) — **seul saut arrière non déclaré** du séquenceur. **Principe
 exploitant** : « un grafcet a des transitions définies, il ne peut pas faire de saut ».
 

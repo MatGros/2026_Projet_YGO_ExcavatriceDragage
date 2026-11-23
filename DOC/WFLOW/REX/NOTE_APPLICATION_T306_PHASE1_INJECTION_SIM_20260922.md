@@ -1,7 +1,7 @@
 # 📝 Note d'application — T306 Phase 1 : rendre le défaut de rotation de phase injectable
 
 - **Tâche** : T306-PHASE1-INJECTION-SIM-ROTATION-PHASE · criticité C2 (phase 0) / C2 (phase 1 simu)
-- **Contrat** : `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T306_PHASE1_INJECTION_SIM.yaml` (amendé `ac9aaea2`)
+- **Contrat** : `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T306_PHASE1_INJECTION_SIM.yaml` (amendé `7613764d`)
 - **Date** : 2026-09-22 · **Agent** : DSH01
 - **Objet** : Remplacer le `TRUE` codé en dur de `FB_SimBench.st:690` par un stimulus simulable.
 
@@ -15,7 +15,7 @@
 | `CODE/L_SIMULATION/FB_Sim_Safety.st` | +7 : entrée `SimPhaseRotationOkBit` + sortie `SimPhaseRotationOk` (propagation) | interface + gate + corps |
 | `CODE/L_SIMULATION/FB_SimBench.st` | +3/-1 : entrée, passage `instSimSafety`, et **`Machine.PhaseRotationOk_DI := instSimSafety.SimPhaseRotationOk`** (remplace `TRUE`) | `:690` |
 | `CODE/M_MAIN/PRG_02_Acquisition.st` | +2 : **une seule ligne** `SimPhaseRotationOkBit := GVL_Simulation.SimPhaseRotationOk,` | ~`:334` |
-| `TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_safety.st` | +21 (additif pur) : `TC-T306-SAF-003` | autorisation étroite `ac9aaea2` |
+| `TOOLS/TEST_AUTO_CI/RESULTS/L_SIMULATION/tests/test_fb_sim_safety.st` | +21 (additif pur) : `TC-T306-SAF-003` | autorisation étroite `7613764d` |
 
 ## 2. Nom canonique figé
 
@@ -51,7 +51,7 @@ Auto-verification liaison (G200_check_linkage.py) ? PASS
 Bundle complet `CODE_XML/CODE_Bundle.xml` frais.
 
 ## 5. Collision résolue
-La modification AX15D/T383 de `PRG_02` (précédemment non committée) a été **committée dans `0358c631`**. Le diff restant de `PRG_02` = uniquement mon ajout T306 (2 lignes). Aucun écrasement, édition chirurgicale.
+La modification AX15D/T383 de `PRG_02` (précédemment non committée) a été **committée dans `b6a5c359`**. Le diff restant de `PRG_02` = uniquement mon ajout T306 (2 lignes). Aucun écrasement, édition chirurgicale.
 
 ## 6. Devoir d'alerte / restants
 - Les 2 correctifs de sécurité (SafeStop M3 inerte + gate MAINT_N2 bypass) restent **hors phase 1** — lot C4 séparé à arbitrer.

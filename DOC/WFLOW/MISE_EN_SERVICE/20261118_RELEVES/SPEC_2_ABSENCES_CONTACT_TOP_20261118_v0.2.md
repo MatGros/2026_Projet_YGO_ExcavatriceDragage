@@ -5,7 +5,7 @@ CC03, 2026-11-18. Fusionne la v0.1 et l'exigence exploitant transmise via T417-C
 descente seule libre) ; si la montée continue après contact, PowerCutOff ».
 Lecture seule, pas de code. Preuves fichier:ligne.
 
-## A0 — Ce qui existe DÉJÀ dans 6956366b (à ne pas refaire)
+## A0 — Ce qui existe DÉJÀ dans e75d1e08 (à ne pas refaire)
 
 - Le contact TOP coupe la montée EN DIRECT : `FB_Safety_Winch.st:577-585`
   (`AscentPermit = NOT (CauseTopLimitSwitchActive OR NOT TopPositionSensor ...)`,
@@ -50,7 +50,7 @@ Reset hors contact → relance possible. + TC persist au reboot (RETAIN).
   (`ReqAscent`/`MovementCommanded` — entrées déjà disponibles :18/:425).
 - Sortie du TON → `MecaDFaultLatched := TRUE` → cause 11 existante → PowerCutOff +
   alarme carrousel MecaD existante. +3-5 lignes.
-- Débogage frein (Meca B / BrakeForceAllowed de 6956366b) : NON touché.
+- Débogage frein (Meca B / BrakeForceAllowed de e75d1e08) : NON touché.
 
 **Délai — décision exploitant 18/11 (après ma proposition 500 ms rejetée) :**
 - **Defaut = 2,0 s minimum, paramètre Cfg** (décision l'exploitant : « reste au moins 2s »).
@@ -83,7 +83,7 @@ aucune escalade ; contact + repos → aucune escalade.
 - **Portée des parades frein (question exploitant : M1/M2 ou M3 ?)** — vérifié au
   commit : l'exemption « descente pure » de Meca D et `BrakeForceAllowed` visent
   les **treuils M1/M2 only** (PRG_04:967/:998/:1070, FB_Safety_Winch:379-381 ; PRG_05
-  et FB_Safety_Translation ne sont PAS dans le diff de 6956366b). Pour **M3**, le design
+  et FB_Safety_Translation ne sont PAS dans le diff de e75d1e08). Pour **M3**, le design
   d'origine de la barrière Trémie autorise déjà le recul (P1/Maintenance) malgré le
   latch (`PRG_06:449-450`) : le besoin « dégager sans être coupé » est déjà couvert
   pour M3 par la géométrie directionnelle, pas besoin des mêmes exemptions.
@@ -105,7 +105,7 @@ aucune escalade ; contact + repos → aucune escalade.
 
 - **T377-B** : même FB (FB_Safety_Winch) mais lignes disjointes (cause 1 :277-282) ;
   aucun conflit si 2 commits (latch/escalade après T377-B). A2 n'ajoute AUCUNE cause.
-- **6956366b** : A2 complète le chantier Meca D ouvert par ce commit (réactivation N2 +
+- **e75d1e08** : A2 complète le chantier Meca D ouvert par ce commit (réactivation N2 +
   exemption descente) — cohérent, aucune reprise du diff existant.
 - **Ordre conseillé** : T377-B d'abord (démarrage), puis A1+A2+A3 (un lot), puis
   AnyFaultActive (A part, trivial).

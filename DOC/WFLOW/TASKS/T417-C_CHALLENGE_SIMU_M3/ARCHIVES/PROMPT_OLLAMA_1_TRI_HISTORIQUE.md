@@ -105,20 +105,20 @@ Le chariot M3 depasse parfois la butee electrique a petite vitesse jusqu'au choc
 19: 
 20: | Commit | Contenu | Statut |
 21: |---|---|---|
-22: | `746e3a0f` | Base de référence avant ce lot (validation T421) | Référence |
-23: | `8669c6dd` | Checkpoint : code simulation T417 non commité + contrat, étude, fiche, liste et template de trace | Commit `wip [NON TESTE]` |
-24: | `0990a225` | Correction : défauts FB `PhysicalBrakeActive` (FB_Sim_TranslationBrake) et `BrakePhysicalActive` (FB_Sim_Translation) remis à **FALSE** | Commit `fix` |
-25: | `be51ce13` | Bundle PLCopenXML régénéré (`CODE_Bundle.xml`, `CODE_DiffBundle.xml`) + XML L_SIMULATION + PRG_02 | Commit `build` |
-26: | `102b1676` | Journal fiche T417 (A/B, sources candidates du délai) | Commit `docs` |
-27: | `14009dcf` | Livrable partiel (section 11 de la fiche) | Commit `docs` |
+22: | `5f7bdaaa` | Base de référence avant ce lot (validation T421) | Référence |
+23: | `aff8cdd0` | Checkpoint : code simulation T417 non commité + contrat, étude, fiche, liste et template de trace | Commit `wip [NON TESTE]` |
+24: | `9247900c` | Correction : défauts FB `PhysicalBrakeActive` (FB_Sim_TranslationBrake) et `BrakePhysicalActive` (FB_Sim_Translation) remis à **FALSE** | Commit `fix` |
+25: | `67ea97b2` | Bundle PLCopenXML régénéré (`CODE_Bundle.xml`, `CODE_DiffBundle.xml`) + XML L_SIMULATION + PRG_02 | Commit `build` |
+26: | `9d72f3dc` | Journal fiche T417 (A/B, sources candidates du délai) | Commit `docs` |
+27: | `6038a040` | Livrable partiel (section 11 de la fiche) | Commit `docs` |
 28: 
-29: **Revert** : `git revert <sha>` par commit. Le commit `0990a225` est isolé : il contient uniquement les deux défauts FB.
+29: **Revert** : `git revert <sha>` par commit. Le commit `9247900c` est isolé : il contient uniquement les deux défauts FB.
 30: 
 31: **Fichiers hors commits (autres chantiers, ne pas embarquer)** : `DOC/WFLOW/TASKS.yaml`, `DOC/WFLOW/TASKS_ORCHESTRATOR.yaml`, `DOC/WFLOW/PROMPTS/04_Divers.md`, `.claude/settings.local.json`, `reponse.md`, `TOOLS/AGENT_WORKFLOW/scripts/run_m3_study_agents.py`, `DOC/WFLOW/PROMPTS/10_ExempleOrchestrator/`.
 32: 
 33: **Attention** : pendant ce lot, un processus `git.exe` concurrent et un `index.lock` transitoire sont apparus. Vérifier qu'aucun autre agent ne committe avant tout commit.
 34: 
-35: **Attention** : `DOC/WFLOW/ETUDES/ANALYSES_T417/RAPPORT_AGENT_{A,B,C}_*.md` ont été committés dans `8669c6dd`. Ce sont des rapports d'agents antérieurs, **non vérifiés** par moi.
+35: **Attention** : `DOC/WFLOW/ETUDES/ANALYSES_T417/RAPPORT_AGENT_{A,B,C}_*.md` ont été committés dans `aff8cdd0`. Ce sont des rapports d'agents antérieurs, **non vérifiés** par moi.
 36: 
 37: ---
 38: 
@@ -126,7 +126,7 @@ Le chariot M3 depasse parfois la butee electrique a petite vitesse jusqu'au choc
 40: 
 41: Fichiers : `CODE/L_SIMULATION/` — `FB_Sim_Translation.st`, `FB_Sim_TranslationDrive.st`, `FB_Sim_TranslationBrake.st`, `FB_SimBench.st`, `GVL_Simulation.st`.
 42: 
-43: | Paramètre | Valeur FB (après `0990a225`) | Valeur GVL utilisée en simulation | Remarque |
+43: | Paramètre | Valeur FB (après `9247900c`) | Valeur GVL utilisée en simulation | Remarque |
 44: |---|---|---|---|
 45: | `PhysicalBrakeActive` / `BrakePhysicalActive` | FALSE (historique) | **TRUE** (`GVL_Simulation.st:79`) | Source unique = GVL, passée par `FB_SimBench.st:697` |
 46: | `CartFreeActive` | FALSE | **TRUE** (`GVL_Simulation.st:84`) | Mode chariot libre actif en simulation ; non testé |
@@ -182,7 +182,7 @@ Le chariot M3 depasse parfois la butee electrique a petite vitesse jusqu'au choc
 96: 
 97: La coupure du variateur, elle, est bien au scan capteur (PRG_06 permission `AND NOT DI`).
 98: 
-99: **Vérification de référence** : la logique de coupure Trémie (`PRG_06:431-443`, `PRG_05:709/720`) est **identique** entre la référence MES `e38cc09a` et `HEAD`. Ce n'est pas un écart de branche.
+99: **Vérification de référence** : la logique de coupure Trémie (`PRG_06:431-443`, `PRG_05:709/720`) est **identique** entre la référence MES `da7ba246` et `HEAD`. Ce n'est pas un écart de branche.
 100: 
 101: ---
 102: 
@@ -216,8 +216,8 @@ Le chariot M3 depasse parfois la butee electrique a petite vitesse jusqu'au choc
 130: ## 8. Tests et gates (état vérifié)
 131: 
 132: **Suite CI L_SIMULATION** (`TOOLS/TEST_AUTO_CI/scripts/run_tests.py --domain L_SIMULATION`, ~40 s) :
-133: - Base `746e3a0f` : 6 PASS / 6 FAIL.
-134: - État courant (après `0990a225`) : **6 PASS / 6 FAIL, mêmes échecs**. Aucune régression.
+133: - Base `5f7bdaaa` : 6 PASS / 6 FAIL.
+134: - État courant (après `9247900c`) : **6 PASS / 6 FAIL, mêmes échecs**. Aucune régression.
 135: - Échecs présents sur la base (non causés par ce lot) :
 136:   - `FB_SimBench` ; `SimOperatorJoystick` ; `SimManualReference`.
 137:   - `SimTranslationLoop` : `TC-T417-LOOP-A/B` attend PHASE 3, obtient 2.
@@ -303,7 +303,7 @@ Le chariot M3 depasse parfois la butee electrique a petite vitesse jusqu'au choc
 ```markdown
 1: # T417 — Registre de reprise et expériences — 2026-10-30
 2: 
-3: Référence témoignage : [registre MES](../../REGISTRES/REGISTRE_MES_TEMOIGNAGE_M3_20261030.md). GO utilisateur reçu pour poursuivre l'objectif ; production inchangée, aucun commit autorisé. Référence de lecture initiale : HEAD `14009dcf`, arbre comportant des travaux tiers conservés.
+3: Référence témoignage : [registre MES](../../REGISTRES/REGISTRE_MES_TEMOIGNAGE_M3_20261030.md). GO utilisateur reçu pour poursuivre l'objectif ; production inchangée, aucun commit autorisé. Référence de lecture initiale : HEAD `6038a040`, arbre comportant des travaux tiers conservés.
 4: 
 5: ## Contrat d'investigation et de contre-expertise (lecture seule)
 6: 
@@ -427,7 +427,7 @@ Le chariot M3 depasse parfois la butee electrique a petite vitesse jusqu'au choc
 124: 
 125: ### M3-DYN-100 : arbitrage reporté, pas de correction opportuniste
 126: 
-127: Le test, ajouté au commit `555327be` à 21:08, attend un PDO fréquence indépendant du balancement. Six minutes plus tard, `6cce0c93` a modifié le même modèle : `ActualFrequency_Hz` retire `LoadFrequencyDroopGain_Hz × ABS(LoadAngularVelocity_RadPerS)` (`FB_Sim_TranslationDrive.st:51-56`) et a supprimé le commentaire qui définissait le PDO comme fréquence électrique indépendante. L'échec 100 est donc une incohérence historique avérée entre test et code, mais aucune des deux sémantiques n'est encore validée par une trace suffisamment qualifiée. Le test reste rouge et le modèle reste inchangé jusqu'à décision documentée.
+127: Le test, ajouté au commit `c9ff5b04` à 21:08, attend un PDO fréquence indépendant du balancement. Six minutes plus tard, `602926ce` a modifié le même modèle : `ActualFrequency_Hz` retire `LoadFrequencyDroopGain_Hz × ABS(LoadAngularVelocity_RadPerS)` (`FB_Sim_TranslationDrive.st:51-56`) et a supprimé le commentaire qui définissait le PDO comme fréquence électrique indépendante. L'échec 100 est donc une incohérence historique avérée entre test et code, mais aucune des deux sémantiques n'est encore validée par une trace suffisamment qualifiée. Le test reste rouge et le modèle reste inchangé jusqu'à décision documentée.
 128: 
 129: Le contrat T417 AC2 indique 200 ms d'ouverture, alors que `FB_Sim_TranslationBrake.st:8-9` et l'étude T417 portent actuellement 100 ms d'ouverture et 90 ms de fermeture. Cette divergence documentaire est un **point ouvert** : aucune valeur n'est modifiée sur cette seule lecture.
 130: 
@@ -439,7 +439,7 @@ Le chariot M3 depasse parfois la butee electrique a petite vitesse jusqu'au choc
 136: 
 137: Exécution initiale : `py -3.13 TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_SimBench --fast`.
 138: 
-139: - La conversion et les contrôles d'interface atteignent les 17 composants déclarés. Le premier blocage était une référence registry vers `CODE/L_SIMULATION/ST_fbSim_Translation_ExtLink_Echo.st`, type supprimé au commit `7b47291f`. Un miroir **test-only** a été placé sous `TOOLS/TEST_AUTO_CI/MOCKS/` et les trois entrées de registry concernées y pointent ; aucune source PLC n'a été recréée.
+139: - La conversion et les contrôles d'interface atteignent les 17 composants déclarés. Le premier blocage était une référence registry vers `CODE/L_SIMULATION/ST_fbSim_Translation_ExtLink_Echo.st`, type supprimé au commit `261deb99`. Un miroir **test-only** a été placé sous `TOOLS/TEST_AUTO_CI/MOCKS/` et les trois entrées de registry concernées y pointent ; aucune source PLC n'a été recréée.
 140: - Après ce rétablissement du harnais, le parseur STruCpp s'arrête avant toute assertion M3 sur `test_fb_simbench.st:897` : `Expected END_FOR found ADVANCE_TIME`. L'instruction est située dans une boucle d'un scénario M2 antérieur. C'est une incompatibilité du test/parser, non un verdict sur M3 et non une autorisation de modifier le test M2 hors scope.
 ```
 

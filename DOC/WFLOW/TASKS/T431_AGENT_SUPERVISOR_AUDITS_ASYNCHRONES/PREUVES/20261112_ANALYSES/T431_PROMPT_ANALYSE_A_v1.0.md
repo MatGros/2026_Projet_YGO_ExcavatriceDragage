@@ -4202,7 +4202,7 @@ tracking:
   user_need: "Superviseur fiable apres pause/redemarrage, constats exploitables et interface simple ; preuve reelle, pas seulement synthetique."
   useful_history:
     - "Plan de campagne 2026-11-08 et challenges P1/P2 : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md"
-    - "Commits cfcae6bc, 812a5eb2 : etat de depart du code"
+    - "Commits 84d03009, 9b451008 : etat de depart du code"
   current_question: "Quels criteres sont deja satisfaits par le code actuel, lesquels restent a implementer ou a prouver ?"
   established:
     - "AC-F0.1 PASS 2026-11-09 : 91 passed x4 en session normale ; l'echec 90/91 du 2026-11-08 venait de la garde d'isolation d'une session background (sessionKind=bg, ecriture refusee), pas d'un bug."
@@ -5193,9 +5193,9 @@ des toasts, des notifications système, du son et du ciblage d'alerte au clic en
 - Test lien profond interface : **PASS** (`VEILLEUR_UI_DEEP_LINK=1 node TOOLS/AGENT_SUPERVISOR/tests/test_ui.mjs`)
 - Tests extension VS Code : **15 PASS** (`npm test` sous `TOOLS/AGENT_SUPERVISOR/poc/vscode-notifier`)
 - Format git : **PASS** (`git diff --check`)
-- Checkpoint Git : `cfcae6bc wip(agent-supervisor): checkpoint current work [NON TESTE]`. Les retouches
+- Checkpoint Git : `84d03009 wip(agent-supervisor): checkpoint current work [NON TESTE]`. Les retouches
   ultérieures de `ui/index.html`, `test_ui.mjs` et de ce plan sont incluses dans le commit de sauvegarde
-  exploitant `812a5eb2`. Le 2026-11-09, `main` a été avancé sur `work/base-machine-simu` (`bb0f65c7`,
+  exploitant `9b451008`. Le 2026-11-09, `main` a été avancé sur `work/base-machine-simu` (`539778ac`,
   accord exploitant « push A », ancien `main` sous le tag `backup/origin-main-avant-ff-20261109`).
 - Revérification 2026-11-09 (reprise CC01, T429) : DOM normal et deep link PASS, extension 15/15,
   pytest **90/91** — 1 échec `PermissionError` (`pathlib`) non encore analysé ; service 8082 inchangé

@@ -366,7 +366,7 @@ commande d'un treuil en maintenance, ce qui relève d'un arbitrage d'exploitatio
 | Heure | Étape | État | Résumé |
 |---|---|---|---|
 | 02:30:55 | `debut` | en_cours | Prise de tag + relevé des verrous + lecture du brief T354 |
-| 02:31:11 | `verrous-ok` | ok | Tag **DSH20** = premier libre (DSH01..DSH19 pris) ; `edit_flags` vide ; T354 existe déjà (`TASKS.yaml:53-69`) ; HEAD `c9e1fbfe`, `CODE/` propre |
+| 02:31:11 | `verrous-ok` | ok | Tag **DSH20** = premier libre (DSH01..DSH19 pris) ; `edit_flags` vide ; T354 existe déjà (`TASKS.yaml:53-69`) ; HEAD `7872086c`, `CODE/` propre |
 | 02:32:03 | `chemins-M2` | en_cours | `M1:117` confirmé (branche manuelle) ; `M2:143-151` sans `BucketBusy` ; MAINT N2 = `Auth.InhibitM1/M2` |
 | 02:34:28 | `fenetre-prouvee` | en_cours | Fenêtre identifiée (`FB_Bucket:559-562` + `ArmingPermit` + `M2:147`) ; référence `PRG_04:104-111` du brief **réfutée** (réel `:492-497`) |
 | 02:39:09 | `contrat-ok` | ok | Contrat C3 écrit **avant** l'analyse : `check_task_contract.py` **PASS 0 erreur / 0 avertissement** (14 critères AC1..AC14) |

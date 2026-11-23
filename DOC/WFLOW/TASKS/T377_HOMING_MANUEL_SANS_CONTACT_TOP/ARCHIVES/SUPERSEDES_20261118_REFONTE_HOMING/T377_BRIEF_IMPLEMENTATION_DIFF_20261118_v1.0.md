@@ -55,7 +55,7 @@ Forbidden : `FB_Safety_Winch.st` (D1=C : aucune modif) · `FB_Encoder_Homing.st`
 
 ## 6. CHANTIERS CONCURRENTS (obligatoire : vérifier avant écriture)
 - Lot terrain MAINT_N2 inconditionnel : PRG_03/04/05/06, FB_Modes, CycleSemiAuto,
-  Translation*, ST_CycleCmd — committé le 18/11 (5e7935a4, 078be11e). Vérifier `git log`
+  Translation*, ST_CycleCmd — committé le 18/11 (4b0ab3c5, 50666eb2). Vérifier `git log`
   avant le tien ; un seul écrivain à la fois sur un fichier.
 - T377-B (séparée, C4, agent à désigner) : FB_Safety_Winch + EmergencyManagement — NE PAS écrire.
 - Bundle `CODE_XML/CODE_Bundle.xml` global disque : régénérer seul, vérifier avant commit.

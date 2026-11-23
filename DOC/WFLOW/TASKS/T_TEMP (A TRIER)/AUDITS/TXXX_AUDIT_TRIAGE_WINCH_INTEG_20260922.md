@@ -9,7 +9,7 @@
 
 ## 0 · Contexte mesuré
 
-- Après purge de l'argument mort `SetOffsetM` (commit `ecce6a5a`, supprime la VAR_INPUT déjà retirée par `ffc811c1` dans `FB_TestHarness_PRG_03.st:96-100`), l'entrée `WINCH_INTEG` **compile et s'exécute** :
+- Après purge de l'argument mort `SetOffsetM` (commit `82442264`, supprime la VAR_INPUT déjà retirée par `ffc811c1` dans `FB_TestHarness_PRG_03.st:96-100`), l'entrée `WINCH_INTEG` **compile et s'exécute** :
   `TOOLS/TEST_AUTO_CI/RESULTS/H_TREUILS_BENNE/reports/WINCH_INTEG.json` → 32 tests, 5 PASS / 27 FAIL.
 - **Observation structurante** : 22 des 27 échecs sont des **préconditions qui tombent** (« M1_StepNumber >= 1 got 0 », « M1RelayFwd got FALSE »). Le mouvement **ne s'établit jamais** dans le harnais. Ce n'est pas 22 défauts indépendants : c'est **une cause racine de harnais** qui cascade, + 1 défaut réel + 4 cibles ROUGE-baseline.
 

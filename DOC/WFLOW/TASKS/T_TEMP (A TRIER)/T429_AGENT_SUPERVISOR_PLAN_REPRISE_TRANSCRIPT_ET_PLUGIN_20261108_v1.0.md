@@ -362,9 +362,9 @@ des toasts, des notifications système, du son et du ciblage d'alerte au clic en
 - Test lien profond interface : **PASS** (`VEILLEUR_UI_DEEP_LINK=1 node TOOLS/AGENT_SUPERVISOR/tests/test_ui.mjs`)
 - Tests extension VS Code : **15 PASS** (`npm test` sous `TOOLS/AGENT_SUPERVISOR/poc/vscode-notifier`)
 - Format git : **PASS** (`git diff --check`)
-- Checkpoint Git : `cfcae6bc wip(agent-supervisor): checkpoint current work [NON TESTE]`. Les retouches
+- Checkpoint Git : `84d03009 wip(agent-supervisor): checkpoint current work [NON TESTE]`. Les retouches
   ultérieures de `ui/index.html`, `test_ui.mjs` et de ce plan sont incluses dans le commit de sauvegarde
-  exploitant `812a5eb2`. Le 2026-11-09, `main` a été avancé sur `work/base-machine-simu` (`bb0f65c7`,
+  exploitant `9b451008`. Le 2026-11-09, `main` a été avancé sur `work/base-machine-simu` (`539778ac`,
   accord exploitant « push A », ancien `main` sous le tag `backup/origin-main-avant-ff-20261109`).
 - Revérification 2026-11-09 (reprise CC01, T429) : DOM normal et deep link PASS, extension 15/15,
   pytest **90/91** — 1 échec `PermissionError` (`pathlib`) non encore analysé ; service 8082 inchangé

@@ -3,7 +3,7 @@
 **Date** : 21 Septembre 2026 — 06:00
 **Auteur** : DSH25 (ex-DSH23 — re-tag pour collision de tag avec le lot T345-L1) — Expert Senior Automatisme Industriel / Sécurité Machine / CI-CD
 **Tâche** : T361 (parent T333) — volet B du brief `DOC/WFLOW/CONTRACTS/BRIEF_T361_SIMU_RATIO_M3.md`
-**Ancrage** : HEAD `276fc11e` — `git status --short -- CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st` → **VIDE** (l'estimateur n'est pas touché ; zéro ligne de code de recalage écrite)
+**Ancrage** : HEAD `03dd7ca5` — `git status --short -- CODE/I_TRANSLATION/FB_Translation_PositionEstimator.st` → **VIDE** (l'estimateur n'est pas touché ; zéro ligne de code de recalage écrite)
 ⚠️ `CODE/I_TRANSLATION/FB_Translation.st` — **autre fichier du même dossier** — est modifié NON COMMITÉ par un autre lot : sans rapport avec ce volet, signalé ici pour éviter toute confusion de lecture du `git status`.
 **Statut** : 🔴 **ANALYSE SEULE — DÉCISION UTILISATEUR REQUISE AVANT TOUT CODE**
 

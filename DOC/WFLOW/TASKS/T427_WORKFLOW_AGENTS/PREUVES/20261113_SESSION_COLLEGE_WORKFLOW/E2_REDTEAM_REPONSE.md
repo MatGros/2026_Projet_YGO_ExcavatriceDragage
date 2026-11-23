@@ -12,7 +12,7 @@ RED TEAM — modes d'échec pratique de la V2 (§E), du plus probable au moins p
 
 6. **Résumé périmé** — `TASKS_ACTIVE_SUMMARY.md` est généré par script mais « fraîcheur du résumé non déclenchée » (§E) ; l'agent travaille sur une tâche déjà close. Parade : en-tête git-sha dans le résumé, refus d'écriture si sha ≠ HEAD. [FAIT §E] [HYPOTHÈSE]
 
-7. **Fatigue opérateur / contradiction** — Étape 2 « flou → questionner » (§E) contredit e06047d1 « action locale réversible : la faire sans question » (§C) ; l'agent alterne et l'opérateur arbitre chaque session, d'autant que le menu d'options a disparu (§A vs §B). Parade : critère de voie en 1 ligne + défaut écrit = Réponse directe, zéro écriture `CODE/`. [FAIT §C/§E]
+7. **Fatigue opérateur / contradiction** — Étape 2 « flou → questionner » (§E) contredit b671a890 « action locale réversible : la faire sans question » (§C) ; l'agent alterne et l'opérateur arbitre chaque session, d'autant que le menu d'options a disparu (§A vs §B). Parade : critère de voie en 1 ligne + défaut écrit = Réponse directe, zéro écriture `CODE/`. [FAIT §C/§E]
 
 8. **« Réponse directe » comme porte dérobée** — « action locale réversible » n'est pas défini (§E) ; sous Codex aucun hook n'arrête une modification de séquenceur ST classée « réversible » (§D), sur machine de dragage réelle. Parade : voie Réponse directe = lecture seule stricte sur `CODE/`, liste blanche de chemins. [FAIT §D/§E] [HYPOTHÈSE]
 

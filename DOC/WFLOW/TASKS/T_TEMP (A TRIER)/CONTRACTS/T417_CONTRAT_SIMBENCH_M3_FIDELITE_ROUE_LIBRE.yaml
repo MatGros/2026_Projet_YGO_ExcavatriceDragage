@@ -78,7 +78,7 @@ execution:
     sous controle ; fin de rampe au seuil0.5 seulement lorsque demande ET rampe interne sont nulles. Balancement et frein physique conserves. Programme
     machine intact.'
   functional_results:
-    checkpoint_fd32b652: 8/12, dont les trois nouveaux controles dynamiques en echec
+    checkpoint_0bc27acb: 8/12, dont les trois nouveaux controles dynamiques en echec
     current: 12/12 PASS, ST reel compile STruCpp ; pas de compilation CODESYS revendiquee
     guard: TOOLS/AGENT_WORKFLOW/scripts/check_sim_m3_dynamics.py
   review:

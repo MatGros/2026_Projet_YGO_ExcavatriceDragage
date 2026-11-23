@@ -2,7 +2,7 @@
 
 > 🎫 Brief : `DOC/WFLOW/CONTRACTS/BRIEF_T345_L1_AXE_POSSEDE_SON_ARRET.md` (préambule `subagent_preamble.md` appliqué)
 > 🧭 Plan parent : `DOC/WFLOW/CONTRACTS/PLAN_T334_PHASE3_AUTORITE_ARRET_AXE.md` §3 (lot L1)
-> 🏷️ Acteur : **DSH23** · 📅 2026-09-21 · 🔖 Ancre : HEAD `276fc11e` (les deux fichiers du lot étaient propres)
+> 🏷️ Acteur : **DSH23** · 📅 2026-09-21 · 🔖 Ancre : HEAD `03dd7ca5` (les deux fichiers du lot étaient propres)
 > 🚦 Statut : **IMPLÉMENTÉ, TESTÉ, NON COMMITÉ** — recette humaine (import CODESYS + essai machine) requise
 
 ---

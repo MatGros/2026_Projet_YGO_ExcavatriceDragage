@@ -11,7 +11,7 @@ Fait notable : la partie `consolidation_review` de T426 **est** l'étude de « 1
 | | T426 (étude, terminée) | T427 (cadrage, non implémentée) |
 |---|---|---|
 | Objet | pilotage vérifiable, contrôles en avertissement, revue A/B sur stagnation | contrat étendu (jalons, sas d'essais, quota sous-agents), note compagnon, routeur de skill |
-| Livré | prototype `check_task_tracking.py` + 43 tests, commit `2a5bf86d` | rien dans le code (gabarit sans ses champs) |
+| Livré | prototype `check_task_tracking.py` + 43 tests, commit `3c052204` | rien dans le code (gabarit sans ses champs) |
 | AC | `T426-AC1…8` | `AC1…5` |
 
 ## 3. Contradictions et décisions
@@ -150,10 +150,10 @@ Pour chaque idée : 1) retrouver l’exemple concret, 2) examiner bénéfice/co�
 > 📌 Responsable : `CC01`/`CC02` · Statut T427 au catalogue : ⏸️ (pause exploitant)
 
 ### 9.1 Pourquoi (constat établi le 2026-11-13)
-- 🎯 **Cause racine** : commit `2a5bf86d` (01/11, intitulé « wip(T426) : prototype advisory task
+- 🎯 **Cause racine** : commit `3c052204` (01/11, intitulé « wip(T426) : prototype advisory task
   tracking ») a supprimé de `AGENTS.md` la section « Démarrage de session — briefing obligatoire »
   (−72 lignes). Depuis, rien ne fait lire les standards au 1er message.
-- 🔓 `e06047d1` (03/11) a retiré « l'agent DOIT interpeller et poser des questions ».
+- 🔓 `b671a890` (03/11) a retiré « l'agent DOIT interpeller et poser des questions ».
 - ✅ Hooks Claude inchangés depuis août et fonctionnels ; aucun hook de démarrage n'a jamais existé.
 - 📂 Preuves : [`PREUVES/20261113_SESSION_COLLEGE_WORKFLOW/`](PREUVES/20261113_SESSION_COLLEGE_WORKFLOW/)
   (collège 4 experts + binôme historique).
@@ -173,7 +173,7 @@ Pour chaque idée : 1) retrouver l’exemple concret, 2) examiner bénéfice/co�
 ### 9.3 Incréments
 
 **✅ I0 — Checkpoint avant modification**
-- 📦 Livrable : commit `a4871f3d`
+- 📦 Livrable : commit `04ee314e`
 - 🧪 Passage : arbre propre, 0 suppression
 
 **🟨 I1 — Démarrage V3.1 dans `AGENTS.md` + résumé généré une fois à la main** · livré, tests à jouer
@@ -235,7 +235,7 @@ Chaque cas se joue sur **Claude** et sur **Codex** ; noter ✅ / ❌ + l'extrait
    - Attendu : restitution standard (rôle, compteurs, une question) · ne reprend pas le fil
    - Claude ⬜ · DSH ⬜
 
-↩️ Retour arrière I1 : `git diff AGENTS.md`, puis restauration ciblée de ce seul fichier depuis `a4871f3d`.
+↩️ Retour arrière I1 : `git diff AGENTS.md`, puis restauration ciblée de ce seul fichier depuis `04ee314e`.
 
 ### 9.5 Points ouverts (à trancher au fil des incréments, sans bloquer I1)
 - **P1** — Antigravity et DSH lisent-ils `AGENTS.md` nativement ? Non vérifié.
@@ -247,9 +247,9 @@ Chaque cas se joue sur **Claude** et sur **Codex** ; noter ✅ / ❌ + l'extrait
 
 ### 9.6 Journal des incréments (ajout en fin, une entrée par événement)
 
-- **2026-11-13 · 🔎 Diagnostic** — cause racine `2a5bf86d` identifiée ; collège de 4 experts.
+- **2026-11-13 · 🔎 Diagnostic** — cause racine `3c052204` identifiée ; collège de 4 experts.
   📂 `PREUVES/20261113_SESSION_COLLEGE_WORKFLOW/`
-- **2026-11-13 · ✅ I0** — checkpoint général. 📦 `a4871f3d`
+- **2026-11-13 · ✅ I0** — checkpoint général. 📦 `04ee314e`
 - **2026-11-13 · ⬜ I1 cadrage** — ligne d'étape colorée ajoutée (demande exploitant) + cas de test T4.
 - **2026-11-13 · 🛠️ I1** — GO exploitant. `AGENTS.md` § Démarrage remplacé (5 sous-sections, ligne
   d'étape couleur + emoji). Résumé généré à la main : 1 684 octets · 🔒 6 · ⏳ 0 · ⏸️ 9 · ⬜ 141 · ⛔ 0.
@@ -477,7 +477,7 @@ Workflow `review-plan-t427` (run `wf_92da4675-9ce`, 10 agents lecture seule : 3 
 5. **Backlog** : B2 avant B1 ; test binaire pour B1 ; tests xfail manquants (B12, B14, B15, B16).
 6. **Besoins non planifiés** : commandes de rôle, question « je gère qui, quoi ? », prompt F4 dans le Superviseur → items B testables.
 
-Décisions attendues de l'exploitant : D2/D3, validation a posteriori des fiches de rôle (f6753d24), emplacement et porteur de F4, écrivain du registre des dérogations.
+Décisions attendues de l'exploitant : D2/D3, validation a posteriori des fiches de rôle (e797172a), emplacement et porteur de F4, écrivain du registre des dérogations.
 Workflow de suivi : non lancé tant que le plan n'est pas corrigé.
 
 ## 20. ✅ Clôture de l'étude (2026-11-15)
@@ -487,7 +487,7 @@ Workflow de suivi : non lancé tant que le plan n'est pas corrigé.
 
 1. **[bloquant] Garde de périmètre** — ✅ **traité**. `classify()` respecte le périmètre
    épinglé, deny-list dure non levée par dérogation, citation littérale exigée (commit
-   `6e261378`). Trou des écritures shell fermé le 2026-11-15 (`9d1f19b0`) : hook
+   `fe64b61c`). Trou des écritures shell fermé le 2026-11-15 (`151741b0`) : hook
    `Bash|PowerShell` actif. Limite assumée : analyse lexicale.
 2. **GO non tracés** — ✅ **traité**. Convention dans `AGENTS.md` (GO + copie datée) et
    **registre append-only livré** : `go_registry.py`, qui **refuse un GO sans référence
@@ -534,7 +534,7 @@ Seuls les points marqués **prouvé** ont une preuve brute. Le reste est signal�
 - Les 14 xfail sont ceux documentés en §13.
 
 ### Prouvé fait
-- M4 garde-fous : hook_scope_guard.py et hook_shell_scope_guard.py référencés dans .claude/settings.json ; commits 6e261378 et 9d1f19b0 présents dans git log.
+- M4 garde-fous : hook_scope_guard.py et hook_shell_scope_guard.py référencés dans .claude/settings.json ; commits fe64b61c et 151741b0 présents dans git log.
 - M6 : workflow_state.py, trace_log.py, exchange_tracker.py, go_registry.py présents.
 - M3 : .claude/commands/workflow-project-orchestrator.md et workflow-project-coordinator.md présents, non commités.
 - B4 : test sans xfail, passe (suite ci-dessus).
@@ -668,7 +668,7 @@ Grille proposée :
 ## 25. Lecture obligatoire avant tâche (demande exploitant, 2026-11-15)
 
 Constat (vérifié) : `AGENTS.md` avait une section « Démarrage de session — briefing obligatoire » (ligne 11)
-avant le commit `2a5bf86d`. Ce commit a réécrit `AGENTS.md` (112 lignes) et `subagent_preamble.md` (250 lignes).
+avant le commit `3c052204`. Ce commit a réécrit `AGENTS.md` (112 lignes) et `subagent_preamble.md` (250 lignes).
 Résultat : aujourd'hui, rien n'oblige à lire le catalogue, le contrat et le plan avant d'agir.
 
 Où vivent les objectifs :
@@ -737,7 +737,7 @@ Points en attente, par ordre de priorité. Chacun attend une décision ou un GO 
 4. Pied `➡️ Choix` : emoji retiré, remplacé par du texte. Règle générale : pas d'emoji dans les réponses ni les documents d'agent. Périmètre du retrait dans les documents à décider.
 5. Hook worktree : écrit, branché dans `.claude/settings.json` (PreToolUse, `EnterWorktree|Agent`, bloquant). Testé en simulation uniquement. Effet réel non vérifié, et une session ouverte avant le changement peut ne pas l'avoir.
 6. `AGENTS.md` : mes passages ont été écrasés une fois par une autre écriture, puis réappliqués. Auteur de la réécriture inconnu. Décision à prendre : qui peut modifier `AGENTS.md`.
-7. Commits : mon dernier commit T427 est `ddeed059`. Mes changements ultérieurs (hook, `AGENTS.md`, skill orchestrateur, plan) figurent dans `4be9460d` « chore(checkpoint): sauvegarde locale complete projet », fait par une autre session.
+7. Commits : mon dernier commit T427 est `7c1506a4`. Mes changements ultérieurs (hook, `AGENTS.md`, skill orchestrateur, plan) figurent dans `45f37322` « chore(checkpoint): sauvegarde locale complete projet », fait par une autre session.
 
 ## 29. Orchestrateur surveille comme un agent particulier (constat 2026-11-16)
 
@@ -766,7 +766,7 @@ celle d'un agent d'exécution. Critères à écrire une fois la forme d'alerte t
 ## 30. Correctif du garde de perimetre (2026-11-17 / 18) — trace
 
 Le correctif du garde et la nouvelle regle de derogation sont bien dans l'historique, mais **noyes**
-dans un commit d'une autre session : `381021be` « wip(checkpoint): point de sauvegarde avant refonte
+dans un commit d'une autre session : `0771dd2d` « wip(checkpoint): point de sauvegarde avant refonte
 grafcet homing T377 » (28 fichiers). Ce message ne parle pas du garde : chercher par message ne le
 retrouvera pas.
 

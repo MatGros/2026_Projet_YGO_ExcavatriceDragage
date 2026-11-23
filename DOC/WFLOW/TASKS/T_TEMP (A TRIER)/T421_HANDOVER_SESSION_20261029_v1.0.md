@@ -8,7 +8,7 @@
 ## 📌 État Git & Environnement de Session
 
 * **Branche active** : `work/base-machine-simu`
-* **Dernier commit validé** : `dc278fa8` (`feat(simu): validation T421 fidelite dynamique treuils M1/M2 et derive benne`)
+* **Dernier commit validé** : `0c2a9ea3` (`feat(simu): validation T421 fidelite dynamique treuils M1/M2 et derive benne`)
 * **État working tree** : 100% propre (`git status` vide, aucun scratch non indexé, cache `.tmp` nettoyé).
 * **Bundle complet PLCopenXML** : [`CODE_XML/CODE_Bundle.xml`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE_XML/CODE_Bundle.xml) (frais et synchronisé).
 * **Diff bundle** : [`CODE_XML/CODE_DiffBundle.xml`](file:///C:/_MGS/DEV/2026_Projet_YGO_ExcavatriceDragage/CODE_XML/CODE_DiffBundle.xml) (contient `FB_SimBench`, `FB_Sim_Encoder`, `GVL_Simulation`, `PRG_02_Acquisition`).

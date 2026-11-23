@@ -1,7 +1,7 @@
 # 🔔 AUDIT T356 — Chaîne alarmes : recensement exhaustif process + safety
 
 > **Lot** : T356 (parent T278) · **Criticité** C2 · **Nature** : AUDIT PUR — **zéro ligne de `CODE/` modifiée**
-> **Agent** : `DSH21` (verrou `TASK_LOCKS.json`) · **Date** : 2026-09-21 · **Ancrage** : `HEAD = c9e1fbfe`
+> **Agent** : `DSH21` (verrou `TASK_LOCKS.json`) · **Date** : 2026-09-21 · **Ancrage** : `HEAD = 7872086c`
 > **Préambule** : `TOOLS/AGENT_WORKFLOW/prompts/subagent_preamble.md` **APPLIQUÉ** — le brief a été exécuté par
 > le porteur lui-même, pas retransmis (condition écrite en tête du brief, même patron que T352/DSH17).
 > **Preuve périmètre** : `git status --short -- CODE/` → **vide** (aucun fichier de `CODE/` touché).

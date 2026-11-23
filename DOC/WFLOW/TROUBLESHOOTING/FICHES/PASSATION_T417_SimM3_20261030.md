@@ -19,20 +19,20 @@
 
 | Commit | Contenu | Statut |
 |---|---|---|
-| `746e3a0f` | Base de référence avant ce lot (validation T421) | Référence |
-| `8669c6dd` | Checkpoint : code simulation T417 non commité + contrat, étude, fiche, liste et template de trace | Commit `wip [NON TESTE]` |
-| `0990a225` | Correction : défauts FB `PhysicalBrakeActive` (FB_Sim_TranslationBrake) et `BrakePhysicalActive` (FB_Sim_Translation) remis à **FALSE** | Commit `fix` |
-| `be51ce13` | Bundle PLCopenXML régénéré (`CODE_Bundle.xml`, `CODE_DiffBundle.xml`) + XML L_SIMULATION + PRG_02 | Commit `build` |
-| `102b1676` | Journal fiche T417 (A/B, sources candidates du délai) | Commit `docs` |
-| `14009dcf` | Livrable partiel (section 11 de la fiche) | Commit `docs` |
+| `5f7bdaaa` | Base de référence avant ce lot (validation T421) | Référence |
+| `aff8cdd0` | Checkpoint : code simulation T417 non commité + contrat, étude, fiche, liste et template de trace | Commit `wip [NON TESTE]` |
+| `9247900c` | Correction : défauts FB `PhysicalBrakeActive` (FB_Sim_TranslationBrake) et `BrakePhysicalActive` (FB_Sim_Translation) remis à **FALSE** | Commit `fix` |
+| `67ea97b2` | Bundle PLCopenXML régénéré (`CODE_Bundle.xml`, `CODE_DiffBundle.xml`) + XML L_SIMULATION + PRG_02 | Commit `build` |
+| `9d72f3dc` | Journal fiche T417 (A/B, sources candidates du délai) | Commit `docs` |
+| `6038a040` | Livrable partiel (section 11 de la fiche) | Commit `docs` |
 
-**Revert** : `git revert <sha>` par commit. Le commit `0990a225` est isolé : il contient uniquement les deux défauts FB.
+**Revert** : `git revert <sha>` par commit. Le commit `9247900c` est isolé : il contient uniquement les deux défauts FB.
 
 **Fichiers hors commits (autres chantiers, ne pas embarquer)** : `DOC/WFLOW/TASKS.yaml`, `DOC/WFLOW/TASKS_ORCHESTRATOR.yaml`, `DOC/WFLOW/PROMPTS/04_Divers.md`, `.claude/settings.local.json`, `reponse.md`, `TOOLS/AGENT_WORKFLOW/scripts/run_m3_study_agents.py`, `DOC/WFLOW/PROMPTS/10_ExempleOrchestrator/`.
 
 **Attention** : pendant ce lot, un processus `git.exe` concurrent et un `index.lock` transitoire sont apparus. Vérifier qu'aucun autre agent ne committe avant tout commit.
 
-**Attention** : `DOC/WFLOW/ETUDES/ANALYSES_T417/RAPPORT_AGENT_{A,B,C}_*.md` ont été committés dans `8669c6dd`. Ce sont des rapports d'agents antérieurs, **non vérifiés** par moi.
+**Attention** : `DOC/WFLOW/ETUDES/ANALYSES_T417/RAPPORT_AGENT_{A,B,C}_*.md` ont été committés dans `aff8cdd0`. Ce sont des rapports d'agents antérieurs, **non vérifiés** par moi.
 
 ---
 
@@ -40,7 +40,7 @@
 
 Fichiers : `CODE/L_SIMULATION/` — `FB_Sim_Translation.st`, `FB_Sim_TranslationDrive.st`, `FB_Sim_TranslationBrake.st`, `FB_SimBench.st`, `GVL_Simulation.st`.
 
-| Paramètre | Valeur FB (après `0990a225`) | Valeur GVL utilisée en simulation | Remarque |
+| Paramètre | Valeur FB (après `9247900c`) | Valeur GVL utilisée en simulation | Remarque |
 |---|---|---|---|
 | `PhysicalBrakeActive` / `BrakePhysicalActive` | FALSE (historique) | **TRUE** (`GVL_Simulation.st:79`) | Source unique = GVL, passée par `FB_SimBench.st:697` |
 | `CartFreeActive` | FALSE | **TRUE** (`GVL_Simulation.st:84`) | Mode chariot libre actif en simulation ; non testé |
@@ -96,7 +96,7 @@ Trois mécanismes candidats, à ne pas départager sans nouvelle donnée :
 
 La coupure du variateur, elle, est bien au scan capteur (PRG_06 permission `AND NOT DI`).
 
-**Vérification de référence** : la logique de coupure Trémie (`PRG_06:431-443`, `PRG_05:709/720`) est **identique** entre la référence MES `e38cc09a` et `HEAD`. Ce n'est pas un écart de branche.
+**Vérification de référence** : la logique de coupure Trémie (`PRG_06:431-443`, `PRG_05:709/720`) est **identique** entre la référence MES `da7ba246` et `HEAD`. Ce n'est pas un écart de branche.
 
 ---
 
@@ -130,8 +130,8 @@ Limite : ne modélise pas le balancier, donc ne dit rien du chariot libre (H4).
 ## 8. Tests et gates (état vérifié)
 
 **Suite CI L_SIMULATION** (`TOOLS/TEST_AUTO_CI/scripts/run_tests.py --domain L_SIMULATION`, ~40 s) :
-- Base `746e3a0f` : 6 PASS / 6 FAIL.
-- État courant (après `0990a225`) : **6 PASS / 6 FAIL, mêmes échecs**. Aucune régression.
+- Base `5f7bdaaa` : 6 PASS / 6 FAIL.
+- État courant (après `9247900c`) : **6 PASS / 6 FAIL, mêmes échecs**. Aucune régression.
 - Échecs présents sur la base (non causés par ce lot) :
   - `FB_SimBench` ; `SimOperatorJoystick` ; `SimManualReference`.
   - `SimTranslationLoop` : `TC-T417-LOOP-A/B` attend PHASE 3, obtient 2.

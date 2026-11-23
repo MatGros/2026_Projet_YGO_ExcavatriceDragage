@@ -1,7 +1,7 @@
 # NOTE D'APPLICATION — T371 « Faux vert du diagnostic mouvement »
 
 > **Tâche** : `T371` (C4, patch, `TASK_CONTRACT_T371_FAUX_VERT_MOTIONCHECKLIST.yaml`) — agent **DSH29**.
-> **Ancrage** : HEAD `bb9436e1` (2026-09-21). **Aucun commit, aucun push.**
+> **Ancrage** : HEAD `0a9733c3` (2026-09-21). **Aucun commit, aucun push.**
 > **Objet** : `Step8_OutputInterlockOk` du diagnostic `ST_MotionChecklist` (MotionM1 / MotionM2 /
 > MotionM3) cessait de refléter le refus RÉEL de la barrière finale : il était dérivé du **seul**
 > `FinalInterlockError`, alimenté par **une seule cause** (ErrorId bit0 = timeout confirmation frein).
@@ -309,7 +309,7 @@ ci-dessous donne l'état **après** traitement, finding par finding.
 | **F5** | MINOR | terme M3 redondant avec `NOT FinalInterlockError` | ⚖️ **ASSUMÉ/DOCUMENTÉ** — §2.5 et §2.6 (résidu 2) : décision inchangée, le gain M3 est la publication |
 | **F6** | MINOR | entrées mortes / collisions de valeurs dans la table du DUT | ✅ **TRAITÉ** — champs **typés énumération** en vocabulaire commun (plus de collision inter-axes) ; `WAIT_STEP_DELAY` explicitement annoté « jamais produit » dans le DUT |
 | **F7** | MINOR | en-tête du test annonçant les cas non exécutables | ✅ **CORRIGÉ** — en-tête réécrit, cas exécutés et collés (§6) |
-| **F8** | MINOR | HEAD annoncé faux dans la note | ✅ **CORRIGÉ** — ancrage `bb9436e1` |
+| **F8** | MINOR | HEAD annoncé faux dans la note | ✅ **CORRIGÉ** — ancrage `0a9733c3` |
 | **F9** | MINOR | faux rouge transitoire en fin de mouvement (skew N-1) | ✅ **RÉSOLU** par F1 — le témoin et `MotorRequest` viennent désormais de la **même source** (barrière), donc plus de décalage |
 | **F10** | MINOR | contrat : méthode AC4 substituée, sites AC5 périmés, AC10 sans trace G200/palier C | ✅ **CORRIGÉ** — contrat mis à jour avec les preuves réellement produites (ROUGE/VERT/G200/palier C), sites courants |
 

@@ -1,6 +1,6 @@
 # SPEC — les 2 absences du patrimoine T377 (pour validation exploitant, puis implémentation T417-C)
 
-CC03, 2026-11-18 · lecture seule · pas de code. Base : relecture 6956366b (même dossier).
+CC03, 2026-11-18 · lecture seule · pas de code. Base : relecture e75d1e08 (même dossier).
 
 ## Absence 1 — Latch « contact capteur haut » (anti-martelage, trace)
 

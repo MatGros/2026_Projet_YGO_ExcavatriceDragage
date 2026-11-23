@@ -2,7 +2,7 @@
 
 > 2026-11-04 · Contrat : `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T417-F_SIMU_M3_HYPOTHESES.yaml` · Statut : **brouillon Phase 1, à valider à PA1**
 > Aucune hypothèse de ce dossier n'est validée. Aucun essai n'a été lancé pour ce dossier.
-> Audit Auditeur A du 04/11 : verdict MAJOR, écarts corrigés dans cette version ; T8, C3 et les cotes `e38cc09a` revérifiés sur source par CC01.
+> Audit Auditeur A du 04/11 : verdict MAJOR, écarts corrigés dans cette version ; T8, C3 et les cotes `da7ba246` revérifiés sur source par CC01.
 
 ## 1. Règles
 
@@ -61,7 +61,7 @@ Traces sous `TOOLS/PLC_CSV_SNAPSHOT/RESULTS/trace/`, sans SIMU dans le nom. Pas 
 | T9 | `Suivi_89_MES_SoirDisj_20260923.trace` | 30,59 ; 37,61 ; 40,39 s | `EstimatedPosM3_M` : 1,764→5,020 ; 11,860→15,010 ; 16,503→20,000 |
 | T10 | idem | 103,66 ; 110,69 ; 114,14 s | `EstimatedPosM3_M` : 18,502→14,980 ; 8,178→4,980 ; 3,205→−0,004 |
 
-**Calcul à challenger** (T11, `Suivi_90_MES_SoirDisj_M3_20260923.trace`, trajets démarrant à 21,40 / 94,41 / 122,94 s) : intégrale de fréquence de 550,8 / 553,6 / 551,2 Hz·s jusqu'à fréquence nulle (14,1 à 14,9 s), ou 540,7 / 543,2 / 540,2 Hz·s mot actif seul (13,0 à 13,8 s). Le banc actuel vaut 250 Hz·s entre capteurs par construction (5 m / 0,02). Le programme du 23/09 n'avait pas ces 5 m : `e38cc09a` porte PV/P2/P1/Maintenance = 5/15/20/30 m, gain 0,02, soit 1000 Hz·s attendus sur 20 m, et T9/T10 montrent les recalages sur ces cotes. Le passage à 1,5/3,5/5/10 m date de `ac17beef` (28/10). Ce calcul pose une question, pas une conclusion : il suppose que la fréquence retournée suit la vitesse du chariot.
+**Calcul à challenger** (T11, `Suivi_90_MES_SoirDisj_M3_20260923.trace`, trajets démarrant à 21,40 / 94,41 / 122,94 s) : intégrale de fréquence de 550,8 / 553,6 / 551,2 Hz·s jusqu'à fréquence nulle (14,1 à 14,9 s), ou 540,7 / 543,2 / 540,2 Hz·s mot actif seul (13,0 à 13,8 s). Le banc actuel vaut 250 Hz·s entre capteurs par construction (5 m / 0,02). Le programme du 23/09 n'avait pas ces 5 m : `da7ba246` porte PV/P2/P1/Maintenance = 5/15/20/30 m, gain 0,02, soit 1000 Hz·s attendus sur 20 m, et T9/T10 montrent les recalages sur ces cotes. Le passage à 1,5/3,5/5/10 m date de `d3dc9385` (28/10). Ce calcul pose une question, pas une conclusion : il suppose que la fréquence retournée suit la vitesse du chariot.
 
 **Lecture prudente** : T6 et T8, deux arrivées à 10 Hz, montrent la même signature à l'arrivée (frein DI 1→0 sur l'échantillon de Trémie, fréquence à 10 Hz). Elles divergent ensuite : T6 frein non rouvert, `ErrorId` 64, Trémie perdue ; T8 frein rouvert au scan échantillonné suivant, pas de défaut, Trémie tenue. Un cas de chaque, à deux dates et deux versions de programme : rien à généraliser. Les arrivées Trémie à 20 Hz de T2 ne montrent pas cette chute, mais elles datent d'une autre version : aucune comparaison à conditions identiques n'existe.
 
@@ -105,6 +105,6 @@ Chaque ligne est réfutable : « Infirmée si » décrit ce qui l'écarterait. L
 2. Hypothèses mal réfutables.
 3. Risque de calage sur un constat.
 4. Conflit de H-P avec la règle « source unique » et le gate G518 : un réglage automate et une vérité procédé sont-ils deux sources d'une même donnée ?
-5. Code de référence : `main` ou programme machine v0.7.25 ≈ `e38cc09a`.
+5. Code de référence : `main` ou programme machine v0.7.25 ≈ `da7ba246`.
 6. Ordre proposé : H-P, H-A, H-K, H-F, H-S, H-G, H-R, H-T, H-C.
 7. Modèle minimal suffisant : qu'est-ce qui change réellement une décision sur AX14–AX18 ?

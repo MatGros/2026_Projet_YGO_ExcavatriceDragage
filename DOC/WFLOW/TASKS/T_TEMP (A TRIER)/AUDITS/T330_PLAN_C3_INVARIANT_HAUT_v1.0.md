@@ -35,7 +35,7 @@
 | **Q24** | Non-rebond | Correction **à sens unique** ⇒ pas de rebond — **à prouver** par un **test 2 scans** | Arbitrage humain 2026-09-20 |
 | **Q27** | Tolérance REAL | **AUCUN `eps`** — règle **stricte** `Δ ≥ 1,00 m` (**lemme de Sterbenz** ⇒ différence **exacte**) | Arbitrage humain + **démonstration mathématique** |
 | **Q18** | Bande `0,50 m` non mesurée | Risque **accepté** ; **mesure en recette P5** | Arbitrage humain 2026-09-20 |
-| **Q28** | Maintien T291-B B1 | **LEVÉ** — B1 remis (commit `55700932`), validation utilisateur | Arbitrage humain 2026-09-20 |
+| **Q28** | Maintien T291-B B1 | **LEVÉ** — B1 remis (commit `7e600594`), validation utilisateur | Arbitrage humain 2026-09-20 |
 | **Q3** | Coïncidence des seuils ±0,50 m | **Une seule** expression dérivée (le point médian devient l'état **nominal** après correction) — **contrainte d'implémentation**, pas une question | Décision orchestrateur, cf. §2.5 |
 | **Q25** | Message IHM | Champ bandeau + **maintien** `CST_BannerHoldTime` + libellé **discriminant** (cf. cadrage §11bis) — **spécifié §2.6** | Décision orchestrateur |
 | **Q26** | Format d'ID + matrice | **`TC-P10-<NNN>` canonique**, bloc **035-071**, déclaré dans `af_traceability_matrix.yaml` | Décision orchestrateur (§4) |

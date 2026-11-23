@@ -1,7 +1,7 @@
 # 📋 Registre de Préparation — Prochaine Mise en Service (26/09/2026)
 
 > **Date d'ouverture :** 2026-09-26  
-> **Branche de départ :** `main` (Jalon `MES_FIN_20260923`, Commit `57076207`)  
+> **Branche de départ :** `main` (Jalon `MES_FIN_20260923`, Commit `37c81388`)  
 > **Objet :** Recueil et suivi des retours d'exploitation sur site, analyse des anomalies physiques, nouvelles demandes et préparation des tâches avant la prochaine séance.
 
 ---
@@ -60,7 +60,7 @@
   - **Diffusion IHM filtrée (H et Min uniquement) :** Seules les grandeurs en **Heures** et **Minutes** sont calculées et diffusées vers la supervision (`GVL_IHM.Commun.RunningHours` de type `ST_RunningHoursHMI`), les secondes restant strictement internes pour éviter tout encombrement et scintillement à l'écran.
   - **Inviolabilité & Zéro RAZ IHM :** Aucun bouton ni commande de remise à zéro sur l'IHM. La seule RAZ possible relève d'une réinitialisation formelle des variables persistantes (NVRAM / RETAIN) en maintenance.
 - **État d'implémentation :**
-  - Logique déjà entièrement conforme et codée sous commit `d95904ae` (`GVL_PERSISTENT`, incrémentation seconde par `TON` 1s + `R_TRIG` dans `PRG_07_Supervision`, division modulo vers `ST_RunningHoursHMI`).
+  - Logique déjà entièrement conforme et codée sous commit `f9855db0` (`GVL_PERSISTENT`, incrémentation seconde par `TON` 1s + `R_TRIG` dans `PRG_07_Supervision`, division modulo vers `ST_RunningHoursHMI`).
   - Reste à déployer en ligne dans le PLC CODESYS, vérifier la persistance NVRAM après redémarrage électrique et raccorder l'affichage sur le synoptique IHM.
 
 ### T377 — Homing M1/M2 manuel sans contact TOP : approche prudente, validation visuelle et sécurité anti-casse

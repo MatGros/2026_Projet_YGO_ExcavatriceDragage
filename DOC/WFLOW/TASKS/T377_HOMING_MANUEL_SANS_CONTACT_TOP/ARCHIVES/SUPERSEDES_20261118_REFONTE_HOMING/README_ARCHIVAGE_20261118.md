@@ -5,7 +5,7 @@ suppression ; commit à l'accord explicite de l'exploitant).
 
 Raison : le grafcet homing a été refontré le 2026-11-18
 (`DOC/WFLOW/MISE_EN_SERVICE/PLAN_REFONTE_GRAFCET_HOMING_20261118_v1.0.md`, D1-D7,
-implémentation commit `6956366b`, relecture
+implémentation commit `e75d1e08`, relecture
 `DOC/WFLOW/MISE_EN_SERVICE/20261118_RELEVES/RELECTURE_6956366B_20261118_v0.1.md`).
 Le design décrit ici (5 gardes MAINT_N2 seul, IHM seule, HX2A=9, bande HX4
 symétrisée, brief de délégation v0.4) est supplanté par les D1-D7.

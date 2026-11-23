@@ -21,10 +21,10 @@
 
 | État | Règle de numérotation |
 |---|---|
-| `HEAD` = `fd12dc0` | les références **du contrat parent** (ex. AX14 `:1386`, `:1387`, `:1395`) sont exactes **à HEAD** |
+| `HEAD` = `4ff6d2d` | les références **du contrat parent** (ex. AX14 `:1386`, `:1387`, `:1395`) sont exactes **à HEAD** |
 | Arbre de travail (WT) au 2026-09-20 | **toute ligne > :1224 est décalée de +4** (insertion T331 en AX10) |
 
-📌 **Convention du présent plan** : `fichier:ligne (WT)` = arbre de travail, `(HEAD)` = commit `fd12dc0`. Les deux sont données là où l'écart existe.
+📌 **Convention du présent plan** : `fichier:ligne (WT)` = arbre de travail, `(HEAD)` = commit `4ff6d2d`. Les deux sont données là où l'écart existe.
 
 🚫 **Interdit** : ouvrir un lot `CODE/` avant que la révision ne soit figée (commit, ou gel explicite du fichier) — sinon chaque `fichier:ligne` du contrat devient faux à l'édition concurrente suivante.
 

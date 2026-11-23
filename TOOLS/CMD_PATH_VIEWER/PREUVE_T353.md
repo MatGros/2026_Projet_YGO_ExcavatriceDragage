@@ -101,8 +101,8 @@ fusionné** dans les maillons (`statut: TABLE_CORRECTION_NON_FUSIONNEE`) :
 Les **48 références corrigées sont toutes résolues** (règle nommée `CORRECTION_MEME_FICHIER` : la
 colonne « valeur correcte » porte un numéro du **même fichier** que la référence périmée).
 
-⚠️ **Ancrage de cette table** : son en-tête déclare « valeur correcte (**disque `d6e54377`**) ». HEAD
-est aujourd'hui `c9e1fbfe` (3 commits plus loin) et **4 fichiers cités ont encore changé de blob
+⚠️ **Ancrage de cette table** : son en-tête déclare « valeur correcte (**disque `3d1bd67e`**) ». HEAD
+est aujourd'hui `7872086c` (3 commits plus loin) et **4 fichiers cités ont encore changé de blob
 pendant ce lot** (§P3bis) ⇒ ces corrections sont **INDICATIVES** et doivent être re-vérifiées par blob
 avant usage. C'est écrit dans le JSON (`corrections_meta.avertissement`) **et** affiché dans l'UI —
 même doctrine que partout ailleurs dans cet outil.
@@ -600,7 +600,7 @@ Cible : `TOOLS/CMD_PATH_VIEWER/git-blob-sha1.js` · blob consigné `7b1b1d730f34
 ### Journal horodaté
 
 `TOOLS/CMD_PATH_VIEWER/data/preuve_garde_fou_T353.json` — dernier passage **`2026-09-21T03:15:08+02:00`**
-(HEAD `c9e1fbfe`), `verdict: PASS`, `fichiers_cites_modifies_dans_le_depot: false`, volet B « PENDANT »
+(HEAD `7872086c`), `verdict: PASS`, `fichiers_cites_modifies_dans_le_depot: false`, volet B « PENDANT »
 = outil `3a92a430…` **=** `git hash-object` `3a92a430…` → ROUGE, puis restauration à l'octet près.
 *(Le test est rejouable à volonté : le journal porte l'horodatage du dernier passage.)*
 
@@ -881,7 +881,7 @@ python TOOLS/CMD_PATH_VIEWER/check_lot_files.py
 
 > Exigence : « les sorties réelles collées, pas des tableaux déclarés ». Tout ce qui suit est la
 > **sortie console verbatim** des commandes, capturée le **2026-09-21 entre 03:25 et 03:27**, HEAD
-> `c9e1fbfe`. Les captures brutes sont conservées dans
+> `7872086c`. Les captures brutes sont conservées dans
 > `TOOLS/CMD_PATH_VIEWER/data/.sortie_parseur.txt`, `.sortie_freshness.txt`, `.sortie_p3.txt`,
 > `.sortie_p4.txt` (conservées, **non supprimées** — règle « aucune suppression automatique »).
 
@@ -925,9 +925,9 @@ P2 — RÉSOLUTION DES RÉFÉRENCES
 ANCRAGE
 ==============================================================================
   fichiers cités avec ancrage : 47  (dérivés seuls : 20, sans ancrage : 1, total 48)  conflits : 0
-  treuils  ancrage=PRESENT head=065591fb2633 horodatage=2026-09-21T01:33:25+02:00 fichiers=27
+  treuils  ancrage=PRESENT head=59d461e4718d horodatage=2026-09-21T01:33:25+02:00 fichiers=27
   t334     ancrage=ABSENT  head=None         horodatage=None fichiers=0
-  annexe   ancrage=PRESENT head=065591fb     horodatage=2026-09-21T01:31:44+02:00 fichiers=32
+  annexe   ancrage=PRESENT head=59d461e4     horodatage=2026-09-21T01:31:44+02:00 fichiers=32
 
 GESTES : 12 entrées · citations non vérifiées : aucune
 LIMITES déclarées : 7
@@ -961,7 +961,7 @@ VERROU DES ATTENDUS DE RÉSOLUTION (valeurs de la revue, vérifiées dans les fi
 ================================================================================================
 GARDE-FOU BLOB — constat figé (mode statique)
 ================================================================================================
-  généré le 2026-09-21T03:25:47+02:00 · HEAD c9e1fbfeff46
+  généré le 2026-09-21T03:25:47+02:00 · HEAD 7872086cf1bf
   fichiers 48 · VERT 43 · ROUGE 4 · ABSENT 0 · NON_ANCRABLE 1 · ancrage DÉRIVÉ 20
   [ROUGE] CODE/G_CYCLE/FB_CycleSemiAuto.st — blob mesuré != blob consigné — les numeros de ligne cités sont a re-verifier
   [ROUGE] CODE/J_SUPERVISION/_TYPES/3_CYCLE_ET_MODES/ST_CycleCfg.st — blob mesuré != blob consigné — …
@@ -981,7 +981,7 @@ GARDE-FOU BLOB — constat figé (mode statique)
 ================================================================================================================
 P3 — TEST VOLONTAIRE DU GARDE-FOU BLOB (3 états : avant / pendant / après)
 ================================================================================================================
-  horodatage : 2026-09-21T03:25:49+02:00 · HEAD c9e1fbfeff46
+  horodatage : 2026-09-21T03:25:49+02:00 · HEAD 7872086cf1bf
   périmètre d'écriture du lot : TOOLS\CMD_PATH_VIEWER/ — CODE/ et les 3 sources sont en LECTURE SEULE
 
   VOLET A — fichiers RÉELLEMENT cités par les documents, test EN MÉMOIRE (lecture seule)
@@ -1064,7 +1064,7 @@ $ git hash-object DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T351_ANNEXE_M
 20bfada06fc56a9fa10f432cd48272f203ed3b95
 
 $ git rev-parse --short HEAD
-c9e1fbfe
+7872086c
 ```
 
 ➡️ **P5 : les 3 blobs source sont STRICTEMENT identiques** aux valeurs du contrat
@@ -1173,7 +1173,7 @@ git hash-object DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T334_M3_DeuxChe
 git hash-object DOC/WFLOW/TROUBLESHOOTING/FICHES/TROUBLESHOOTING_T351_ANNEXE_M3_TrousT334_20260921.md
 ```
 
-> 🧊 **Constat figé de la livraison** : `2026-09-21T02:39:08+02:00` · HEAD `c9e1fbfe` ·
+> 🧊 **Constat figé de la livraison** : `2026-09-21T02:39:08+02:00` · HEAD `7872086c` ·
 > **47 fichiers cités VERT / 0 ROUGE** · 1 non ancrable · 20 fichiers à **ancrage DÉRIVÉ**
 > (T334 via l'annexe §1.3) · **0 conflit** entre les deux ancrages.
 >

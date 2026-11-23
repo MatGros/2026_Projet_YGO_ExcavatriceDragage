@@ -8,7 +8,7 @@
 > section n'est renumérotée : **toute l'analyse d'origine ci-dessous reste dans son état v1.0**. Ce bloc
 > n'existe que pour empêcher la fiche de servir de **source d'erreur** : deux de ses constats sont
 > **périmés**, et ses renvois de lignes ont **dérivé**.
-> **Ancrage** : vérifié à `HEAD = 25101c0b` par **DSH28** (mission T224, lecture seule).
+> **Ancrage** : vérifié à `HEAD = 499e16f1` par **DSH28** (mission T224, lecture seule).
 > **Source** : `DOC/WFLOW/AUDITS/DESIGN/DIAGNOSTIC_T224_ARMINGPERMIT_20260921.md` (§C34, §4.3).
 
 ### 1. ✅ **Défaut 2 — CORRIGÉ à HEAD** (tableau §2 et §3 PÉRIMÉS sur ce point)
@@ -22,9 +22,9 @@
 
 - Le commentaire du code le dit lui-même (`:133-135`) : *« purge desormais atteignable — le temps mort
   minimal a ete respecte, il ne doit pas rester arme indefiniment une fois le delai reellement ecoule »*.
-- Commit : **`657be973`** (2026-09-20), *« wip(treuils): purge DeadTimeArmed atteignable des que le delai
+- Commit : **`b013aa3c`** (2026-09-20), *« wip(treuils): purge DeadTimeArmed atteignable des que le delai
   est ecoule (D18, T325 phase 1) [NON TESTE] »*. **Vérifié** :
-  `git merge-base --is-ancestor 657be973 HEAD` → **0** (ancêtre de HEAD confirmé).
+  `git merge-base --is-ancestor b013aa3c HEAD` → **0** (ancêtre de HEAD confirmé).
 - ⚠️ **Inutile de re-scoper le correctif proposé en §3** (inversion `DirectionChangeDelay.Q` avant
   `DeadTimeArmed`) : **il est appliqué**. La question ouverte en fin de §3 (*« le `DeadTimeArmed` doit-il
   imposer un délai minimum incompressible ? »*) **reste posée**, mais elle n'est plus un blocage : le
@@ -36,12 +36,12 @@
   historique, pas comme un constat. Dette déjà cataloguée (`DOC/WFLOW/TASKS.yaml:316`, relevée par T351
   §10/§14).
 
-### 2. ⚠️ **Défaut 1 — corrigé (`6f708b22`) mais TOUJOURS NON TESTÉ CODESYS**
+### 2. ⚠️ **Défaut 1 — corrigé (`a4d1a3fe`) mais TOUJOURS NON TESTÉ CODESYS**
 
 Inchangé depuis la rédaction. Corroboration trace inchangée (trace 62/63 ≈ **805 ms** ≈ `T#800ms` ;
-trace 65 après correctif ≈ **100 ms**). Complément de datation relevé par T224 : **`e638308f`**
+trace 65 après correctif ≈ **100 ms**). Complément de datation relevé par T224 : **`1db5456a`**
 (*« corrige debordement TIME D18 + deborne affichage ouverture benne »*) est également ancêtre de HEAD
-(`git merge-base --is-ancestor e638308f HEAD` → 0).
+(`git merge-base --is-ancestor 1db5456a HEAD` → 0).
 
 ### 3. 🔴 **Défaut 3 — TOUJOURS OUVERT à HEAD**, et **lignes citées DÉCALÉES**
 
@@ -99,7 +99,7 @@ périmètre correctif (Étape B) **sur la mesure** — pas sur cette fiche.
 
 > 📌 Livrable T325 (contrat `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T325_D18_NEUTRE_ANALYSE_RISQUE.yaml`).
 > **Aucune ligne de code ST modifiée par cette fiche** — un seul correctif (Défaut 1) est déjà
-> committé et non testé (`6f708b22`), les deux autres (Défauts 2 et 3) sont proposés ici pour
+> committé et non testé (`a4d1a3fe`), les deux autres (Défauts 2 et 3) sont proposés ici pour
 > relecture croisée avant implémentation. Classement cible de l'implémentation future : **C4**.
 >
 > ⚠️ **Distinction avec T224** (précisée par Mathieu, 2026-09-20) : T224 décrit une commande
@@ -132,7 +132,7 @@ validé et implémenté, jamais l'inverse.
 
 | # | Nom | Fichier | Statut code | Preuve |
 |---|---|---|---|---|
-| **1** | D18 ne crédite pas le temps d'arrêt réel au neutre | `FB_WinchDirectionInterlock.st` | ✅ **Corrigé, committé** (`6f708b22`), non testé CODESYS | Trace 62/63 AX10→AX11 (~805ms ≈ `T#800ms`) ; trace 65 après correctif (raccordement AX10B en ~100ms) |
+| **1** | D18 ne crédite pas le temps d'arrêt réel au neutre | `FB_WinchDirectionInterlock.st` | ✅ **Corrigé, committé** (`a4d1a3fe`), non testé CODESYS | Trace 62/63 AX10→AX11 (~805ms ≈ `T#800ms`) ; trace 65 après correctif (raccordement AX10B en ~100ms) |
 | **2** | `DeadTimeArmed` prioritaire sur `DirectionChangeDelay.Q`, purge inatteignable | `FB_WinchDirectionInterlock.st` L90/109/116/119 | ⬜ Non corrigé | Trace 67 : `DelayElapsed` grimpe à **2174ms** sans jamais que `Pending` retombe par adoption — seul le retour au neutre (~7s) puis Reset l'a résolu |
 | **3** | Garde croisée M1/M2 — risque de livelock | `PRG_04_Treuils_Benne.st:1360-1361 / 1452-1453` | ⬜ Non corrigé | Mécanisme architectural confirmé par lecture code (pas encore observé en trace, à vérifier par Watch) |
 
@@ -292,4 +292,4 @@ la garde croisée).
 4. Contrat de conservation à rédiger pour cette future tâche C4 (hors scope C2 de T325).
 
 **Zéro ligne de code ST modifiée par cette fiche.** Le correctif du Défaut 1 reste le seul
-actuellement en place (commit `6f708b22`), non validé en essai machine réel.
+actuellement en place (commit `a4d1a3fe`), non validé en essai machine réel.

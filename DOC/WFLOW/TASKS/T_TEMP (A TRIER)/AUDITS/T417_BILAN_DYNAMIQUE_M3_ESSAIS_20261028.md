@@ -19,7 +19,7 @@
 
 ## Correction et sauvegarde
 
-Checkpoint avant correction : `fd32b652`, 14 fichiers ST/XML du chantier L4/L5.
+Checkpoint avant correction : `0bc27acb`, 14 fichiers ST/XML du chantier L4/L5.
 
 Seul ST modifié depuis ce checkpoint : `CODE/L_SIMULATION/FB_Sim_Translation.st`.
 Le frottement est appliqué comme une impulsion dissipative bornée à zéro après la

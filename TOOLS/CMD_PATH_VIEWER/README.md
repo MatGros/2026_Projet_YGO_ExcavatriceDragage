@@ -146,7 +146,7 @@ n'entrent dans aucun dénominateur.
 L'annexe sert donc à trois choses, **jamais fusionnées dans les chaînes** : source d'**ancrage blob**
 (§1.3, étiqueté DÉRIVÉ), **compléments non fusionnés** (§4.2–§4.6 : 7 ajouts + 1 correction), et
 **table de correction des références périmées** (§4.10 → `corrections_references_perimees`, affichée
-dans l'UI avec l'avertissement que son ancrage `d6e54377` est **périmé**).
+dans l'UI avec l'avertissement que son ancrage `3d1bd67e` est **périmé**).
 
 ### Références : 4 formes traitées, aucune devinée
 
@@ -292,7 +292,7 @@ vérifiés contre `git hash-object` s'exécute à chaque ouverture de la page et
 | **L12** | L'audit global compte **501 continuations refusées** : la plupart sont des **citations** de références de T334 dans les colonnes « Ligne citée par T334 » de l'annexe, qui ne nomment aucun fichier. | Ce n'est pas un défaut de résolution : c'est la nature du document (contre-vérification). Elles sont listées avec leur zone d'origine. |
 | **L13** | **Le rouge peut apparaître à tout moment sans que rien ne soit cassé** : d'autres lots écrivent dans ce dépôt. Exemple **mesuré pendant ce lot** : `CODE/G_CYCLE/FB_CycleSemiAuto.st` est passé de 1652 à 1659 lignes (blob `032af59f…` → `f66dabfc…`) après les ancrages des documents → l'outil l'a affiché **ROUGE** (attendu vs mesuré). | Comportement **voulu** : un blob d'ancrage n'est valide que pour un contenu. Après stabilisation de l'arbre : relancer `verify_anchors.py` puis `parse_cartographies.py`. Le re-ancrage des fiches appartient à leurs auteurs (lecture seule ici). |
 | **L14** | **Les continuations de la fiche T351 sont rédigées de façon relâchée** : plusieurs se rattachent au mauvais fichier de la cellule (le fichier réellement visé est nommé **plus tôt**, ou seulement dans une autre colonne de la même ligne). | L'outil les **reroute** par la règle **nommée** `E_CONTINUATION_HORS_BORNES_REROUTAGE` (3 cas mesurés : `M63 :1602`, `C32 :1441`, `C32 :1509`) — jamais par une heuristique silencieuse. **Trouvaille signalée, fiches NON corrigées** (lecture seule). |
-| **L16** | **La table de correction §4.10 de l'annexe porte un ancrage PÉRIMÉ** : son en-tête dit « valeur correcte (disque `d6e54377`) » alors que HEAD est `c9e1fbfe` et que 4 fichiers cités ont encore changé de blob pendant ce lot. | Les 26 corrections sont **INDICATIVES** : elles sont affichées avec cet avertissement et doivent être **re-vérifiées par blob** avant usage. Elles ne sont **jamais** fusionnées dans les maillons. |
+| **L16** | **La table de correction §4.10 de l'annexe porte un ancrage PÉRIMÉ** : son en-tête dit « valeur correcte (disque `3d1bd67e`) » alors que HEAD est `7872086c` et que 4 fichiers cités ont encore changé de blob pendant ce lot. | Les 26 corrections sont **INDICATIVES** : elles sont affichées avec cet avertissement et doivent être **re-vérifiées par blob** avant usage. Elles ne sont **jamais** fusionnées dans les maillons. |
 | **L15** | **Une fiche peut citer une ligne qui n'existe pas** : T334 (row `D07`) écrit `PRG_06_Outputs.st:431-432,650` alors que ce fichier a **549** lignes (le `650` appartient à `PRG_05_Translation.st`). | L'outil **scinde** la référence : la partie valide reste `RESOLUE`, le numéro impossible devient **`CONTESTEE_HORS_BORNES`** (`regle: LIGNE_HORS_FICHIER_EXPLICITE`) et s'affiche comme telle. Cas trouvé par l'**auto-contrôle du parseur**, qui **fait échouer** la génération si l'invariant casse. |
 
 ---

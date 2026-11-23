@@ -4,7 +4,7 @@ Lis le DOSSIER ci-dessous (seule source ; tu n'as aucun outil). Règles de sorti
 
 # DOSSIER COMMUN — Collège d'experts workflow agents (projet automate CODESYS, machine de dragage réelle, sécurité machine)
 
-## A. ANCIEN WORKFLOW — section AGENTS.md « Démarrage de session — briefing obligatoire » (présente jusqu'au commit 2a5bf86d du 2026-11-01, supprimée par un commit WIP intitulé « prototype advisory task tracking »)
+## A. ANCIEN WORKFLOW — section AGENTS.md « Démarrage de session — briefing obligatoire » (présente jusqu'au commit 3c052204 du 2026-11-01, supprimée par un commit WIP intitulé « prototype advisory task tracking »)
 ## 🎬 Démarrage de session — briefing obligatoire
 
 > Concerne **tout agent** (Claude Code, Codex, Antigravity, autre) et tout humain qui reprend le projet —
@@ -87,7 +87,7 @@ un briefing complet, un inventaire du dépôt ou un menu d'options sans utilité
 - orchestrator/SKILL.md 385 -> 369 lignes ; sections retirées : BANNIÈRE DE DÉCLENCHEMENT (OBLIGATOIRE), Résumé rapide post-bannière, mode d'emploi du registre TASKS_ORCHESTRATOR.
 - troubleshooting/SKILL.md 167 -> 70 lignes ; retirés : RÈGLE D'OR, BANNIÈRE OBLIGATOIRE, ORIENTATION MÉTHODE, Procédure étapes 0 à 4ter (fiche de session, contexte figé, indices, symptôme, arbre des causes, acquisition par SNAPSHOT, test CI ad hoc). Possiblement déplacé dans prompts/troubleshooting.md : NON VÉRIFIÉ.
 - task-planner : retiré le titre « Protocole obligatoire avant toute écriture dans TASKS.yaml » (règle reformulée pour le coordinateur).
-- 2026-11-03 (e06047d1) : retiré « l'agent DOIT interpeller et poser des questions » ; ajouté « action demandée, locale, réversible : la faire sans question ».
+- 2026-11-03 (b671a890) : retiré « l'agent DOIT interpeller et poser des questions » ; ajouté « action demandée, locale, réversible : la faire sans question ».
 - AGENTS.md 04->13/11 : délégation Ollama passée de « uniquement sur demande explicite » à « utilisable par défaut ».
 
 ## D. MÉCANISMES RÉELS (vérifiés)

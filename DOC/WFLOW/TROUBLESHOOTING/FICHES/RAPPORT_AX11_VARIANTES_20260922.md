@@ -11,8 +11,8 @@
 | Essai | Programme | Résultat AX11 | Preuve |
 |---|---|---|---|
 | Référence défaut | Programme utilisé pour `Suivi_77/79` | ❌ Trou de 0,8–0,9 s : paliers M1/M2 = 0 et `MotorRequest M2 = 0` | `Suivi_77`, `Suivi_79` |
-| Variante B | Base matin `8ec1fa28` + seule modification MécaB | ✅ Fluide : aucun échantillon AX11 avec `MotorRequest M2 = 0` | `Suivi_81` |
-| Variante C | Base matin `8ec1fa28` + homing machine inhibé | ✅ Fluide : aucun échantillon AX11 avec `MotorRequest M2 = 0` | `Suivi_83` |
+| Variante B | Base matin `80f60bc2` + seule modification MécaB | ✅ Fluide : aucun échantillon AX11 avec `MotorRequest M2 = 0` | `Suivi_81` |
+| Variante C | Base matin `80f60bc2` + homing machine inhibé | ✅ Fluide : aucun échantillon AX11 avec `MotorRequest M2 = 0` | `Suivi_83` |
 
 ### Chronologie de `Suivi_83` — variante C
 

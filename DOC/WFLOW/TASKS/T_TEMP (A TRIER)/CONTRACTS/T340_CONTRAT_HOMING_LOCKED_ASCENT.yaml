@@ -298,7 +298,7 @@ validation:
     TROIS REVUES INDEPENDANTES passees (2 completes + 1 verification ciblee des correctifs) ;
     les 3 defauts MAJOR identifies ont ete corriges puis re-verifies comme REELS, COMPLETS et
     SANS regression (aucun mouvement altere, aucun chemin de reference sans preuve capteur).
-    🚨 ALERTE INTEGRATION (a arbitrer par l'humain) : le commit 50e57cd6 d'un AUTRE acteur
+    🚨 ALERTE INTEGRATION (a arbitrer par l'humain) : le commit 9e9f9e94 d'un AUTRE acteur
     (T330/T299) a inclus dans TOOLS/AGENT_WORKFLOW/scripts/run_all_gates.py la ligne de
     branchement G511 de CE lot, alors que le script G511_check_homing_climb_guard.py n'est pas
     encore commite (fichier non suivi). Consequence : a HEAD, le palier C est ROUGE sur G511

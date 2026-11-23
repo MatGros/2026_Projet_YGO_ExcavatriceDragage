@@ -226,7 +226,7 @@ tracking:
   user_need: "Superviseur fiable apres pause/redemarrage, constats exploitables et interface simple ; preuve reelle, pas seulement synthetique."
   useful_history:
     - "Plan de campagne 2026-11-08 et challenges P1/P2 : DOC/WFLOW/ETUDES/PLAN_AGENT_SUPERVISOR_REPRISE_TRANSCRIPT_ET_PLUGIN.md"
-    - "Commits cfcae6bc, 812a5eb2 : etat de depart du code"
+    - "Commits 84d03009, 9b451008 : etat de depart du code"
   current_question: "Quels criteres sont deja satisfaits par le code actuel, lesquels restent a implementer ou a prouver ?"
   established:
     - "AC-F0.1 PASS 2026-11-09 : 91 passed x4 en session normale ; l'echec 90/91 du 2026-11-08 venait de la garde d'isolation d'une session background (sessionKind=bg, ecriture refusee), pas d'un bug."

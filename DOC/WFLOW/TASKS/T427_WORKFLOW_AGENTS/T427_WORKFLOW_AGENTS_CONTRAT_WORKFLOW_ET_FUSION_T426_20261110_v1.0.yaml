@@ -114,7 +114,7 @@ absorbed_tasks:
       est la base de la regle 1 tache = 1 dossier.
     contrat_origine: DOC/WFLOW/TASKS/T427_WORKFLOW_AGENTS/ARCHIVES/T427_WORKFLOW_AGENTS_CONTRAT_T426_ORIGINE_20261101_v1.0.yaml
     livre:
-      commit: 2a5bf86d
+      commit: 3c052204
       fichiers:
       - TOOLS/AGENT_WORKFLOW/scripts/check_task_tracking.py
       - TOOLS/AGENT_WORKFLOW/templates/task_contract.yaml
@@ -128,7 +128,7 @@ execution_plan:
   milestones:
   - id: M0
     title: 'Recu de T426 : etude, prototype advisory CDX01, 43 tests'
-    done_when: Prototype commit 2a5bf86d relu par l'orchestrateur ; validation humaine du plan d'activation (D3) en attente
+    done_when: Prototype commit 3c052204 relu par l'orchestrateur ; validation humaine du plan d'activation (D3) en attente
   - id: M1
     title: Cadrage, gabarit etendu et plan du dossier T427
     done_when: Contrat fusionne valide (check_task_contract PASS), plan T427 redige, fiches T426/T427 mises a jour

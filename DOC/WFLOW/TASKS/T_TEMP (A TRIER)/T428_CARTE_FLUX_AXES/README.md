@@ -2,7 +2,7 @@
 
 **But :** savoir, pour chaque axe, quelles commandes, réglages et mesures agissent sur les actionneurs, par quels maillons, et lesquels se voient au snapshot.
 
-**État :** étude du 2026-11-06, base `work/base-machine-simu` (`597a9571`). Aucune preuve sur automate. Aucune modification de `CODE/`.
+**État :** étude du 2026-11-06, base `work/base-machine-simu` (`47028176`). Aucune preuve sur automate. Aucune modification de `CODE/`.
 
 ## Fichiers
 

@@ -5,8 +5,8 @@
 ## Q3 (la seule sur laquelle tu ne pouvais pas trancher seul)
 
 VÉRIFIÉ par l'orchestrateur — le correctif D18 EXISTE et est COMMITTÉ
-(git log : `6f708b22` "credit du temps d'arret reel", `657be973` "purge
-DeadTimeArmed atteignable", `e638308f` "corrige debordement TIME D18" —
+(git log : `a4d1a3fe` "credit du temps d'arret reel", `b013aa3c` "purge
+DeadTimeArmed atteignable", `1db5456a` "corrige debordement TIME D18" —
 tous `[NON TESTE MACHINE]` mais présents dans HEAD, confirmé par
 `git show HEAD:CODE/H_TREUILS_BENNE/FB_WinchDirectionInterlock.st`).
 `TASKS.yaml:969` est PÉRIMÉ (dit encore "analyse uniquement"), à corriger

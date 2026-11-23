@@ -25,7 +25,7 @@ Rédigé par : DSH01 (titulaire du verrou T330, auteur du cadrage et du plan v1.
 | 4 | **Plan à réviser** : `DOC/WFLOW/AUDITS/DESIGN/PLAN_T330_C3_INVARIANT_HAUT_v1.0.md` — **révision interne v1.1**, journal d'audit **§11** | — | STOP |
 | 5 | **Contrat** : `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T330_HOMING_TOP_SOFT_LIMIT_INVARIANT.yaml` (AC1→AC7) | — | STOP |
 
-**Maintien T291-B : LEVÉ** (B1 remis, commit `55700932`, validation utilisateur 2026-09-20). T291-B B2 attend T330.
+**Maintien T291-B : LEVÉ** (B1 remis, commit `7e600594`, validation utilisateur 2026-09-20). T291-B B2 attend T330.
 
 ---
 

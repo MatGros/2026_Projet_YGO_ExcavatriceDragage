@@ -18,7 +18,7 @@ Agent natif en lecture seule, deux passes. Rapport relayé par l'orchestrateur `
 Sur 8 AC T426 et 5 AC T427, aucun n'est identique (déclaré par l'agent).
 
 ## Risques relevés
-- Perte du travail CDX01 : faible, prototype commité (`2a5bf86d`, indépendant du catalogue).
+- Perte du travail CDX01 : faible, prototype commité (`3c052204`, indépendant du catalogue).
 - 13 AC en un contrat C2 : garder les identifiants d'origine (appliqué : `T426-AC1…8`, `AC1…5`).
 - Les 43 tests prouvent les AC T426, pas ceux de T427.
 - Trou de périmètre dans le contrat T427 d'origine : ni hooks, ni skills, ni `.claude/settings.json` dans `scope.allowed` alors que AC1 et AC4 les touchent ✅ (corrigé : ces cibles sont maintenant en `forbidden` tant que D2/D3 ne sont pas tranchées).

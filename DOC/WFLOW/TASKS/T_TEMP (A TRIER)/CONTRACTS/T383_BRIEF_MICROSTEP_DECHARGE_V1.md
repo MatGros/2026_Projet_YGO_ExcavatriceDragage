@@ -60,7 +60,7 @@ FB_CycleSemiAuto.st:1567   IF DeadmanArmed AND JoystickPull THEN
 FB_CycleSemiAuto.st:1568       BucketCmd.ReqOpen := FALSE;
 FB_CycleSemiAuto.st:1569       State := E_AutoCycleStep.AX10_CLOSE_BUCKET;   ⛔ 6 etapes EN ARRIERE
 ```
-Origine : commit **`31c9db0d`** (T331, 2026-09-20, **`[NON TESTE MACHINE]`**), **sans amendement du GEL**.
+Origine : commit **`c4b6b31f`** (T331, 2026-09-20, **`[NON TESTE MACHINE]`**), **sans amendement du GEL**.
 
 ### 2.3 Mesure d'ensemble (à rejouer)
 - **39** affectations `State := AX…` dispersées dans les corps d'étapes vs **22** transitions déclarées au GEL.

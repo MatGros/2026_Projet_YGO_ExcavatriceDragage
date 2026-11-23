@@ -172,7 +172,7 @@ moment du transfert, mais elle ne produit pas la temporisation de 800 ms.
 
 ### 6.3 Régression récente du code
 
-La comparaison avec la base du matin `8ec1fa28` n'a pas identifié de différence pertinente dans la
+La comparaison avec la base du matin `80f60bc2` n'a pas identifié de différence pertinente dans la
 chaîne AX10/AX10B/AX11, `FB_WinchDirectionInterlock`, `PRG_04` ou `PRG_06`. Les mécanismes D18 et AX10B
 sont déjà présents dans cette base.
 

@@ -43,7 +43,7 @@ Le détail et les limites sont dans `TOOLS/AGENT_WORKFLOW/docs/AGENT_SESSION_OBS
 
 ### Contexte simulation M3 / T417
 
-Le worktree `.claude/worktrees/t417-cd` est sur `work/t417-cd-poc-prg`, commit observé `d798de72` (« trace CI réelle + revue autonome… »), mais **n’est pas propre** : modifications locales du POC et beaucoup de nouveaux artefacts/scratchs associés à P6 sont présents. Ils n’ont pas été modifiés par cette revue et ne doivent pas être nettoyés par les reviewers.
+Le worktree `.claude/worktrees/t417-cd` est sur `work/t417-cd-poc-prg`, commit observé `18a1cf94` (« trace CI réelle + revue autonome… »), mais **n’est pas propre** : modifications locales du POC et beaucoup de nouveaux artefacts/scratchs associés à P6 sont présents. Ils n’ont pas été modifiés par cette revue et ne doivent pas être nettoyés par les reviewers.
 
 Le rapport `DOC/WFLOW/ETUDES/ANALYSES_T417/T417C_POC_CI_PRG_20261101.md` qualifie P6 ainsi : PRG_02 à PRG_06 réels (219 objets ; PRG_04 réel exécuté après correction du macro-runner), PRG_07 coquille, physique treuil simulée et substitutions déclarées. H-LOCK treuils a des cas conformes, avec un cas W3 initialement partiel puis W3b conforme après relâchement 600 ms. Le rapport mentionne aussi un défaut du runner : horloge remise à zéro entre TEST alors que l’état global persistait ; correction T8 rejouée, sans changement des verdicts antérieurs revendiqués. L’intégration complète PRG02–07 et l’équivalence CODESYS restent explicitement **non validées**. Le retour variateur réel (StatusWord/fréquence) reste une suite possible.
 

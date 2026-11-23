@@ -160,7 +160,7 @@ execution:
     - "bundle : 261/261 objets, 0 erreur ; G200 liaison PASS 0 erreur (2052 instances)"
     - "palier C : 4 rouges = G300/G340/G430/G483, exactement les dettes preexistantes (delta 0)"
     - "diff bundle : CODE_XML/CODE_DiffBundle.xml -- FB_CycleSemiAuto, FB_Hmi_BannerFormatter, PRG_07_Supervision"
-    - "REPRISE apres deux commits tiers (T364 reapplique + seuil benne 8742eb4e) : bundle regenere, G200 liaison PASS 0 erreur, T368-001 et T368-002 toujours PASS, delta de rouges CI toujours 0, palier C toujours 4 rouges preexistants (G300/G340/G430/G483), diff bundle regenere en derniere action"
+    - "REPRISE apres deux commits tiers (T364 reapplique + seuil benne 9f3a640f) : bundle regenere, G200 liaison PASS 0 erreur, T368-001 et T368-002 toujours PASS, delta de rouges CI toujours 0, palier C toujours 4 rouges preexistants (G300/G340/G430/G483), diff bundle regenere en derniere action"
 
 validation:
   status: PENDING

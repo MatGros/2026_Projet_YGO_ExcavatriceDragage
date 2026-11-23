@@ -35,10 +35,10 @@ La preuve la plus forte est la trace `Suivi_93` : elle établit une chronologie,
 - Coupure dure neutralisée si `ReqTremieSemantic` tombe au même scan que le capteur : `M3_TremieHardStopActive := DI AND ReqTremieSemantic`. Réf. `PASSATION_T417`, lignes 70-71 et 93 ; `PRG_06_Outputs.st:431-443`.
 - Coupure variateur au scan capteur : permission `AND NOT DI` ; trace `DriveFreqCmd_Hz=0` et `DriveControlWord=0` à 70,37 s. Réf. `PASSATION_T417`, ligne 97.
 - Configuration simulation : `PhysicalBrakeActive` et `CartFreeActive` à TRUE via `GVL_Simulation.st:79/84`, passés par `FB_SimBench.st:697`, malgré les défauts FB à FALSE. Réf. `PASSATION_T417`, lignes 43-46.
-- CI `L_SIMULATION` : 6 PASS / 6 FAIL sur la base et après `0990a225`, mêmes échecs ; `FB_Sim_Translation` ne compile pas à cause de `FullTravelTimeS`. Réf. `PASSATION_T417`, lignes 132-139.
+- CI `L_SIMULATION` : 6 PASS / 6 FAIL sur la base et après `9247900c`, mêmes échecs ; `FB_Sim_Translation` ne compile pas à cause de `FullTravelTimeS`. Réf. `PASSATION_T417`, lignes 132-139.
 - Gates palier C : 8 échecs sur 61, identiques à la base sauf G390 qui passe après régénération. Réf. `PASSATION_T417`, lignes 141-144.
 - Correction dissipative : `M3-DYN-030` passe après frottement borné ; 13/14 PASS ; `M3-DYN-100` reste rouge. Réf. `REPRISE_PREUVES`, lignes 109-111.
-- Incohérence historique `M3-DYN-100` : test `555327be` attend un PDO indépendant du balancement ; `6cce0c93` ajoute le droop ; aucune sémantique validée par trace qualifiée. Réf. `REPRISE_PREUVES`, lignes 125-127.
+- Incohérence historique `M3-DYN-100` : test `c9ff5b04` attend un PDO indépendant du balancement ; `602926ce` ajoute le droop ; aucune sémantique validée par trace qualifiée. Réf. `REPRISE_PREUVES`, lignes 125-127.
 
 ### B. Hypothèse non prouvée
 

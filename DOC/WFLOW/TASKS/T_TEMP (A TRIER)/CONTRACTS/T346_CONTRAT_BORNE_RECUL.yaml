@@ -180,7 +180,7 @@ execution:
     LOT LIVRE, NON COMMITE. Phase 1 diagnostic (6 defauts D1 a D6 prouves fichier:ligne sur la version
     reelle d'avant le commit 2a307b5b) puis phase 2 implementation apres arbitrage humain du
     2026-09-20 (Q1 = frontiere physique, Q2 = option A reprise au joystick, Q3 resolu par le commit
-    T339 83a24ef4, Q4 = gate bloquante limitee au perimetre du lot).
+    T339 cb295b16, Q4 = gate bloquante limitee au perimetre du lot).
     (1) CORRECTIF SECURITE : BusyEdge recoit la clause NOT Lifecycle.Busy. Elle ferme D6 (defaut de
     detection de glissement M1, absent du brief initial : M1RefPosM etait recapturee a chaque front de
     joystick, ce qui decoupait la derive en tranches sous la tolerance) et supprime la recapture des

@@ -1,6 +1,6 @@
 # T417 — Registre de reprise et expériences — 2026-10-30
 
-Référence témoignage : [registre MES](../../REGISTRES/REGISTRE_MES_TEMOIGNAGE_M3_20261030.md). GO utilisateur reçu pour poursuivre l'objectif ; production inchangée, aucun commit autorisé. Référence de lecture initiale : HEAD `14009dcf`, arbre comportant des travaux tiers conservés.
+Référence témoignage : [registre MES](../../REGISTRES/REGISTRE_MES_TEMOIGNAGE_M3_20261030.md). GO utilisateur reçu pour poursuivre l'objectif ; production inchangée, aucun commit autorisé. Référence de lecture initiale : HEAD `6038a040`, arbre comportant des travaux tiers conservés.
 
 ## Contrat d'investigation et de contre-expertise (lecture seule)
 
@@ -124,7 +124,7 @@ Bundle complet régénéré et fraîcheur PASS ; diff bundle contient `FB_Sim_Tr
 
 ### M3-DYN-100 : arbitrage reporté, pas de correction opportuniste
 
-Le test, ajouté au commit `555327be` à 21:08, attend un PDO fréquence indépendant du balancement. Six minutes plus tard, `6cce0c93` a modifié le même modèle : `ActualFrequency_Hz` retire `LoadFrequencyDroopGain_Hz × ABS(LoadAngularVelocity_RadPerS)` (`FB_Sim_TranslationDrive.st:51-56`) et a supprimé le commentaire qui définissait le PDO comme fréquence électrique indépendante. L'échec 100 est donc une incohérence historique avérée entre test et code, mais aucune des deux sémantiques n'est encore validée par une trace suffisamment qualifiée. Le test reste rouge et le modèle reste inchangé jusqu'à décision documentée.
+Le test, ajouté au commit `c9ff5b04` à 21:08, attend un PDO fréquence indépendant du balancement. Six minutes plus tard, `602926ce` a modifié le même modèle : `ActualFrequency_Hz` retire `LoadFrequencyDroopGain_Hz × ABS(LoadAngularVelocity_RadPerS)` (`FB_Sim_TranslationDrive.st:51-56`) et a supprimé le commentaire qui définissait le PDO comme fréquence électrique indépendante. L'échec 100 est donc une incohérence historique avérée entre test et code, mais aucune des deux sémantiques n'est encore validée par une trace suffisamment qualifiée. Le test reste rouge et le modèle reste inchangé jusqu'à décision documentée.
 
 Le contrat T417 AC2 indique 200 ms d'ouverture, alors que `FB_Sim_TranslationBrake.st:8-9` et l'étude T417 portent actuellement 100 ms d'ouverture et 90 ms de fermeture. Cette divergence documentaire est un **point ouvert** : aucune valeur n'est modifiée sur cette seule lecture.
 
@@ -136,7 +136,7 @@ Deux demandes courtes ont été adressées au runner Ollama local le 30 octobre,
 
 Exécution initiale : `py -3.13 TOOLS/TEST_AUTO_CI/scripts/run_tests.py --fb FB_SimBench --fast`.
 
-- La conversion et les contrôles d'interface atteignent les 17 composants déclarés. Le premier blocage était une référence registry vers `CODE/L_SIMULATION/ST_fbSim_Translation_ExtLink_Echo.st`, type supprimé au commit `7b47291f`. Un miroir **test-only** a été placé sous `TOOLS/TEST_AUTO_CI/MOCKS/` et les trois entrées de registry concernées y pointent ; aucune source PLC n'a été recréée.
+- La conversion et les contrôles d'interface atteignent les 17 composants déclarés. Le premier blocage était une référence registry vers `CODE/L_SIMULATION/ST_fbSim_Translation_ExtLink_Echo.st`, type supprimé au commit `261deb99`. Un miroir **test-only** a été placé sous `TOOLS/TEST_AUTO_CI/MOCKS/` et les trois entrées de registry concernées y pointent ; aucune source PLC n'a été recréée.
 - Après ce rétablissement du harnais, le parseur STruCpp s'arrête avant toute assertion M3 sur `test_fb_simbench.st:897` : `Expected END_FOR found ADVANCE_TIME`. L'instruction est située dans une boucle d'un scénario M2 antérieur. C'est une incompatibilité du test/parser, non un verdict sur M3 et non une autorisation de modifier le test M2 hors scope.
 - Remplacement proposé et ajouté : `test_fb_simbench_m3_dynamics.st` + `check_simbench_m3_chronology.py`. Le runner substitue le seul chemin de test en mémoire dans l'entrée existante `FB_SimBench` : mêmes sources/dependencies réelles, pas de duplication du modèle, pas d'écriture de rapport tiers. Le scénario vérifie la chronologie confirmée dans les sources AX14→AX15 (rampe frein maintenu ouvert, puis retombée mécanique différée) à pente simulée nulle. Il ne représente pas le cycle complet ni une mesure terrain.
 

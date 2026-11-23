@@ -6,8 +6,8 @@
 > **Références** : `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T358_FORCESTEP_SANS_GARDE.yaml`,
 > `DOC/WFLOW/CONTRACTS/NOTE_APPLICATION_T358_FORCESTEP_SANS_GARDE.md`,
 > `DOC/WFLOW/CONTRACTS/BRIEF_T358_FORCESTEP_SIMPLIFICATION_SANS_GARDE.md`
-> **Ancrage** : `HEAD = c9e1fbfe` à la prise (arbre `CODE/` propre vs HEAD pour `FB_CycleSemiAuto.st`,
-> dernier commit le touchant : `d6e54377` / T347). Le reviewer n'a modifié AUCUN fichier du dépôt.
+> **Ancrage** : `HEAD = 7872086c` à la prise (arbre `CODE/` propre vs HEAD pour `FB_CycleSemiAuto.st`,
+> dernier commit le touchant : `3d1bd67e` / T347). Le reviewer n'a modifié AUCUN fichier du dépôt.
 
 ---
 
@@ -37,7 +37,7 @@ Interdits (écriture d'artefacts) : CI `run_tests.py`, bundlisation, `G200 --rep
 | 7 | `WaitingResume` intact (écrit + consommé) et forçage qui ne gèle pas l'étape | `:658`, `:695` (écriture) ; `:808-816` (consommation) ; `:775` (annulation par le forçage) |
 | 8 | Signaux partagés retirés de la garde **toujours vivants ailleurs** | `KoboldImmersionQualified` : calcul `:1139` + consommateurs `:430, :874, :1168, :1171, :1175` ; `Fault.Latched` : `:547, :580, :793, :897, :913, :929` ; `BottomContextValid` : **0 occurrence** dans tout `CODE/` |
 | 9 | Aucune donnée **persistée** n'alimente la consigne | `GVL_IHM.st:7` `VAR_GLOBAL` non RETAIN ; `GVL_PERSISTENT` sans `SetForceStepTgt` ; `ST_CycleCfg.st:13` inerte et sans lecteur |
-| 10 | Contrat et note conformes au code livré (numéros d'origine compris) | `git show d6e54377` reproduit littéralement `:206`, `:625`, `:626`, `:628`, `:653`, `:656` ; les écarts relevés sont dans le **contrat** (AC2, objectif), pas dans la note |
+| 10 | Contrat et note conformes au code livré (numéros d'origine compris) | `git show 3d1bd67e` reproduit littéralement `:206`, `:625`, `:626`, `:628`, `:653`, `:656` ; les écarts relevés sont dans le **contrat** (AC2, objectif), pas dans la note |
 
 ### Défenses indépendantes non contournées (vérification exhaustive)
 

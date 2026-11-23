@@ -6,7 +6,7 @@
 # Validation : python TOOLS/AGENT_WORKFLOW/scripts/check_task_contract.py <ce fichier>
 #
 # Contexte : le diagnostic T338 a identifie TROIS causes racines. CR1 (plancher dur RawPos := 0
-# dans FB_Sim_Encoder) a ete corrige et committe (6a5910da, comptage signe 32 bits + garde de
+# dans FB_Sim_Encoder) a ete corrige et committe (4d348a6f, comptage signe 32 bits + garde de
 # plage signalee + G510). CR2, cause DIRECTE du symptome « saut 8,50 -> 204,677 m apres AU »,
 # etait HORS du lot T338 (fichier FB_SimBench.st verrouille DSH03/T328/T300). Il est traite ici.
 #

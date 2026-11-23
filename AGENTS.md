@@ -11,7 +11,7 @@ Automate CODESYS 3.5 pour machine de dragage en carrière noyée.
 ## 🧭 Démarrage de session — Entonnoir réflexe
 
 > 🧪 Version d'essai (T427, incrément I1 — 2026-11-13). Restaure l'effet du briefing obligatoire
-> supprimé par `2a5bf86d`, sans son décor. Plan et tests :
+> supprimé par `3c052204`, sans son décor. Plan et tests :
 > `DOC/WFLOW/TASKS/T427_WORKFLOW_AGENTS/T427_WORKFLOW_AGENTS_PLAN_20261110_v1.0.md` §9.
 
 ### 1. ⏱️ Portée & exemptions

@@ -6,7 +6,7 @@
 > référencement · sécurité machine (ISO 13849). **Posture anti-yes-man : rien n'est validé par défaut,
 > y compris l'hypothèse utilisateur.**
 > **Périmètre** : ⛔ **LECTURE SEULE** — aucun fichier `CODE/` modifié, aucun commit, aucune écriture hors ce livrable.
-> **Date** : 2026-09-20 · **HEAD** : `e011036b`
+> **Date** : 2026-09-20 · **HEAD** : `0bb5b7ad`
 > **Sources lues** : fiche `TROUBLESHOOTING_T336_CycleHoming_Graphe7_2026-09-20.md` · `CODE/G_CYCLE/FB_CycleMachineHoming.st`
 > (685 l.) · `CODE/E_CODEURS/FB_Encoder_Homing.st` · `CODE/M_MAIN/PRG_02/03/04/05/07` · `CODE/H_TREUILS_BENNE/*`
 > · `CODE/GVL_PERSISTENT.st` · `DOC/AF/AF_Partie-09_v2.4` · `DOC/AF/AF_Partie-10` · `DOC/WFLOW/AUDITS/GEL_GRAFCET_HOMING_CYCLE_20260903.md`

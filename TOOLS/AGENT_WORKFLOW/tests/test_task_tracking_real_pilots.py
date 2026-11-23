@@ -17,7 +17,7 @@ class ContractBackedScenarioTests(unittest.TestCase):
     def setUp(self):
         self.root = Path(__file__).resolve().parents[3]
         # Fixtures locales : contenu reel des contrats pilotes T417-C et T280
-        # captures au moment du prototype T426 (commit 2a5bf86d). Les emplacements
+        # captures au moment du prototype T426 (commit 3c052204). Les emplacements
         # d'origine dans le depot ont bouge (fusions T426->T427, archivage) ; le
         # test ne depend plus d'aucun emplacement mobile.
         self.fixtures = Path(__file__).resolve().parent / "fixtures"

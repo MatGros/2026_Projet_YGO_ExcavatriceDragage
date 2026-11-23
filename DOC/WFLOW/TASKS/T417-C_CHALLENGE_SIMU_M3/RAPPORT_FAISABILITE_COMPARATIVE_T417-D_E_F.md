@@ -31,7 +31,7 @@ Le présent rapport d'ingénierie délivre l'arbitrage exhaustif et déterminist
 | **Périmètre Fichiers Déclaré** | `CODE/L_SIMULATION/**`<br>`TOOLS/TEST_AUTO_CI/.../AGY02_T417_M3_SANDBOX/**` | `CODE/M_MAIN/PRG_06_Outputs.st`<br>`CODE/M_MAIN/PRG_05_Translation.st`<br>`CODE/I_TRANSLATION/**` | `CODE/M_MAIN/PRG_03_Modes_Cycle.st`<br>`CODE/F_MODES/FB_Modes.st`<br>`CODE/G_CYCLE/FB_CycleSemiAuto.st`<br>`CODE/H_TREUILS_BENNE/**` |
 | **Fichiers Réellement Nécessaires** | `L_SIMULATION/FB_Sim_PositionSensor.st`<br>`L_SIMULATION/GVL_Simulation.st`<br>`L_SIMULATION/FB_Sim_Translation.st`<br>`L_SIMULATION/FB_SimBench.st`<br>*(Hors PRG_02 avant J_FINAL)* | `M_MAIN/PRG_06_Outputs.st`<br>`M_MAIN/PRG_05_Translation.st`<br>`I_TRANSLATION/FB_Safety_Translation.st`<br>`I_TRANSLATION/FB_Translation_PositionDecoder.st`<br>`C_PERSISTENCE/GVL_PERSISTENT.st` | `M_MAIN/PRG_03_Modes_Cycle.st`<br>`F_MODES/FB_Modes.st`<br>`G_CYCLE/FB_CycleSemiAuto.st`<br>*(Lecture seule sur PRG_05)* |
 | **Verdict Faisabilité** | **FAISABLE SOUS CONDITIONS** | **FAISABLE SOUS CONDITIONS STRICTES** | **FAISABLE SOUS CONDITIONS** |
-| **Verrous Majeurs Identifiés** | 1. Rupture de câblage dans le contrat initial (omission de `FB_Sim_Translation` et `FB_SimBench`).<br>2. Échec du banc sandbox CI (`FB_TestHarnessT417_M3.st` forcé en `SEMI_AUTO`).<br>3. Écrêtage odométrique de production `CST_GainMax := 0.05` vs $k=0.0551$. | 1. **Bug critique de persistance volatile** dans `PRG_06_Outputs:97` + réinitialisation `01111` dans `PRG_05:327` (danger crash au reboot).<br>2. Anti-rebond $100\text{ ms}$ aveugle sur came $4\text{ cm}$ à $10\text{ Hz}$ ($72\text{ ms}$).<br>3. Risque piège `2#00000` en maintenance.<br>4. Absence de reset ergonomique au joystick. | 1. Micro-perte came physique $115\text{ ms}$ (Trace 27) résolue par `M3_AtTremieStable` (commit `aa20ed28`).<br>2. Diagnostic imprécis en `AX1_INIT`.<br>3. Capteur de niveau trémie non câblé physiquement sur machine. |
+| **Verrous Majeurs Identifiés** | 1. Rupture de câblage dans le contrat initial (omission de `FB_Sim_Translation` et `FB_SimBench`).<br>2. Échec du banc sandbox CI (`FB_TestHarnessT417_M3.st` forcé en `SEMI_AUTO`).<br>3. Écrêtage odométrique de production `CST_GainMax := 0.05` vs $k=0.0551$. | 1. **Bug critique de persistance volatile** dans `PRG_06_Outputs:97` + réinitialisation `01111` dans `PRG_05:327` (danger crash au reboot).<br>2. Anti-rebond $100\text{ ms}$ aveugle sur came $4\text{ cm}$ à $10\text{ Hz}$ ($72\text{ ms}$).<br>3. Risque piège `2#00000` en maintenance.<br>4. Absence de reset ergonomique au joystick. | 1. Micro-perte came physique $115\text{ ms}$ (Trace 27) résolue par `M3_AtTremieStable` (commit `c51ff03c`).<br>2. Diagnostic imprécis en `AX1_INIT`.<br>3. Capteur de niveau trémie non câblé physiquement sur machine. |
 | **Statut d'Ordonnancement** | **Lancement Parallèle Immédiat** (Plan B Python actif immédiatement ; révision contrat ST requise) | **Lancement Parallèle Immédiat** sous condition d'intégration du patch `GVL_PERSISTENT` et levée mesures terrain | **Lancement Parallèle Immédiat** (Découplage total, interface `M3_AtTremieStable` déjà active) |
 
 ---
@@ -144,7 +144,7 @@ Créer un `PRG_00_Safety` constituerait une régression architecturale sévère 
 ### 3.2 Analyse des Verrous Techniques Critiques
 
 #### Verrou 1 : Faille Critique de Persistance au Reboot (Power-up Overtravel Crash)
-Le commit `8fc65110` a introduit un verrou directionnel dans `CODE/M_MAIN/PRG_06_Outputs.st` :
+Le commit `0b4a4b06` a introduit un verrou directionnel dans `CODE/M_MAIN/PRG_06_Outputs.st` :
 ```iecst
 // Ligne 97 :
 M3_TremieHardStopLatched : BOOL; // Déclaré en VAR locale simple (VOLATILE !)
@@ -238,7 +238,7 @@ IF M3AtTremie AND NOT AllowWinchMoveAtTremie THEN
     Auth.JoystickWinchSelectArbitrated := 2; // Forçage Treuil Benne Seul (interdiction couple 0)
 ```
 Si le signal `M3AtTremie` retombe à `0` (comme constaté sur la Trace 27 après $115\text{ ms}$ de survol), la garde se relâchait instantanément, autorisant le couplage accidentel des treuils au-dessus de la trémie (risque de chute de benne ou d'accrochage de structure).
-**Résolution déjà intégrée** : Le commit `aa20ed28` a apporté la solution Plan A dans `PRG_03_Modes_Cycle.st:111-113` :
+**Résolution déjà intégrée** : Le commit `c51ff03c` a apporté la solution Plan A dans `PRG_03_Modes_Cycle.st:111-113` :
 ```iecst
 M3AtTremie := PRG_05_Translation.Data.TranslationState.LimitSwitchTremie
               OR PRG_05_Translation.Data.M3_AtTremieStable;

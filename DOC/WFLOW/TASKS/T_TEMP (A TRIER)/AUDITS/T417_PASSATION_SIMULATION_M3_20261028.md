@@ -7,7 +7,7 @@
 
 ## État courant après mise à jour dynamique
 
-- Checkpoint humain **fd32b652** : L4/L5 et réglages précédents sauvegardés (14 ST/XML).
+- Checkpoint humain **0bc27acb** : L4/L5 et réglages précédents sauvegardés (14 ST/XML).
 - Seul ST modifié depuis ce checkpoint : `FB_Sim_Translation`, correction du frottement
   numérique qui retournait une faible vitesse à 100 ms. Aucun réglage physique changé.
 - **9/9 scénarios fonctionnels PASS** sur le ST réel ; review indépendante et DeepSeek
@@ -28,9 +28,9 @@ pour la reprise actuelle.
 
 | Commit | Contenu | Essai utilisateur |
 |---|---|---|
-| `0dcd676c` | Plan, synthèse experts, contrat T301 V2 | — |
-| `ac17beef` | **L0** `FB_Translation_OdometryGain` : gain = \|P2−PV\| / (CalibFreq × CalibTime), mesure P2↔PV proposée jamais appliquée, positions réalistes 0/1,5/3,5/5/10, 2 persistantes ajoutées en fin (`_TranslationCalibFreq_Hz` 50, `_TranslationCalibTimeP2PV_S` 2,0). **L1** simu en source unique (positions GVL_PERSISTENT + gain effectif PRG_05), butées ±0,5 m, G518 réécrit | Manuel OK ; mesure 2,518 s @ 39,98 Hz → 0,01987 ; auto sans blocage |
-| `ac7fe43e` | **L3** frein simulé physique (`SimM3BrakePhysicalActive`, 2 m/s²) + **L2** indicateurs `GVL_Simulation.SimM3Obs*` | Manuel P1 0,27 m ; auto Trémie 0,27 m ; auto P1 0,28 m |
+| `ce0f447c` | Plan, synthèse experts, contrat T301 V2 | — |
+| `d3dc9385` | **L0** `FB_Translation_OdometryGain` : gain = \|P2−PV\| / (CalibFreq × CalibTime), mesure P2↔PV proposée jamais appliquée, positions réalistes 0/1,5/3,5/5/10, 2 persistantes ajoutées en fin (`_TranslationCalibFreq_Hz` 50, `_TranslationCalibTimeP2PV_S` 2,0). **L1** simu en source unique (positions GVL_PERSISTENT + gain effectif PRG_05), butées ±0,5 m, G518 réécrit | Manuel OK ; mesure 2,518 s @ 39,98 Hz → 0,01987 ; auto sans blocage |
+| `3769c479` | **L3** frein simulé physique (`SimM3BrakePhysicalActive`, 2 m/s²) + **L2** indicateurs `GVL_Simulation.SimM3Obs*` | Manuel P1 0,27 m ; auto Trémie 0,27 m ; auto P1 0,28 m |
 
 ## ⏳ Fait, NON commité (attend le verdict du challenge)
 

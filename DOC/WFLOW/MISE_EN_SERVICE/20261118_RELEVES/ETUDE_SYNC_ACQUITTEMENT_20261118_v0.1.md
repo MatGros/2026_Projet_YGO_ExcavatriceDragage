@@ -28,7 +28,7 @@ séparés des hypothèses. Snapshot de référence : `Snapshot_Troubleshooting_2
 - Hypothèse à vérifier sur le levé d'aujourd'hui : **la valeur 4,288 m est suspecte**.
   Idx103_OffsetPos_M = 0 et benne ni ouverte ni fermée (snapshot :373-375, :384) →
   `ActiveOffsetM = 0` : si la référence benne est perdue (reset d'état au boot — le bug
-  `FB_Bucket.st:416-419` listé au plan 6956366b §1), la synchro compare les positions
+  `FB_Bucket.st:416-419` listé au plan e75d1e08 §1), la synchro compare les positions
   BRUTES et 4,29 m = l'écart géométrique benne fermée d'origine → **faux positif
   structurel au boot sans offset benne restauré**. À confirmer : l'écart a-t-il suivi
   une glissade de frein réelle (historique positions) ?
@@ -72,11 +72,11 @@ séparés des hypothèses. Snapshot de référence : `Snapshot_Troubleshooting_2
   benne — un cycle SEMI_AUTO s'exécute synchro surveillée ; le changement O2/O3 n'ajoute
   aucun chemin de masquage en mouvement.
 
-## 4. Conflits 6956366b / T377-B
+## 4. Conflits e75d1e08 / T377-B
 
-- 6956366b ne touche ni FB_SyncDeviation ni FB_WinchSync (vérifié au --stat) ; il touche
+- e75d1e08 ne touche ni FB_SyncDeviation ni FB_WinchSync (vérifié au --stat) ; il touche
   PRG_04 (zones distinctes : :1710/:1731 PowerCutOff, :967 BrakeForce) — AUCUN conflit
-  de fichier avec O2/O3 ; seul l'ordre de commit importe (après le 6956366b pour éviter
+  de fichier avec O2/O3 ; seul l'ordre de commit importe (après le e75d1e08 pour éviter
   les rebases).
 - T377-B : aucun chevauchement (FB_Encoder_Abs, FB_Safety_Winch cause 1, autotest AU) ;
   noter seulement que `PRG_04:673` Reset de la syncho est déjà `FaultMachineReset_IHM`

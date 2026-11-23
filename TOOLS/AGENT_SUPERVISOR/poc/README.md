@@ -1,6 +1,6 @@
 # Veilleur — suivi des POC
 
-Référence Git avant essais : `2ae79f2b`. Les données des POC ci-dessous sont synthétiques. Les résultats sont des preuves de faisabilité bornées, pas une validation générale ni une intégration au service.
+Référence Git avant essais : `f4b978a9`. Les données des POC ci-dessous sont synthétiques. Les résultats sont des preuves de faisabilité bornées, pas une validation générale ni une intégration au service.
 
 | POC | Preuves | Résultat et réserve | Prochaine décision |
 |---|---|---|---|

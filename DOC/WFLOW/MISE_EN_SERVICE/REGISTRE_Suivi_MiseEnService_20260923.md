@@ -1,7 +1,7 @@
 # 🧾 Mise en service — Journal et Clôture du 23/09/2026
 
 > **Date :** 2026-09-23  
-> **Branche :** `main` (Tag Git : `MES_FIN_20260923`, Commit de clôture : `44c2b368`)  
+> **Branche :** `main` (Tag Git : `MES_FIN_20260923`, Commit de clôture : `dfa23cb2`)  
 > **Nature :** Journal exhaustif des correctifs appliqués, testés et validés sur machine réelle en clôture de mise en service.
 
 ---
@@ -60,7 +60,7 @@
 | **Liaison des variables** | `G200_check_linkage.py --report` | **PASS (0 erreur)** sur 2070 instances vérifiées |
 | **Bundle complet** | `generate_codesys_bundle.py` | `CODE_XML/CODE_Bundle.xml` généré et à jour |
 | **Diff bundle ciblé** | `generate_codesys_diff_bundle.py` | `CODE_XML/CODE_DiffBundle.xml` prêt pour import CODESYS (`FB_CycleSemiAuto` + `PRG_02_Acquisition`) |
-| **Commit Git récapitulatif** | `git commit` | `420e2eea` (merge) & `44c2b368` (docs history) |
+| **Commit Git récapitulatif** | `git commit` | `da301114` (merge) & `dfa23cb2` (docs history) |
 | **Tag immuable** | `git tag` | `MES_FIN_20260923` |
 | **Synchronisation GitHub** | `git push origin main --tags` | Aligné 100%, working tree clean |
 

@@ -9,7 +9,7 @@
 > 📊 Diagnostic source : `DOC/WFLOW/AUDITS/DESIGN/DIAGNOSTIC_T224_ARMINGPERMIT_20260921.md` (Étape A, accepté)
 > — **relevé mesuré** : **99 525 octets = 97,2 KiB, 836 lignes**.
 > 🎫 Contrat : `DOC/WFLOW/CONTRACTS/TASK_CONTRACT_T224_ARMINGPERMIT_ACTIONNEUR_PRET.yaml` (C4).
-> 🗓️ Rédigé le 2026-09-21 par **DSH28** — ancrage `HEAD 25101c0b`.
+> 🗓️ Rédigé le 2026-09-21 par **DSH28** — ancrage `HEAD 499e16f1`.
 > 📏 **Métadonnées — règle appliquée** : seules des tailles **mesurées** sont citées. La taille de la
 > *présente* procédure n'est **volontairement pas figée ici** : toute édition la périme (piège
 > d'auto-référence constaté en cours de rédaction). Elle se mesure par outil —
@@ -143,7 +143,7 @@ Le rejeu reste concluant : **chaque groupe répond à une question fermée du §
 | B10 | `PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.DeadTimeArmed` | BOOL | 🆕 **D18 lui-même** — l'arme du temps mort au front `Enable` |
 | B11 | `PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.DirectionChangePending` | BOOL | 🆕 vue interne du même signal (source, pas projection) |
 | B12 | `PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.DelayElapsed` | TIME | 🆕 date l'inversion — la valeur **2 174 ms** de la trace 67 est le chiffre de référence à confronter |
-| B13 | `PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.RemainingDelay` | TIME | 🆕 reliquat à courir (crédit du temps d'arrêt réel, correctif `6f708b22`) |
+| B13 | `PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.RemainingDelay` | TIME | 🆕 reliquat à courir (crédit du temps d'arrêt réel, correctif `a4d1a3fe`) |
 | B14 | `PRG_04_Treuils_Benne.instWinchM1.DirectionInterlock.RequestActive` | BOOL | 🆕 neutre franc vs demande maintenue |
 | B15 | `PRG_04_Treuils_Benne.Data.WinchM1State.CommandedAscent` | BOOL | ♻️ trace 67 — sens **adopté** par le FB |
 | B16 | `PRG_04_Treuils_Benne.Data.WinchM1State.DirectionChangePending` | BOOL | ♻️ trace 67 — la projection publiée (à comparer à B5/B11) |

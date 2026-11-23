@@ -73,7 +73,7 @@ service (`%LOCALAPPDATA%\ExcavatriceDragage\agent-supervisor-server.log`).
 - État final : 8082 pid 42168, build `49f3ac4aa683`, `update_available: false`
 
 ### A11 — 11:56 · Commit incident
-- `3dce9dce` : fix purge + re-verif par colonnes + run_forever journalisé + taisement
+- `78036c76` : fix purge + re-verif par colonnes + run_forever journalisé + taisement
   aborts + conftest garde + test_purge_guard (3 tests) + journal d'actions + RECU T432
 
 ---
@@ -86,7 +86,7 @@ service (`%LOCALAPPDATA%\ExcavatriceDragage\agent-supervisor-server.log`).
   rotation du journal à 2 Mo
 - Preuve live : les nouveaux logs ont tout de suite servi — `commande -> ECHEC :
   JSONDecodeError` (mon POST mal échappé) visible dans le journal
-- Commit `80986343` (rapide checkpoint, à la demande)
+- Commit `4c6a7bd9` (rapide checkpoint, à la demande)
 
 ### A13 — 12:12 · P7 : re-rattachement de session clôturée (id conservé)
 - Fichier : `supervisor_service.py` (handler add) — session clôturée du même native_id
@@ -94,7 +94,7 @@ service (`%LOCALAPPDATA%\ExcavatriceDragage\agent-supervisor-server.log`).
   événement `session_reattached` tracé
 - Preuves : `test_connect_session 11 passed` avec le service réel en marche (gardes
   conftest actifs, états isoles dans %TEMP%\pytest) ; journal : `purge ignoree`
-- Commit `dc088b5f`
+- Commit `e9d2bffe`
 
 ### A14 — 12:14 · Découverte : `restart_service` répond "ok" mais ne relance JAMAIS
 - Preuves journal : `action=restart_service -> ok` puis aucun `SCRIPT LANCE` derrière
@@ -103,7 +103,7 @@ service (`%LOCALAPPDATA%\ExcavatriceDragage\agent-supervisor-server.log`).
   `DETACHED_PROCESS`) puis `os._exit(0)` de l'ancien
 - **Preuve en réel** : commande 12:16:10 → nouveau pid 21796 (`SCRIPT LANCE` 12:16:20)
   → `VERDICT libere (killed=[5640])` → PRET, état conservé
-- Commit `6c33499d` (erreur corrégée au passage : un vidage du journal dans un premier
+- Commit `852229df` (erreur corrégée au passage : un vidage du journal dans un premier
   jet du patch a été retiré avant commit — le journal est une archive)
 
 ### A15 — 12:16 · État machine final
@@ -119,7 +119,7 @@ service (`%LOCALAPPDATA%\ExcavatriceDragage\agent-supervisor-server.log`).
 - 3 constats : TORC pas reconnu coordination · fiche vide muette · 0 veille d'inactivité
 - Approbation exploitant : plan 3 correctifs + forme alerte = constat mécanique seul par défaut
 
-### A17 — Implémentation (commit `3aef23a3`, 18 tests verts)
+### A17 — Implémentation (commit `6ca3d3e9`, 18 tests verts)
 - B : `is_coordination_session` reconnait T000*/TORC* (+ notice juge TORC)
 - C : `_detect_inactive_sessions` au cycle de poll (fingerprint, idempotent), seuils 4 h
   coordination / criticité contrat (cache mtime, C2=12 h, défaut 24 h)
@@ -155,8 +155,8 @@ service (`%LOCALAPPDATA%\ExcavatriceDragage\agent-supervisor-server.log`).
 - 22/11 21:44 : nouvelle relance, même échec. **Zéro perte : le gel a protégé le fichier.**
 
 ### A21 — POURQUOI (archéologie git, agent expert)
-- Fail-closed global : introduit `2ae79f2b` (2026-11-05, checkpoint WIP, message vide)
-- **Aggravation : `8dbd86bd` (2026-11-15, M23 « mémoire configurable ») — la borne d'ÉCRITURE
+- Fail-closed global : introduit `f4b978a9` (2026-11-05, checkpoint WIP, message vide)
+- **Aggravation : `9ee5cd03` (2026-11-15, M23 « mémoire configurable ») — la borne d'ÉCRITURE
   passe à `memory_max_items` (100) mais le validateur de CHARGEMENT `_validate_memory` reste
   codé à 20. Sessions >20 items (T427 22, TORC 31, T417 30) → ValueError → tout jeté.**
 - Le "transcript introuvable" ne lève PAS dans _load (correction de mon hypothèse initiale :

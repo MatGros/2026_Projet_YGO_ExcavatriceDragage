@@ -70,7 +70,7 @@ contract:
       - "Armement immédiat de la perte codeur en marche (AC3, AC4)"
       - "Cause 0 (communication opérateur) et toutes les autres causes de FB_Safety_Winch"
       - "Reset opérateur sur front, jamais conditionné"
-      - "Table instCauses de FB_Safety_Winch (ARRAY[0..15], 16 causes déjà utilisées, ErrorId sur 16 bits) : aucune cause ajoutée ; T377-B n'ajoute que BusOppedOnce et une condition d'armement de la cause 1 (constat T377-CC03, vérifié : la table était déjà pleine avant le commit 6956366b)"
+      - "Table instCauses de FB_Safety_Winch (ARRAY[0..15], 16 causes déjà utilisées, ErrorId sur 16 bits) : aucune cause ajoutée ; T377-B n'ajoute que BusOppedOnce et une condition d'armement de la cause 1 (constat T377-CC03, vérifié : la table était déjà pleine avant le commit e75d1e08)"
       - "Sémantique de EncoderAvailable inchangée (consommée par FB_Encoder, FB_EncoderReliability, FB_Encoder_Homing, FB_Safety_Winch:441, PRG_04, vue troubleshooting)"
     dropped_on_purpose:
       - "Armement de la perte codeur avant le premier OP du bus (retardé de X secondes, décision exploitant 2026-11-18)"
@@ -93,7 +93,7 @@ execution_plan:
   milestones:
   - id: M0
     title: 'Étude en lecture seule, puis validation de l exploitant, puis implémentation'
-    done_when: 'phase 1 étude lecture seule rendue (rebase du pré-cadrage sur le commit 6956366b) ; GO explicite de l exploitant sur la variante B étendue et le repli ; check_task_contract PASS ; rien n est écrit dans CODE/ avant ce GO'
+    done_when: 'phase 1 étude lecture seule rendue (rebase du pré-cadrage sur le commit e75d1e08) ; GO explicite de l exploitant sur la variante B étendue et le repli ; check_task_contract PASS ; rien n est écrit dans CODE/ avant ce GO'
   - id: M1
     title: 'Mesure de X et lecture des points ouverts'
     done_when: 'temps de montée à OP des codeurs M1/M2 relevé à froid ; effet de Reset sur l autotest AU lu dans le code'

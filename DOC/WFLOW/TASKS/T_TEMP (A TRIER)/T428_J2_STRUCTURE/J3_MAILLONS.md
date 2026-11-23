@@ -12,7 +12,7 @@
 
 Fichier modifié : `TOOLS/PLC_CSV_SNAPSHOT/variable_lists/troubleshooting_variables.txt`, avec 24 lignes en fin de liste. Le chargeur n'accepte ni commentaire ni titre : la mise en ordre se fera à J4.
 
-⚠️ Ce changement a été embarqué dans le commit `2ccca204` du Veilleur (« checkpoint local changes »), avec la validation J1. Le contenu est correct ; seul le message du commit est trompeur.
+⚠️ Ce changement a été embarqué dans le commit `5353c4a1` du Veilleur (« checkpoint local changes »), avec la validation J1. Le contenu est correct ; seul le message du commit est trompeur.
 
 ## 2. Les 24 ajouts
 

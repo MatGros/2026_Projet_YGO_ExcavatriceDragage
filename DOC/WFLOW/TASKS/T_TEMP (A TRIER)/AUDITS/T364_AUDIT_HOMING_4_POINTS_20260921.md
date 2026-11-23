@@ -13,7 +13,7 @@
 | Point | Valeur prouvée |
 |---|---|
 | Base de lecture | **arbre de travail** `CODE/G_CYCLE/FB_CycleMachineHoming.st` (876 lignes) — les numéros de ligne cités sont ceux **du disque** |
-| HEAD dépôt | `276fc11e` (`feat(cycle,ihm): T358 - forcage de step a une valeur...`) |
+| HEAD dépôt | `03dd7ca5` (`feat(cycle,ihm): T358 - forcage de step a une valeur...`) |
 | ⚠️ Fichier **modifié NON COMMITÉ** au moment de l'audit | lot **T362/DSH24** : 4 littéraux IHM contractés (`:794`, `:797`, `:800`, `:831`). `git diff -- CODE/G_CYCLE/FB_CycleMachineHoming.st` = **4 insertions / 4 suppressions**. Les points 1-2-4 du brief citent des lignes **post-T362** → cohérents avec le disque, **pas** avec `HEAD` |
 | Verrou T364 | **absent** de `DOC/WFLOW/TASK_LOCKS.json` (aucune entrée T364 ; DSH24 = T362, DSH25 = T361) → aucun conflit d'acteur, aucune écriture concurrente de ma part |
 | Contrainte de gate à ne pas oublier | **G408** (`TOOLS/AGENT_WORKFLOW/scripts/G408_check_ihm_message_length.py`) : plafond **70 car.** sur le message **assemblé** `CONCAT('Homing: ', MachineHomingInstruction)` (`CODE/J_SUPERVISION/FB_Hmi_BannerFormatter.st:332`) → **tout littéral de `MachineHomingInstruction` doit rester ≤ 62 caractères** (8 + 62 = 70) |
@@ -299,7 +299,7 @@ La confirmation **consommée** par le GRAFCET est celle du **bouton N2 dédié**
 | `DOC/AF/AF_Partie-05_Modes_Maintenance_v2.1.md:266` | **« Décision T184 : MAINT_N2 seul pour confirmer la position visuelle de benne. »** (+ `:268` préconditions cumulatives `MAINT_N2` ; `:271` *« MAINT_N2 conserve les actions de récupération autorisées »*) |
 | `TASK_CONTRACT_T264_HOMING_BOOT_GUARD.yaml:8` | *« HX1 reste une étape informative et **le référencement mouvement reste réservé à MAINT_N2** »* |
 | Code | Garde N2 : `:557` (`ModeIsMaint2`), commentaire d'interface `:21`, routage des ordres `PRG_03:417-425`, `:445-453` |
-| Code — **origine datée de la garde** | `git blame` : la garde N2 de HX1→HX2 est **préexistante** (`5efede11`, **2026-09-03**), dont le message cite *« Decision utilisateur (tranche Q3) »* ; **T340** (`266fb11f`, 2026-09-20) l'a **renommée** `ModeIsMaint2` **sans la créer** ; le commentaire d'interface `:21` vient de `e6bc681b` (2026-09-03, T233) |
+| Code — **origine datée de la garde** | `git blame` : la garde N2 de HX1→HX2 est **préexistante** (`5efede11`, **2026-09-03**), dont le message cite *« Decision utilisateur (tranche Q3) »* ; **T340** (`d1fdd3cd`, 2026-09-20) l'a **renommée** `ModeIsMaint2` **sans la créer** ; le commentaire d'interface `:21` vient de `e6bc681b` (2026-09-03, T233) |
 | `TASK_CONTRACT_T340_HOMING_LOCKED_ASCENT.yaml:132-134` (AC7) et `:193` (`must_survive`) | *« en **MAINT_N1/N2**, le referencement unitaire manuel (bouton `BtnHome`, treuils arretes ou capteur haut atteint) reste disponible et sa semantique est inchangee »* → la voie N1 est un **chemin légitime reconnu par contrat**, pas une anomalie |
 
 ⚠️ **Chaîne de traçabilité cassée (fait à connaître)** : `AF-05:266` énonce une **« Décision T184 »** — or l'identifiant **T184** correspond aux **permits directionnels M3** (`AF_Partie-11`), **aucune entrée `id: T184`** n'existe dans `TASKS.yaml`, et le snapshot archivé `DOC/WFLOW/ARCHIVES/TASKS_SNAPSHOT_20260915/TASKS_20260915_234600.yaml:3997` qualifie lui-même le lot d'origine d'*« ex-contrat **T184** homing benne, **mal numéroté** »*. ⇒ Le seul ancrage humain réellement traçable de la doctrine est le **contrat T185** (`_CONJOINT_N2`, `APPROVED`). Si l'exploitant rouvre la doctrine, le point d'entrée documentaire est **T185 + `AF-05:262-272`**, jamais « décision T184 ».
@@ -343,4 +343,4 @@ La confirmation **consommée** par le GRAFCET est celle du **bouton N2 dédié**
 
 ---
 
-*Rapport produit en lecture seule — `DOC/WFLOW/AUDITS/AUDIT_T364_HOMING_4_POINTS_20260921.md` · base : arbre de travail `FB_CycleMachineHoming.st` (HEAD `276fc11e` + diff T362 non commité) · 2026-09-21.*
+*Rapport produit en lecture seule — `DOC/WFLOW/AUDITS/AUDIT_T364_HOMING_4_POINTS_20260921.md` · base : arbre de travail `FB_CycleMachineHoming.st` (HEAD `03dd7ca5` + diff T362 non commité) · 2026-09-21.*

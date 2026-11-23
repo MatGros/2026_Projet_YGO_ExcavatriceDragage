@@ -17,7 +17,7 @@
 1. Toutes les causes de `FB_Safety_Translation` et `FB_Translation` qui peuvent produire `PowerCutOff` à l'arrivée sur P1 ou Trémie (cause 6, Méca A, Méca B, cause 7, autres) : conditions, durées, scénario déclencheur nominal.
 2. Correctif minimal de la cause 6 : retrait de `DriveStatusWord.0` ; ajout de `DriveOnline AND DriveOperational` ; conserver `ReqTremie` / `ReqMaintenance` (avis consultatif déjà donné par TORC-CC10, non validé). Effets de bord : perte de bus sur fin de course, arrivée nominale avec rampe de 2,0 s, `TC-T300-SAF-061` à inverser.
 3. Passage de `BypassAuPowerCutOff := TRUE` à `FALSE` par défaut : effet RETAIN (la valeur par défaut ne s'applique qu'après un chargement complet qui remet les RETAIN à zéro), écriture à prévoir, GO C4 explicite, ordre : d'abord le correctif de la cause 6 validé sur la machine, ensuite le défaut à FALSE.
-4. Conflits avec le commit `6956366b` (`PRG_06`, `PRG_04`) et avec `T377-B`.
+4. Conflits avec le commit `e75d1e08` (`PRG_06`, `PRG_04`) et avec `T377-B`.
 
 ## Point 5 à étudier : perte joystick en mode boutons IHM (demande de l'exploitant, 18/11 09:17)
 Besoin : quand `GVL_IHM.Modes.Cmd.TglJoystickMaster` est FALSE (pilotage par les boutons IHM), l'absence du joystick ne doit plus mettre les treuils et M3 en SafeStop ; le programme doit le gérer lui-même, sans bypass manuel.

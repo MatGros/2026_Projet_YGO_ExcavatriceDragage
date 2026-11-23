@@ -6,7 +6,7 @@
 # Cadrage    : ajouts R0-R6 de l'orchestrateur (2026-09-21), non negociables
 # Parent     : T328 (couplage mecanique M1/M2) ; fiche amont : T351 (DSH18)
 # Nature     : ANALYSE SEULE — ZERO ligne de CODE/ ecrite, ZERO commit
-# Revision figee a l'ecriture : HEAD = c9e1fbfe (arbre de travail CODE/ PROPRE
+# Revision figee a l'ecriture : HEAD = 7872086c (arbre de travail CODE/ PROPRE
 #   vs HEAD a la prise : git status --short -- CODE/ vide, git diff HEAD -- CODE/
 #   vide — verifie par le porteur, et re-verifie avant chaque ecriture).
 # ═══════════════════════════════════════════════════════════════════════════
@@ -251,7 +251,7 @@ execution:
   summary: >
     ANALYSE SEULE LIVREE, ZERO ligne de CODE/ ecrite. AC1 : table de verite
     publiee (7 lignes R1..R7, chaque ligne citant la garde traversee en
-    fichier:ligne). AC2 : bloc d'ancrage HEAD c9e1fbfe + 20 blobs SHA horodates.
+    fichier:ligne). AC2 : bloc d'ancrage HEAD 7872086c + 20 blobs SHA horodates.
     AC3 : asymetrie etablie ET bornee (garde M1:117 dans la branche manuelle
     ELSE ligne 62 seulement ; branche SEMI_AUTO M1:56-61 sans garde ; gate M2
     :143-151 sans terme BucketBusy). AC4 : les 3 chemins M2 traces jusqu'aux
